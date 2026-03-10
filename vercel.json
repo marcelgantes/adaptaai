@@ -1,15 +1,8 @@
 {
   "version": 2,
-  "builds": [
-    {
-      "src": "client/public/index.html",
-      "use": "@vercel/static"
-    },
-    {
-      "src": "api/**/*.js",
-      "use": "@vercel/node"
-    }
-  ],
+  "public": true,
+  "buildCommand": "echo 'Static site - no build needed'",
+  "outputDirectory": "client/public",
   "routes": [
     {
       "src": "/api/(.*)",
@@ -17,7 +10,7 @@
     },
     {
       "src": "/(.*)",
-      "dest": "/client/public/index.html"
+      "dest": "/index.html"
     }
   ]
 }
