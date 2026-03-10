@@ -1,8 +1,8 @@
 /**
  * Serverless function for Vercel: /api/chat
  * 
- * This function acts as a secure proxy between the frontend and the Anthropic API.
- * The frontend sends requests to this endpoint instead of calling the Anthropic API directly,
+ * This function acts as a secure proxy between the frontend and the Google Gemini API.
+ * The frontend sends requests to this endpoint instead of calling the Gemini API directly,
  * preventing CORS issues and keeping the API key secure on the server side.
  * 
  * Request body:
@@ -11,7 +11,7 @@
  *   "system": "optional system prompt"
  * }
  * 
- * Response:
+ * Response (converted to Anthropic-compatible format):
  * {
  *   "content": [{ "type": "text", "text": "..." }],
  *   "usage": { "input_tokens": 123, "output_tokens": 456 }
@@ -33,50 +33,78 @@ export default async function handler(req, res) {
     }
 
     // Get the API key from environment variables
-    const apiKey = process.env.ANTHROPIC_API_KEY;
+    const apiKey = process.env.GEMINI_API_KEY;
     if (!apiKey) {
-      console.error('ANTHROPIC_API_KEY is not set in environment variables');
+      console.error('GEMINI_API_KEY is not set in environment variables');
       return res.status(500).json({ error: 'Server configuration error' });
     }
 
-    // Build the request body for Anthropic API
-    const anthropicRequest = {
-      model: 'claude-sonnet-4-20250514',
-      max_tokens: 1000,
-      messages: messages,
+    // Convert messages from Anthropic format to Gemini format
+    const geminiMessages = messages.map(msg => ({
+      role: msg.role === 'user' ? 'user' : 'model',
+      parts: [{ text: msg.content }]
+    }));
+
+    // Build the request body for Google Gemini API
+    const geminiRequest = {
+      contents: geminiMessages,
+      generationConfig: {
+        maxOutputTokens: 1000,
+        temperature: 0.7,
+      },
     };
 
     // Add system prompt if provided
     if (system) {
-      anthropicRequest.system = system;
+      geminiRequest.systemInstruction = {
+        parts: [{ text: system }]
+      };
     }
 
-    // Call the Anthropic API
-    const anthropicResponse = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': apiKey,
-        'anthropic-version': '2023-06-01',
-      },
-      body: JSON.stringify(anthropicRequest),
-    });
+    // Call the Google Gemini API
+    const geminiResponse = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(geminiRequest),
+      }
+    );
 
     // Check if the response is OK
-    if (!anthropicResponse.ok) {
-      const errorData = await anthropicResponse.json();
-      console.error('Anthropic API error:', errorData);
-      return res.status(anthropicResponse.status).json({
-        error: 'Error calling Anthropic API',
+    if (!geminiResponse.ok) {
+      const errorData = await geminiResponse.json();
+      console.error('Gemini API error:', errorData);
+      return res.status(geminiResponse.status).json({
+        error: 'Error calling Gemini API',
         details: errorData,
       });
     }
 
-    // Parse the response from Anthropic
-    const data = await anthropicResponse.json();
+    // Parse the response from Gemini
+    const data = await geminiResponse.json();
 
-    // Return the response to the frontend
-    return res.status(200).json(data);
+    // Convert Gemini response to Anthropic-compatible format
+    // This ensures the frontend doesn't need to change its response parsing logic
+    const responseText = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+    
+    const convertedResponse = {
+      content: [
+        {
+          type: 'text',
+          text: responseText,
+        }
+      ],
+      usage: {
+        input_tokens: data.usageMetadata?.promptTokenCount || 0,
+        output_tokens: data.usageMetadata?.candidatesTokenCount || 0,
+      }
+    };
+
+    // Return the converted response to the frontend
+    return res.status(200).json(convertedResponse);
   } catch (error) {
     console.error('Error in /api/chat:', error);
     return res.status(500).json({
