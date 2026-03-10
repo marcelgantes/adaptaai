@@ -19,8 +19,5 @@
       "src": "/(.*)",
       "dest": "/client/public/index.html"
     }
-  ],
-  "env": {
-    "ANTHROPIC_API_KEY": "@anthropic_api_key"
-  }
+  ]
 }
