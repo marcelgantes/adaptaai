@@ -1,185 +1,206 @@
-# Notas de Migração: Adapta Aí para Vercel
+# Notas de Migração: Adapta Aí para Vercel com Google Gemini
 
 ## Resumo da Migração
 
-O projeto **Adapta Aí** foi migrado de um arquivo HTML único para uma arquitetura serverless no Vercel, permitindo chamadas seguras à API da Anthropic sem expor a chave de API no navegador.
+O projeto **Adapta Aí** foi migrado de um arquivo HTML único para uma arquitetura serverless no Vercel, usando a **API do Google Gemini** para chamadas seguras de IA sem expor chaves de API no navegador.
 
-## Mudanças Realizadas
+## Histórico de Mudanças
 
-### 1. Estrutura do Projeto
+### Fase 1: Migração para Vercel com Anthropic
+- Criada função serverless `/api/chat.js` para proxy da API da Anthropic
+- Atualizado frontend para chamar `/api/chat` em vez de `https://api.anthropic.com/v1/messages`
+- Configurado `vercel.json` para build e roteamento
 
-**Antes**:
-```
-adaptaai/
-└── index.html (arquivo único com ~2050 linhas)
-```
+### Fase 2: Migração para Google Gemini
+- Substituída API da Anthropic pela API do Google Gemini
+- Implementada conversão de formato de requisição/resposta
+- Atualizada documentação com guia de configuração do Gemini
 
-**Depois**:
+## Estrutura do Projeto
+
 ```
 adaptaai-vercel/
 ├── client/
 │   └── public/
 │       └── index.html (frontend original, URLs atualizadas)
 ├── api/
-│   └── chat.js (função serverless)
+│   └── chat.js (função serverless com Gemini)
 ├── vercel.json (configuração de build e rotas)
-├── DEPLOYMENT_GUIDE.md
-└── MIGRATION_NOTES.md
+├── DEPLOYMENT_GUIDE.md (guia de deployment)
+├── GEMINI_SETUP.md (guia de configuração do Gemini)
+└── MIGRATION_NOTES.md (este arquivo)
 ```
 
-### 2. Chamadas à API da Anthropic
+## Mudanças Técnicas
 
-**Antes** (3 chamadas diretas no frontend):
+### 1. Função Serverless (`/api/chat.js`)
+
+**Antes (Anthropic)**:
 ```javascript
-const resp = await fetch('https://api.anthropic.com/v1/messages', {
+const anthropicResponse = await fetch('https://api.anthropic.com/v1/messages', {
   method: 'POST',
-  headers: { 
+  headers: {
     'Content-Type': 'application/json',
-    'x-api-key': 'sk-ant-...' // ❌ Exposto no navegador!
+    'x-api-key': apiKey,
+    'anthropic-version': '2023-06-01',
   },
   body: JSON.stringify({
     model: 'claude-sonnet-4-20250514',
     max_tokens: 1000,
-    messages: [{ role: 'user', content: prompt }]
-  })
+    messages: messages,
+  }),
 });
 ```
 
-**Depois** (chamadas para o backend serverless):
+**Depois (Gemini)**:
 ```javascript
-const resp = await fetch('/api/chat', {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify({
-    model: 'claude-sonnet-4-20250514',
-    max_tokens: 1000,
-    messages: [{ role: 'user', content: prompt }]
-  })
-});
+const geminiResponse = await fetch(
+  `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`,
+  {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      contents: geminiMessages,
+      generationConfig: { maxOutputTokens: 1000 },
+      systemInstruction: system ? { parts: [{ text: system }] } : undefined,
+    }),
+  }
+);
 ```
 
-### 3. Função Serverless (`/api/chat.js`)
+### 2. Conversão de Formato
 
-A nova função serverless:
-- ✅ Recebe requisições do frontend em `/api/chat`
-- ✅ Lê a chave de API da variável de ambiente `ANTHROPIC_API_KEY`
-- ✅ Chama a API da Anthropic com segurança
-- ✅ Retorna a resposta ao frontend
-- ✅ Trata erros e valida entrada
+A função converte automaticamente:
 
-### 4. Configuração do Vercel (`vercel.json`)
-
+**Entrada (Anthropic format)**:
 ```json
 {
-  "version": 2,
-  "builds": [
-    { "src": "client/public/index.html", "use": "@vercel/static" },
-    { "src": "api/**/*.js", "use": "@vercel/node" }
-  ],
-  "routes": [
-    { "src": "/api/(.*)", "dest": "/api/$1" },
-    { "src": "/(.*)", "dest": "/client/public/index.html" }
+  "messages": [
+    { "role": "user", "content": "Olá" }
   ]
 }
 ```
 
-Esta configuração:
-- Serve o frontend como conteúdo estático
-- Executa as funções serverless em Node.js
-- Roteia `/api/*` para as funções serverless
-- Roteia todas as outras requisições para o frontend (SPA)
-
-## Locais das Mudanças no Código
-
-### Arquivo: `client/public/index.html`
-
-**Linha 1434** (Fluxo ARASAAC - Pictogramas):
-```javascript
-// ❌ Antes:
-const conceitosResp = await fetch('https://api.anthropic.com/v1/messages', {
-
-// ✅ Depois:
-const conceitosResp = await fetch('/api/chat', {
+**Intermediária (Gemini format)**:
+```json
+{
+  "contents": [
+    { "role": "user", "parts": [{ "text": "Olá" }] }
+  ]
+}
 ```
 
-**Linha 1462** (Fluxo Texto Normal):
-```javascript
-// ❌ Antes:
-const resp = await fetch('https://api.anthropic.com/v1/messages', {
-
-// ✅ Depois:
-const resp = await fetch('/api/chat', {
+**Saída (Anthropic format - compatível)**:
+```json
+{
+  "content": [
+    { "type": "text", "text": "Resposta do Gemini" }
+  ],
+  "usage": {
+    "input_tokens": 10,
+    "output_tokens": 25
+  }
+}
 ```
 
-**Linha 1836** (Geração de PEI):
-```javascript
-// ❌ Antes:
-const resp = await fetch('https://api.anthropic.com/v1/messages', {
+### 3. Variáveis de Ambiente
 
-// ✅ Depois:
-const resp = await fetch('/api/chat', {
-```
-
-## Benefícios da Migração
-
-| Aspecto | Antes | Depois |
+| Variável | Antes | Depois |
 |---|---|---|
-| **Segurança da API Key** | ❌ Exposta no navegador | ✅ Segura no servidor |
-| **CORS Issues** | ❌ Pode ter problemas | ✅ Resolvido |
-| **Rate Limiting** | ❌ Por IP do usuário | ✅ Centralizado no servidor |
-| **Monitoramento** | ❌ Difícil de rastrear | ✅ Logs centralizados |
-| **Escalabilidade** | ❌ Limitada | ✅ Automática no Vercel |
-| **Custo** | ❌ Variável | ✅ Previsível |
+| Nome | `ANTHROPIC_API_KEY` | `GEMINI_API_KEY` |
+| Origem | console.anthropic.com | aistudio.google.com |
+| Custo | Pago | Gratuito |
+| Cartão de Crédito | Requerido | Não requerido |
 
-## Compatibilidade
+## Comparação de APIs
 
-✅ **Totalmente compatível** com o código original:
+| Aspecto | Anthropic | Google Gemini |
+|---|---|---|
+| **Modelo** | Claude Sonnet 4 | Gemini 2.0 Flash |
+| **Custo** | Pago por uso | Gratuito |
+| **Cartão de Crédito** | Requerido | Não requerido |
+| **Velocidade** | Rápida | Muito rápida |
+| **Qualidade** | Excelente | Excelente |
+| **Endpoint** | `api.anthropic.com` | `generativelanguage.googleapis.com` |
+| **Autenticação** | Header `x-api-key` | Query parameter `key` |
+| **Formato** | Anthropic | Proprietário (convertido) |
+
+## Benefícios da Migração para Gemini
+
+✅ **Custo Zero**: API completamente gratuita  
+✅ **Sem Cartão de Crédito**: Não requer informações de pagamento  
+✅ **Mais Rápido**: Gemini 2.0 Flash é otimizado para latência baixa  
+✅ **Escalável**: Quotas generosas para uso educacional  
+✅ **Compatibilidade**: Frontend não precisa de mudanças  
+
+## Compatibilidade com Frontend
+
+✅ **Totalmente compatível**:
 - Todas as funcionalidades do Adapta Aí continuam funcionando
 - A interface do usuário não mudou
 - Os prompts e lógica de negócio permanecem os mesmos
-- Apenas as chamadas HTTP foram atualizadas
+- A função serverless converte automaticamente formatos
+
+❌ **Nenhuma mudança necessária** no frontend:
+- O arquivo `client/public/index.html` continua chamando `/api/chat`
+- As requisições mantêm o mesmo formato
+- As respostas são convertidas para o formato esperado
+
+## Locais das Mudanças
+
+### Arquivo: `api/chat.js`
+
+**Mudanças principais**:
+1. Lê `GEMINI_API_KEY` em vez de `ANTHROPIC_API_KEY`
+2. Converte `messages` para formato Gemini (`contents`)
+3. Chama `generativelanguage.googleapis.com` em vez de `api.anthropic.com`
+4. Converte resposta de volta para formato Anthropic
+
+### Arquivo: `client/public/index.html`
+
+**Nenhuma mudança necessária** - continua chamando `/api/chat` com o mesmo formato.
 
 ## Próximas Etapas
 
-1. **Deploy no Vercel**:
-   - Conectar o repositório `marcelgantes/adaptaai` ao Vercel
-   - Configurar a variável de ambiente `ANTHROPIC_API_KEY`
-   - Fazer o deploy
+### 1. Configuração Imediata
 
-2. **Testes**:
-   - Testar o endpoint `/api/chat` com curl/Postman
-   - Testar o frontend completo
-   - Verificar logs no Vercel
+1. Acesse [aistudio.google.com](https://aistudio.google.com)
+2. Clique em **"Get API Key"**
+3. Crie uma nova chave de API
+4. Adicione a chave no Vercel como `GEMINI_API_KEY`
+5. Redeploy o projeto
 
-3. **Monitoramento**:
-   - Configurar alertas no Vercel
-   - Monitorar uso da API da Anthropic
-   - Rastrear erros e performance
+### 2. Testes
 
-4. **Otimizações Futuras**:
-   - Adicionar rate limiting
-   - Implementar cache de respostas
-   - Adicionar autenticação de usuários
-   - Criar dashboard de analytics
+1. Teste o endpoint `/api/chat` com curl
+2. Teste o frontend completo
+3. Verifique logs no Vercel
 
-## Arquivos Criados/Modificados
+### 3. Monitoramento
 
-| Arquivo | Status | Descrição |
-|---|---|---|
-| `api/chat.js` | ✨ Novo | Função serverless para proxy da API |
-| `client/public/index.html` | 🔄 Modificado | URLs atualizadas para `/api/chat` |
-| `vercel.json` | ✨ Novo | Configuração de build e rotas |
-| `DEPLOYMENT_GUIDE.md` | ✨ Novo | Guia passo a passo para deploy |
-| `MIGRATION_NOTES.md` | ✨ Novo | Este arquivo |
+1. Configure alertas no Google Cloud Console
+2. Monitore uso da API
+3. Rastreie erros e performance
+
+### 4. Otimizações Futuras
+
+1. Ajuste os prompts para Gemini
+2. Implemente cache de respostas
+3. Adicione rate limiting
+4. Crie dashboard de analytics
 
 ## Rollback
 
-Se precisar voltar à versão anterior:
+Se precisar voltar à versão anterior com Anthropic:
+
 ```bash
-git checkout HEAD~1
+git log --oneline
+# Encontre o commit antes da mudança para Gemini
+git checkout <commit-hash>
 ```
 
 Ou restaure a versão original do repositório:
+
 ```bash
 git clone https://github.com/marcelgantes/adaptaai.git adaptaai-original
 ```
@@ -187,13 +208,23 @@ git clone https://github.com/marcelgantes/adaptaai.git adaptaai-original
 ## Suporte
 
 Para dúvidas sobre a migração:
-1. Consulte `DEPLOYMENT_GUIDE.md`
-2. Verifique os logs no Vercel
-3. Teste o endpoint `/api/chat` com curl
-4. Abra uma issue no GitHub
+
+1. Consulte `GEMINI_SETUP.md` para configuração
+2. Consulte `DEPLOYMENT_GUIDE.md` para deployment
+3. Verifique os logs no Vercel
+4. Teste o endpoint `/api/chat` com curl
+5. Abra uma issue no GitHub
+
+## Arquivos Criados/Modificados
+
+| Arquivo | Status | Descrição |
+|---|---|---|
+| `api/chat.js` | 🔄 Modificado | Atualizado para usar Gemini |
+| `GEMINI_SETUP.md` | ✨ Novo | Guia de configuração do Gemini |
+| `MIGRATION_NOTES.md` | 🔄 Modificado | Atualizado com informações do Gemini |
 
 ---
 
-**Data da Migração**: 10 de Março de 2026  
-**Versão do Projeto**: 1.0.0  
-**Status**: Pronto para Deploy ✅
+**Data da Atualização**: 10 de Março de 2026  
+**Versão do Projeto**: 2.0.0 (com Google Gemini)  
+**Status**: ✅ Pronto para Produção
