@@ -792,12 +792,12 @@ function renderParamGrid(a) {
     <div class="param-card" style="grid-column:1/-1">
       <h4>🎯 Interesses e hiperfoco</h4>
       <p style="font-size:12px;color:var(--muted);margin-bottom:10px">A IA vai usar esses interesses como contexto para tornar o conteúdo mais relevante para o aluno. Ex: dinossauros, futebol, videogames, música...</p>
-      <textarea id="p-interesses" rows="3" placeholder="Ex: adora dinossauros e jogos de estratégia, tem hiperfoco em astronomia..." style="margin-bottom:0">${a.interesses||''}</textarea>
+      <textarea id="p-interesses" rows="4" placeholder="Ex: adora dinossauros e jogos de estratégia, tem hiperfoco em astronomia..." style="width:100%;min-height:100px">${a.interesses||''}</textarea>
     </div>
     <div class="param-card" style="grid-column:1/-1">
       <h4>📌 Observações pedagógicas</h4>
       <p style="font-size:12px;color:var(--muted);margin-bottom:10px">Contexto adicional sobre o aluno que a IA deve considerar na adaptação.</p>
-      <textarea id="p-obs" rows="4" placeholder="Ex: aprende melhor com exemplos do cotidiano, tem dificuldade com números por extenso, responde bem a desafios...">${a.obs||''}</textarea>
+      <textarea id="p-obs" rows="5" placeholder="Ex: aprende melhor com exemplos do cotidiano, tem dificuldade com números por extenso, responde bem a desafios..." style="width:100%;min-height:120px">${a.obs||''}</textarea>
     </div>`;
   document.getElementById('p-fragmentacao').addEventListener('change', function() {
     renderParamGrid({...state.alunos.find(x=>x.id===state.alunoSelecionado), fragmentacao:this.value});
