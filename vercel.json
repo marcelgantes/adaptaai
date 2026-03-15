@@ -6,6 +6,8 @@
   "routes": [
     { "src": "/api/(.*)", "dest": "/api/$1" },
     { "src": "/(.*\\.(png|jpg|jpeg|gif|svg|ico|css|js|woff|woff2))", "dest": "/$1" },
+    { "src": "/privacidade.html", "dest": "/privacidade.html" },
+    { "src": "/landing.html", "dest": "/landing.html" },
     { "src": "/app", "dest": "/index.html" },
     { "src": "/app/(.*)", "dest": "/index.html" },
     { "src": "/", "dest": "/landing.html" },
