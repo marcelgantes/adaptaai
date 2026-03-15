@@ -237,7 +237,7 @@
 <!-- LOGIN -->
 <div class="page" id="page-login">
   <div class="login-box">
-    <div class="login-logo"><div class="logo-icon">🧠</div><div class="logo-text">Adapta Aí <span>por Prof. Marcel Gantes</span></div></div>
+    <div class="login-logo"><img src="/logo.png" alt="Adapta Aí" style="height:44px;object-fit:contain"></div>
     <h2 id="login-title">Bem-vindo de volta</h2>
     <p id="login-sub">Acesse sua conta para gerenciar suas turmas e adaptações</p>
     <div id="login-error"></div>
@@ -257,13 +257,13 @@
 <!-- APP -->
 <div class="page" id="page-app">
   <div class="mobile-topbar">
-    <div class="logo-mark"><div class="mark">🧠</div><div class="name">Adapta Aí</div></div>
+    <div class="logo-mark"><img src="/logo.png" alt="Adapta Aí" style="height:28px;object-fit:contain"></div>
     <button class="hamburger" onclick="toggleSidebar()"><span></span><span></span><span></span></button>
   </div>
   <div class="sidebar-overlay" id="sidebar-overlay" onclick="closeSidebar()"></div>
   <div class="main-layout">
     <div class="sidebar" id="main-sidebar">
-      <div class="sidebar-logo"><div class="logo-mark"><div class="mark">🧠</div><div class="name">Adapta Aí <small>Prof. Marcel Gantes</small></div></div></div>
+      <div class="sidebar-logo"><img src="/logo.png" alt="Adapta Aí" style="height:36px;object-fit:contain;max-width:180px"></div>
       <div class="nav-section">
         <div class="nav-label">Principal</div>
         <div class="nav-item active" onclick="showPanel('dashboard')" id="nav-dashboard"><span class="nav-icon">🏠</span> Início</div>
@@ -453,7 +453,10 @@
           <div class="alert alert-success">✅ PEI pronto!</div>
           <div id="pei-tabs" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px"></div>
           <div class="resultado-box"><div class="resultado-content" id="pei-texto"></div></div>
-          <div style="display:flex;gap:10px;margin-top:16px"><button class="btn btn-success" style="width:auto" onclick="baixarPei()">📥 Baixar PEI (.docx)</button></div>
+          <div style="display:flex;gap:10px;margin-top:16px">
+            <button class="btn btn-success" style="width:auto" onclick="baixarPei()">📥 Baixar PEI do aluno selecionado</button>
+            <button class="btn btn-primary" style="width:auto" onclick="baixarTodosPei()">📦 Baixar todos em DOCX</button>
+          </div>
         </div>
       </div>
 
@@ -1020,6 +1023,20 @@ async function baixarPei() {
   if (!dado) return;
   try { await criarDocx(`PEI_${dado.aluno.nome.replace(/\s/g,'_')}.docx`, `PEI — ${dado.aluno.nome}`, dado.texto); showToast('📥 PEI baixado em DOCX!'); }
   catch(e) { showToast('❌ Erro ao gerar DOCX','warn'); console.error(e); }
+}
+
+async function baixarTodosPei() {
+  if (!state.peiAtual?.alunos) return;
+  const ids = Object.keys(state.peiAtual.alunos);
+  if (!ids.length) return showToast('⚠️ Nenhum PEI gerado','warn');
+  let baixados = 0;
+  for (const id of ids) {
+    const dado = state.peiAtual.alunos[id];
+    if (!dado) continue;
+    try { await criarDocx(`PEI_${dado.aluno.nome.replace(/\s/g,'_')}.docx`, `PEI — ${dado.aluno.nome}`, dado.texto); baixados++; await new Promise(r=>setTimeout(r,600)); }
+    catch(e) { console.error(e); }
+  }
+  showToast(`📦 ${baixados} PEIs baixados!`);
 }
 
 async function gerarPei() {
