@@ -735,7 +735,10 @@ function renderAlunosList(turmaId) {
     return `<div class="aluno-row" onclick="openAluno('${a.id}')">
       <div class="aluno-avatar" style="background:${alunoColors[i%8]}22;color:${alunoColors[i%8]}">${a.nome.charAt(0)}</div>
       <div class="aluno-info"><div class="aluno-name">${a.nome}</div><div class="aluno-tags">${tags.join('')}</div></div>
-      <button class="btn btn-secondary btn-sm" style="flex-shrink:0">Editar perfil →</button>
+      <div style="display:flex;gap:8px;align-items:center;flex-shrink:0">
+        <button class="btn btn-secondary btn-sm" onclick="event.stopPropagation();openAluno('${a.id}')">Editar perfil →</button>
+        <button class="btn btn-sm" onclick="event.stopPropagation();confirmarApagarAluno('${a.id}','${a.nome}')" style="color:var(--danger);border:1px solid var(--border);background:var(--surface2)">🗑</button>
+      </div>
     </div>`;
   }).join('');
 }
@@ -1220,6 +1223,21 @@ function showToast(msg, type) {
   const t=document.createElement('div');
   t.style.cssText=`position:fixed;bottom:24px;right:24px;padding:14px 20px;border-radius:12px;font-size:14px;font-weight:500;z-index:9999;animation:fadeUp 0.3s ease;background:${type==='warn'?'#fb923c22':'#34d39922'};border:1px solid ${type==='warn'?'#fb923c':'#34d399'};color:${type==='warn'?'#fb923c':'#34d399'};font-family:DM Sans,sans-serif;backdrop-filter:blur(10px);`;
   t.textContent=msg; document.body.appendChild(t); setTimeout(()=>t.remove(),3000);
+}
+
+function confirmarApagarAluno(id, nome) {
+  if (!confirm(`Apagar o aluno "${nome}"?\n\nEssa ação não pode ser desfeita.`)) return;
+  apagarAluno(id);
+}
+
+async function apagarAluno(id) {
+  const { error } = await sb.from('alunos').delete().eq('id', id);
+  if (error) return showToast('❌ Erro ao apagar aluno', 'warn');
+  state.alunos = state.alunos.filter(a => a.id !== id);
+  renderAlunosList(state.turmaSelecionada);
+  renderPainelAlunos();
+  updateStats();
+  showToast('✅ Aluno apagado.');
 }
 
 function confirmarApagarTurma(id, nome) {
