@@ -631,6 +631,8 @@ async function salvarAluno() {
     tdah:         document.getElementById('p-tdah')?.checked       || false,
     tea:          document.getElementById('p-tea')?.checked        || false,
     baixa_visao:  document.getElementById('p-baixa-visao')?.checked|| false,
+    altas_habilidades: document.getElementById('p-altas-habilidades')?.checked || false,
+    interesses:   document.getElementById('p-interesses')?.value   || '',
     obs:          document.getElementById('p-obs')?.value          || '',
   };
   const { error } = await sb.from('alunos').update(updates).eq('id', a.id);
@@ -774,13 +776,29 @@ function renderParamGrid(a) {
     (!isNaoAlf ? paramSelect('p-abstracao','Nível de abstração','🧩','Define se usa analogias ou mantém tudo literal.',abstOpts,a.abstracao) : '') +
     (!isNaoAlf ? paramSelect('p-mediacao','Mediação / Autonomia','🧭','Define se o aluno precisa de instruções detalhadas.',medOpts,a.mediacao||'guiado') : '') +
     (!isNaoAlf ? paramSelect('p-tipografia','Tipo de letra','🔤','Define o formato de texto.',tipoOpts,a.tipografia) : '') +
-    `<div class="param-card" ${isNaoAlf?'style="grid-column:1/-1"':''}><h4>📚 Condições adicionais</h4><div class="check-group">
-      <label class="check-item"><input type="checkbox" id="p-dislexia" ${a.dislexia?'checked':''}> <span><strong>Dislexia</strong></span></label>
-      <label class="check-item"><input type="checkbox" id="p-tdah" ${a.tdah?'checked':''}> <span><strong>TDAH</strong></span></label>
-      <label class="check-item"><input type="checkbox" id="p-tea" ${a.tea?'checked':''}> <span><strong>TEA</strong></span></label>
-      <label class="check-item"><input type="checkbox" id="p-baixa-visao" ${a.baixa_visao?'checked':''}> <span><strong>Baixa visão</strong></span></label>
-    </div></div>
-    <div class="param-card" style="grid-column:1/-1"><h4>📌 Observações individuais</h4><textarea id="p-obs" placeholder="Informações extras que a IA deve considerar...">${a.obs||''}</textarea></div>`;
+    `<div class="param-card" ${isNaoAlf?'style="grid-column:1/-1"':''}>
+      <h4>📚 Condições adicionais</h4>
+      <div class="check-group">
+        <label class="check-item"><input type="checkbox" id="p-dislexia" ${a.dislexia?'checked':''}> <span><strong>Dislexia</strong> — frases curtas, espaçamento maior</span></label>
+        <label class="check-item"><input type="checkbox" id="p-tdah" ${a.tdah?'checked':''}> <span><strong>TDAH</strong> — blocos curtos, um item por vez</span></label>
+        <label class="check-item"><input type="checkbox" id="p-tea" ${a.tea?'checked':''}> <span><strong>TEA</strong> — linguagem literal, sem metáforas</span></label>
+        <label class="check-item"><input type="checkbox" id="p-baixa-visao" ${a.baixa_visao?'checked':''}> <span><strong>Baixa visão</strong> — texto simples, sem tabelas complexas</span></label>
+        <label class="check-item" style="margin-top:8px;padding-top:8px;border-top:1px solid var(--border)">
+          <input type="checkbox" id="p-altas-habilidades" ${a.altas_habilidades?'checked':''}>
+          <span><strong>⭐ Altas habilidades / Superdotação</strong> — aprofundar, desafiar e enriquecer o conteúdo</span>
+        </label>
+      </div>
+    </div>
+    <div class="param-card" style="grid-column:1/-1">
+      <h4>🎯 Interesses e hiperfoco</h4>
+      <p style="font-size:12px;color:var(--muted);margin-bottom:10px">A IA vai usar esses interesses como contexto para tornar o conteúdo mais relevante para o aluno. Ex: dinossauros, futebol, videogames, música...</p>
+      <textarea id="p-interesses" rows="3" placeholder="Ex: adora dinossauros e jogos de estratégia, tem hiperfoco em astronomia..." style="margin-bottom:0">${a.interesses||''}</textarea>
+    </div>
+    <div class="param-card" style="grid-column:1/-1">
+      <h4>📌 Observações pedagógicas</h4>
+      <p style="font-size:12px;color:var(--muted);margin-bottom:10px">Contexto adicional sobre o aluno que a IA deve considerar na adaptação.</p>
+      <textarea id="p-obs" rows="4" placeholder="Ex: aprende melhor com exemplos do cotidiano, tem dificuldade com números por extenso, responde bem a desafios...">${a.obs||''}</textarea>
+    </div>`;
   document.getElementById('p-fragmentacao').addEventListener('change', function() {
     renderParamGrid({...state.alunos.find(x=>x.id===state.alunoSelecionado), fragmentacao:this.value});
   });
@@ -839,9 +857,23 @@ function buildPrompt(aluno, texto, disciplina, nomeAtiv) {
   const tipoMap={normal:'Fonte padrão.',bastao:'Escreva tudo em CAIXA ALTA.'};
   const conds=[];
   if(aluno.dislexia) conds.push('Dislexia: frases curtas, espaçamento claro.');
-  if(aluno.tdah) conds.push('TDAH: blocos muito curtos, um item por vez.');
-  if(aluno.tea) conds.push('TEA: linguagem totalmente literal, sem metáforas.');
-  if(aluno.baixa_visao) conds.push('Baixa visão: texto simples, sem tabelas complexas.');
+  if(aluno.tdah) conds.push('TDAH: blocos muito curtos, um item por vez, elimine distrações.');
+  if(aluno.tea) conds.push('TEA: linguagem totalmente literal, sem metáforas ou expressões idiomáticas.');
+  if(aluno.baixa_visao) conds.push('Baixa visão: texto simples, sem tabelas complexas, legende todo conteúdo visual.');
+
+  const altasHabilidades = aluno.altas_habilidades ? `
+ATENÇÃO — ALTAS HABILIDADES/SUPERDOTAÇÃO:
+Este aluno tem altas habilidades. NÃO simplifique o conteúdo. Em vez disso:
+- Aprofunde os conceitos além do previsto para a série
+- Inclua conexões interdisciplinares e curiosidades avançadas
+- Proponha desafios extras e questões que estimulem o pensamento crítico
+- Apresente perspectivas científicas mais complexas
+- Sugira fontes para aprofundamento (livros, experimentos, pesquisas)` : '';
+
+  const interessesTexto = aluno.interesses ? `
+INTERESSES E HIPERFOCO DO ALUNO: ${aluno.interesses}
+Use esses interesses como contexto e exemplos ao longo do material. Se o aluno gosta de dinossauros, use dinossauros como exemplo. Se gosta de futebol, use futebol. Isso aumenta o engajamento e facilita a compreensão.` : '';
+
   return `Você é um especialista em educação inclusiva. Adapte o material abaixo para um aluno com o seguinte perfil. Siga as instruções à risca.
 
 PERFIL DO ALUNO:
@@ -850,7 +882,9 @@ PERFIL DO ALUNO:
 - Mediação/Autonomia: ${medMap[aluno.mediacao]||medMap['guiado']}
 - Tipo de letra: ${tipoMap[aluno.tipografia]||'Padrão'}
 ${conds.length?'- Condições especiais:\n  • '+conds.join('\n  • '):''}
-${aluno.obs?'- Observações individuais: '+aluno.obs:''}
+${aluno.obs?'- Observações pedagógicas: '+aluno.obs:''}
+${altasHabilidades}
+${interessesTexto}
 
 Fidelidade: mantenha TODAS as informações do original. Apenas adapte linguagem, estrutura e acessibilidade.
 Não gere introdução ou comentários. Apenas o material adaptado no formato abaixo.
