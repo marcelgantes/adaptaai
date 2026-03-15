@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Adapta Aí — Adaptação pedagógica com IA</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<style>
+:root {
+  --blue:#2563eb; --blue-light:#eff6ff; --blue-mid:#dbeafe;
+  --purple:#7c3aed; --purple-light:#f5f3ff;
+  --green:#059669; --green-light:#ecfdf5;
+  --orange:#ea580c;
+  --dark:#0f172a; --dark2:#1e293b; --dark3:#334155;
+  --muted:#64748b; --muted2:#94a3b8;
+  --light:#f8fafc; --light2:#f1f5f9;
+  --border:#e2e8f0; --border2:#cbd5e1;
+  --white:#fff;
+  --shadow-sm:0 1px 3px rgba(0,0,0,0.08),0 1px 2px rgba(0,0,0,0.04);
+  --shadow:0 4px 16px rgba(0,0,0,0.08),0 2px 6px rgba(0,0,0,0.04);
+  --shadow-lg:0 16px 48px rgba(0,0,0,0.10),0 4px 16px rgba(0,0,0,0.06);
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{font-family:'DM Sans',sans-serif;background:var(--white);color:var(--dark);overflow-x:hidden;-webkit-font-smoothing:antialiased;}
+h1,h2,h3,h4,h5{font-family:'Syne',sans-serif;}
+img{max-width:100%;display:block;}
+
+/* ── NAV ── */
+nav{
+  position:fixed;top:0;left:0;right:0;z-index:200;
+  background:rgba(255,255,255,0.95);backdrop-filter:blur(16px);
+  border-bottom:1px solid var(--border);
+  height:68px;display:flex;align-items:center;
+  padding:0 48px;gap:40px;
+  transition:box-shadow 0.3s;
+}
+nav.scrolled{box-shadow:0 4px 24px rgba(0,0,0,0.07);}
+.nav-logo img{height:38px;object-fit:contain;}
+.nav-links{display:flex;align-items:center;gap:28px;flex:1;justify-content:center;}
+.nav-links a{font-size:14px;font-weight:500;color:var(--muted);text-decoration:none;transition:color 0.2s;white-space:nowrap;}
+.nav-links a:hover{color:var(--dark);}
+.nav-actions{display:flex;align-items:center;gap:10px;flex-shrink:0;}
+.btn-nav-login{
+  padding:9px 20px;border-radius:8px;font-family:'Syne',sans-serif;font-weight:700;font-size:13px;
+  color:var(--dark);text-decoration:none;border:1px solid var(--border);background:transparent;
+  transition:all 0.2s;white-space:nowrap;
+}
+.btn-nav-login:hover{border-color:var(--blue);color:var(--blue);}
+.btn-nav-signup{
+  padding:9px 20px;border-radius:8px;font-family:'Syne',sans-serif;font-weight:700;font-size:13px;
+  color:var(--white);background:var(--blue);text-decoration:none;
+  transition:all 0.2s;white-space:nowrap;
+}
+.btn-nav-signup:hover{background:#1d4ed8;transform:translateY(-1px);}
+
+/* ── HERO ── */
+.hero{
+  min-height:100vh;display:flex;align-items:center;
+  padding:100px 48px 80px;
+  background:linear-gradient(160deg,#fafbff 0%,#f5f0ff 40%,#f0fdf8 100%);
+  position:relative;overflow:hidden;
+}
+.hero-blob1{
+  position:absolute;top:-120px;right:-120px;width:600px;height:600px;border-radius:50%;
+  background:radial-gradient(circle,rgba(37,99,235,0.10) 0%,transparent 70%);pointer-events:none;
+}
+.hero-blob2{
+  position:absolute;bottom:-80px;left:-80px;width:480px;height:480px;border-radius:50%;
+  background:radial-gradient(circle,rgba(124,58,237,0.08) 0%,transparent 70%);pointer-events:none;
+}
+.hero-inner{max-width:1200px;margin:0 auto;width:100%;display:grid;grid-template-columns:1fr 1fr;gap:72px;align-items:center;position:relative;z-index:1;}
+.hero-eyebrow{
+  display:inline-flex;align-items:center;gap:8px;margin-bottom:20px;
+  background:var(--blue-light);border:1px solid var(--blue-mid);
+  color:var(--blue);padding:6px 14px;border-radius:20px;
+  font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;
+}
+.hero h1{font-size:clamp(36px,4.5vw,56px);font-weight:800;line-height:1.08;margin-bottom:22px;color:var(--dark);}
+.hero h1 em{font-style:normal;background:linear-gradient(135deg,var(--blue),var(--purple));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.hero-desc{font-size:17px;color:var(--muted);line-height:1.75;margin-bottom:36px;max-width:460px;}
+.hero-btns{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:48px;}
+.btn-primary{
+  display:inline-flex;align-items:center;gap:8px;padding:15px 32px;
+  background:linear-gradient(135deg,var(--blue),#3b82f6);color:var(--white);
+  border-radius:10px;font-family:'Syne',sans-serif;font-weight:700;font-size:15px;
+  text-decoration:none;transition:all 0.25s;
+}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 12px 32px rgba(37,99,235,0.30);}
+.btn-outline{
+  display:inline-flex;align-items:center;gap:8px;padding:15px 28px;
+  background:var(--white);color:var(--dark);
+  border-radius:10px;font-family:'Syne',sans-serif;font-weight:700;font-size:15px;
+  text-decoration:none;border:1.5px solid var(--border);transition:all 0.25s;
+}
+.btn-outline:hover{border-color:var(--blue);color:var(--blue);transform:translateY(-2px);}
+.hero-stats{display:flex;gap:36px;padding-top:32px;border-top:1px solid var(--border);}
+.stat-val{font-family:'Syne',sans-serif;font-weight:800;font-size:26px;color:var(--dark);}
+.stat-lbl{font-size:12px;color:var(--muted);margin-top:2px;line-height:1.4;}
+
+/* HERO VISUAL */
+.hero-right{position:relative;}
+.screen-wrap{
+  background:var(--white);border-radius:18px;
+  box-shadow:var(--shadow-lg);border:1px solid var(--border);
+  overflow:hidden;
+}
+.screen-bar{
+  background:var(--light);padding:10px 14px;display:flex;align-items:center;gap:6px;
+  border-bottom:1px solid var(--border);
+}
+.dot{width:9px;height:9px;border-radius:50%;}
+.dot.r{background:#ff5f57;}.dot.y{background:#febc2e;}.dot.g{background:#28c840;}
+.url-bar{
+  flex:1;background:var(--white);border-radius:5px;padding:3px 10px;
+  font-size:10px;color:var(--muted);border:1px solid var(--border);margin:0 8px;
+}
+.screen-body{padding:20px;}
+.sb-greeting{font-family:'Syne',sans-serif;font-weight:800;font-size:14px;color:var(--dark);margin-bottom:14px;}
+.sb-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px;}
+.sb-card{border-radius:10px;padding:12px 10px;color:var(--white);}
+.sb-card .ic{font-size:16px;margin-bottom:5px;}
+.sb-card .tt{font-family:'Syne',sans-serif;font-weight:700;font-size:10px;}
+.sb-card .ss{font-size:9px;opacity:0.8;margin-top:1px;}
+.sb-card.c1{background:linear-gradient(135deg,#2563eb,#3b82f6);}
+.sb-card.c2{background:linear-gradient(135deg,#7c3aed,#8b5cf6);}
+.sb-card.c3{background:linear-gradient(135deg,#059669,#10b981);}
+.sb-label{font-size:10px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:7px;}
+.sb-aluno{
+  display:flex;align-items:center;gap:9px;
+  background:var(--light);border-radius:8px;padding:9px 11px;margin-bottom:6px;
+}
+.sb-av{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:11px;color:var(--white);flex-shrink:0;}
+.sb-an{font-weight:600;font-size:11px;}
+.sb-tags{display:flex;gap:3px;margin-top:2px;}
+.sb-tag{padding:1px 5px;border-radius:8px;font-size:8px;font-weight:600;}
+.sb-tag.o{background:rgba(234,88,12,0.12);color:#ea580c;}
+.sb-tag.b{background:rgba(37,99,235,0.12);color:#2563eb;}
+.sb-tag.p{background:rgba(124,58,237,0.12);color:#7c3aed;}
+.sb-btn{
+  background:linear-gradient(135deg,#7c3aed,#8b5cf6);color:var(--white);
+  border-radius:8px;padding:9px;text-align:center;font-family:'Syne',sans-serif;
+  font-weight:700;font-size:10px;margin-top:10px;
+}
+.float-chip{
+  position:absolute;background:var(--white);border-radius:10px;
+  padding:9px 13px;box-shadow:var(--shadow-lg);border:1px solid var(--border);
+  display:flex;align-items:center;gap:8px;font-size:11px;font-weight:600;
+  white-space:nowrap;
+}
+.float-chip.f1{top:-18px;right:-10px;animation:fl 3s ease-in-out infinite;}
+.float-chip.f2{bottom:30px;left:-24px;animation:fl 3s ease-in-out infinite 1.5s;}
+.float-chip .chip-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.float-chip .chip-dot.green{background:#10b981;}
+.float-chip .chip-dot.blue{background:#3b82f6;}
+@keyframes fl{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
+
+/* ── LOGOS / SOCIAL PROOF ── */
+.proof-bar{
+  background:var(--light);border-top:1px solid var(--border);border-bottom:1px solid var(--border);
+  padding:20px 48px;
+}
+.proof-inner{max-width:1200px;margin:0 auto;display:flex;align-items:center;gap:32px;flex-wrap:wrap;justify-content:center;}
+.proof-label{font-size:12px;font-weight:600;color:var(--muted2);text-transform:uppercase;letter-spacing:0.07em;white-space:nowrap;}
+.proof-badges{display:flex;gap:16px;flex-wrap:wrap;justify-content:center;}
+.proof-badge{
+  display:flex;align-items:center;gap:8px;
+  background:var(--white);border:1px solid var(--border);border-radius:8px;
+  padding:8px 16px;font-size:12px;font-weight:600;color:var(--dark3);
+}
+
+/* ── SECTIONS ── */
+.sec{padding:96px 48px;}
+.sec-inner{max-width:1200px;margin:0 auto;}
+.sec-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.09em;color:var(--blue);margin-bottom:12px;}
+.sec-title{font-size:clamp(26px,3.5vw,40px);font-weight:800;line-height:1.15;margin-bottom:16px;}
+.sec-sub{font-size:16px;color:var(--muted);line-height:1.75;max-width:560px;}
+.sec-center{text-align:center;}
+.sec-center .sec-sub{margin:0 auto;}
+
+/* ── PROBLEMA ── */
+.problema-grid{display:grid;grid-template-columns:1fr 1fr;gap:56px;align-items:start;margin-top:56px;}
+.dor-list{display:flex;flex-direction:column;gap:18px;}
+.dor-item{
+  display:flex;gap:16px;align-items:flex-start;
+  background:var(--white);border:1px solid var(--border);border-radius:14px;padding:20px;
+  transition:box-shadow 0.2s;
+}
+.dor-item:hover{box-shadow:var(--shadow);}
+.dor-ic{
+  width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;
+  font-size:20px;flex-shrink:0;
+}
+.dor-ic.red{background:#fef2f2;}
+.dor-ic.amber{background:#fffbeb;}
+.dor-ic.slate{background:var(--light);}
+.dor-text strong{display:block;font-size:14px;font-weight:600;margin-bottom:4px;}
+.dor-text span{font-size:13px;color:var(--muted);line-height:1.65;}
+.solucao-card{
+  background:linear-gradient(160deg,var(--blue-light),var(--purple-light));
+  border:1px solid var(--blue-mid);border-radius:20px;padding:36px;
+  position:sticky;top:88px;
+}
+.solucao-card h3{font-size:20px;font-weight:800;margin-bottom:8px;}
+.solucao-card .sc-sub{font-size:13px;color:var(--muted);margin-bottom:24px;}
+.sc-item{display:flex;gap:12px;align-items:flex-start;margin-bottom:14px;}
+.sc-check{
+  width:20px;height:20px;border-radius:50%;background:var(--green);
+  display:flex;align-items:center;justify-content:center;
+  font-size:10px;color:var(--white);flex-shrink:0;margin-top:1px;
+}
+.sc-item p{font-size:13px;line-height:1.65;color:var(--dark3);}
+.sc-metric{
+  margin-top:24px;padding-top:20px;border-top:1px solid rgba(37,99,235,0.15);
+  display:flex;gap:24px;
+}
+.sc-m-val{font-family:'Syne',sans-serif;font-weight:800;font-size:28px;color:var(--blue);}
+.sc-m-lbl{font-size:12px;color:var(--muted);margin-top:2px;}
+
+/* ── COMO FUNCIONA ── */
+.sec-gray{background:var(--light);}
+.steps-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:0;margin-top:56px;position:relative;}
+.steps-grid::after{
+  content:'';position:absolute;top:32px;left:calc(12.5%);right:calc(12.5%);
+  height:2px;background:linear-gradient(90deg,var(--blue),var(--purple));opacity:0.18;
+}
+.step-item{padding:0 16px;text-align:center;position:relative;z-index:1;}
+.step-n{
+  width:64px;height:64px;border-radius:50%;margin:0 auto 20px;
+  background:var(--white);border:2px solid var(--border);
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Syne',sans-serif;font-weight:800;font-size:22px;color:var(--blue);
+  box-shadow:var(--shadow);
+}
+.step-item h3{font-size:15px;font-weight:700;margin-bottom:8px;}
+.step-item p{font-size:13px;color:var(--muted);line-height:1.65;}
+
+/* ── FEATURES ── */
+.feat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-top:56px;}
+.feat-card{
+  background:var(--white);border:1px solid var(--border);border-radius:16px;padding:28px;
+  transition:all 0.25s;
+}
+.feat-card:hover{box-shadow:var(--shadow-lg);transform:translateY(-4px);border-color:transparent;}
+.feat-ic{
+  width:48px;height:48px;border-radius:12px;
+  display:flex;align-items:center;justify-content:center;font-size:22px;margin-bottom:18px;
+}
+.feat-ic.b{background:var(--blue-light);}
+.feat-ic.p{background:var(--purple-light);}
+.feat-ic.g{background:var(--green-light);}
+.feat-ic.o{background:#fff7ed;}
+.feat-ic.t{background:#f0fdfa;}
+.feat-ic.y{background:#fefce8;}
+.feat-card h3{font-size:16px;font-weight:700;margin-bottom:8px;}
+.feat-card p{font-size:13px;color:var(--muted);line-height:1.7;}
+
+/* ── LEI ── */
+.lei-hero{
+  background:linear-gradient(135deg,#fffbeb 0%,#fef9c3 100%);
+  border:1px solid #fde68a;border-radius:20px;padding:36px 40px;
+  display:flex;gap:24px;align-items:flex-start;margin-top:48px;
+}
+.lei-emoji{font-size:40px;flex-shrink:0;line-height:1;}
+.lei-hero h3{font-size:19px;font-weight:800;color:#92400e;margin-bottom:8px;}
+.lei-hero p{font-size:14px;color:#78350f;line-height:1.75;}
+.lei-badges{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:16px;}
+.lei-badge{
+  background:var(--white);border:1px solid var(--border);border-radius:14px;padding:22px;
+}
+.lei-badge .lb-ic{font-size:24px;margin-bottom:10px;}
+.lei-badge h4{font-size:13px;font-weight:700;margin-bottom:6px;}
+.lei-badge p{font-size:12px;color:var(--muted);line-height:1.6;}
+
+/* ── CTA ── */
+.cta-sec{
+  background:linear-gradient(135deg,var(--blue) 0%,var(--purple) 100%);
+  padding:100px 48px;text-align:center;color:var(--white);position:relative;overflow:hidden;
+}
+.cta-sec::before{
+  content:'';position:absolute;top:-160px;left:50%;transform:translateX(-50%);
+  width:700px;height:700px;border-radius:50%;
+  background:radial-gradient(circle,rgba(255,255,255,0.08) 0%,transparent 65%);
+  pointer-events:none;
+}
+.cta-sec h2{font-size:clamp(26px,4vw,46px);font-weight:800;margin-bottom:14px;position:relative;}
+.cta-sec p{font-size:17px;opacity:0.85;margin-bottom:36px;position:relative;}
+.btn-cta-white{
+  display:inline-flex;align-items:center;gap:8px;
+  background:var(--white);color:var(--blue);padding:17px 44px;
+  border-radius:12px;font-family:'Syne',sans-serif;font-weight:800;font-size:16px;
+  text-decoration:none;transition:all 0.25s;position:relative;
+}
+.btn-cta-white:hover{transform:translateY(-3px);box-shadow:0 16px 48px rgba(0,0,0,0.18);}
+.cta-note{font-size:13px;opacity:0.65;margin-top:14px;position:relative;}
+
+/* ── FOOTER ── */
+footer{background:var(--dark);color:rgba(255,255,255,0.45);padding:40px 48px;font-size:13px;}
+.footer-inner{max-width:1200px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;}
+footer img{height:26px;opacity:0.55;}
+footer a{color:rgba(255,255,255,0.45);text-decoration:none;transition:color 0.2s;}
+footer a:hover{color:rgba(255,255,255,0.8);}
+.footer-links{display:flex;gap:24px;}
+
+/* ── ANIMATIONS ── */
+.fi{opacity:0;transform:translateY(22px);transition:opacity 0.6s ease,transform 0.6s ease;}
+.fi.v{opacity:1;transform:translateY(0);}
+.fi.d1{transition-delay:0.1s;}.fi.d2{transition-delay:0.2s;}.fi.d3{transition-delay:0.3s;}.fi.d4{transition-delay:0.4s;}
+
+/* ── RESPONSIVE ── */
+@media(max-width:1024px){
+  nav{padding:0 24px;}
+  .hero{padding:90px 24px 60px;}
+  .hero-inner{grid-template-columns:1fr;gap:40px;}
+  .hero-right{display:none;}
+  .hero-stats{gap:20px;}
+  .sec{padding:64px 24px;}
+  .proof-bar{padding:16px 24px;}
+  .problema-grid{grid-template-columns:1fr;gap:32px;}
+  .solucao-card{position:static;}
+  .steps-grid{grid-template-columns:repeat(2,1fr);gap:32px;}
+  .steps-grid::after{display:none;}
+  .feat-grid{grid-template-columns:1fr 1fr;}
+  .lei-badges{grid-template-columns:1fr;}
+  .cta-sec{padding:64px 24px;}
+  footer{padding:32px 24px;}
+  .footer-inner{flex-direction:column;text-align:center;}
+}
+@media(max-width:640px){
+  nav{gap:12px;}
+  .nav-links{display:none;}
+  .hero h1{font-size:32px;}
+  .hero-btns{flex-direction:column;}
+  .btn-primary,.btn-outline{justify-content:center;}
+  .feat-grid{grid-template-columns:1fr;}
+  .steps-grid{grid-template-columns:1fr;}
+  .lei-hero{flex-direction:column;}
+  .hero-stats{flex-wrap:wrap;gap:16px;}
+  .footer-links{flex-wrap:wrap;justify-content:center;gap:16px;}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav id="nav">
+  <div class="nav-logo"><img src="/logo.png" alt="Adapta Aí"></div>
+  <div class="nav-links">
+    <a href="#como-funciona">Como funciona</a>
+    <a href="#features">Funcionalidades</a>
+    <a href="#lei">Legislação</a>
+  </div>
+  <div class="nav-actions">
+    <a href="/app" class="btn-nav-login">Entrar</a>
+    <a href="/app" class="btn-nav-signup">Criar conta grátis</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-blob1"></div>
+  <div class="hero-blob2"></div>
+  <div class="hero-inner">
+    <div class="fi">
+      <div class="hero-eyebrow">✨ IA para Educação Inclusiva</div>
+      <h1>Adapte materiais.<br><em>Inclua todos.</em></h1>
+      <p class="hero-desc">O Adapta Aí usa inteligência artificial para transformar qualquer conteúdo pedagógico em material adaptado para cada aluno com necessidades especiais — em segundos.</p>
+      <div class="hero-btns">
+        <a href="/app" class="btn-primary">Experimentar grátis →</a>
+        <a href="#como-funciona" class="btn-outline">Ver como funciona</a>
+      </div>
+      <div class="hero-stats">
+        <div><div class="stat-val">3 min</div><div class="stat-lbl">por adaptação completa</div></div>
+        <div><div class="stat-val">100%</div><div class="stat-lbl">alinhado à Lei 13.146</div></div>
+        <div><div class="stat-val">∞</div><div class="stat-lbl">perfis de alunos</div></div>
+      </div>
+    </div>
+    <div class="hero-right fi d2">
+      <div class="float-chip f1"><div class="chip-dot green"></div>Adaptação gerada em DOCX</div>
+      <div class="float-chip f2"><div class="chip-dot blue"></div>Prancha ARASAAC criada</div>
+      <div class="screen-wrap">
+        <div class="screen-bar">
+          <div class="dot r"></div><div class="dot y"></div><div class="dot g"></div>
+          <div class="url-bar">adaptaai.vercel.app</div>
+        </div>
+        <div class="screen-body">
+          <div class="sb-greeting">Olá, Prof. Marcel! 👋</div>
+          <div class="sb-cards">
+            <div class="sb-card c1"><div class="ic">✨</div><div class="tt">Adaptar</div><div class="ss">Material com IA</div></div>
+            <div class="sb-card c2"><div class="ic">📋</div><div class="tt">Gerar PEI</div><div class="ss">Individual</div></div>
+            <div class="sb-card c3"><div class="ic">📁</div><div class="tt">Histórico</div><div class="ss">Atividades</div></div>
+          </div>
+          <div class="sb-label">Alunos — 3º EM Tarde</div>
+          <div class="sb-aluno">
+            <div class="sb-av" style="background:#4f9cf9">A</div>
+            <div><div class="sb-an">Aluno A</div><div class="sb-tags"><span class="sb-tag o">Dislexia</span><span class="sb-tag b">Frag. Alta</span></div></div>
+          </div>
+          <div class="sb-aluno">
+            <div class="sb-av" style="background:#a78bfa">B</div>
+            <div><div class="sb-an">Aluno B</div><div class="sb-tags"><span class="sb-tag o">TDAH</span><span class="sb-tag p">TEA</span></div></div>
+          </div>
+          <div class="sb-aluno">
+            <div class="sb-av" style="background:#34d399">C</div>
+            <div><div class="sb-an">Aluno C</div><div class="sb-tags"><span class="sb-tag b">⭐ Altas hab.</span></div></div>
+          </div>
+          <div class="sb-btn">🤖 Gerar adaptações com IA</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PROOF BAR -->
+<div class="proof-bar">
+  <div class="proof-inner">
+    <span class="proof-label">Alinhado com</span>
+    <div class="proof-badges">
+      <div class="proof-badge">⚖️ Lei 13.146/2015</div>
+      <div class="proof-badge">📚 BNCC</div>
+      <div class="proof-badge">🧩 Currículo Gaúcho</div>
+      <div class="proof-badge">🌐 ARASAAC</div>
+      <div class="proof-badge">🔒 LGPD</div>
+      <div class="proof-badge">♿ UDL</div>
+    </div>
+  </div>
+</div>
+
+<!-- PROBLEMA -->
+<section class="sec" id="problema">
+  <div class="sec-inner">
+    <div class="problema-grid">
+      <div>
+        <div class="sec-label fi">O desafio da inclusão</div>
+        <h2 class="sec-title fi">Cada aluno é único.<br>O tempo do professor, não.</h2>
+        <p class="sec-sub fi">Adaptar materiais manualmente para cada aluno com necessidades especiais pode levar horas — tempo que o professor simplesmente não tem.</p>
+        <div class="dor-list" style="margin-top:32px">
+          <div class="dor-item fi d1">
+            <div class="dor-ic amber">⏰</div>
+            <div class="dor-text">
+              <strong>2 a 4 horas por adaptação manual</strong>
+              <span>Adaptar um único material para 3 alunos diferentes consome o tempo que o professor precisaria para planejar toda a semana</span>
+            </div>
+          </div>
+          <div class="dor-item fi d2">
+            <div class="dor-ic red">📄</div>
+            <div class="dor-text">
+              <strong>PEI obrigatório em 30 dias letivos</strong>
+              <span>A Lei Brasileira de Inclusão exige PEI para cada aluno — documento que muitas vezes não é elaborado por falta de tempo e modelo</span>
+            </div>
+          </div>
+          <div class="dor-item fi d3">
+            <div class="dor-ic slate">🧩</div>
+            <div class="dor-text">
+              <strong>Cada condição exige estratégias diferentes</strong>
+              <span>TEA, TDAH, dislexia, baixa visão, altas habilidades — cada perfil precisa de uma abordagem pedagógica específica</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="fi d2">
+        <div class="solucao-card">
+          <h3>✨ O Adapta Aí resolve isso</h3>
+          <p class="sc-sub">Tudo que o professor precisa, em um só lugar</p>
+          <div class="sc-item"><div class="sc-check">✓</div><p>Cole ou faça upload do material original (PDF, DOCX, TXT)</p></div>
+          <div class="sc-item"><div class="sc-check">✓</div><p>A IA adapta automaticamente para cada perfil de aluno cadastrado</p></div>
+          <div class="sc-item"><div class="sc-check">✓</div><p>Baixe todas as versões em DOCX, prontas para imprimir</p></div>
+          <div class="sc-item"><div class="sc-check">✓</div><p>Gere o PEI completo com base no planejamento da turma</p></div>
+          <div class="sc-item"><div class="sc-check">✓</div><p>Para não alfabetizados, gere prancha de pictogramas ARASAAC</p></div>
+          <div class="sc-item"><div class="sc-check">✓</div><p>Para altas habilidades, o conteúdo é aprofundado e enriquecido</p></div>
+          <div class="sc-metric">
+            <div><div class="sc-m-val">3 min</div><div class="sc-m-lbl">com o Adapta Aí</div></div>
+            <div><div class="sc-m-val" style="color:var(--muted2)">~3h</div><div class="sc-m-lbl">manualmente</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- COMO FUNCIONA -->
+<section class="sec sec-gray" id="como-funciona">
+  <div class="sec-inner">
+    <div class="sec-center fi">
+      <div class="sec-label">Simples e rápido</div>
+      <h2 class="sec-title">Como funciona</h2>
+      <p class="sec-sub">Em 4 passos você tem materiais adaptados para todos os seus alunos inclusos</p>
+    </div>
+    <div class="steps-grid">
+      <div class="step-item fi d1">
+        <div class="step-n">1</div>
+        <h3>Cadastre sua turma</h3>
+        <p>Adicione seus alunos com seus perfis pedagógicos — condições, nível de leitura, interesses e hiperfoco</p>
+      </div>
+      <div class="step-item fi d2">
+        <div class="step-n">2</div>
+        <h3>Envie o material</h3>
+        <p>Cole o texto ou faça upload do arquivo PDF, DOCX ou TXT que deseja adaptar</p>
+      </div>
+      <div class="step-item fi d3">
+        <div class="step-n">3</div>
+        <h3>IA gera as adaptações</h3>
+        <p>A inteligência artificial cria uma versão personalizada para cada aluno em segundos</p>
+      </div>
+      <div class="step-item fi d4">
+        <div class="step-n">4</div>
+        <h3>Baixe em DOCX</h3>
+        <p>Faça o download dos materiais prontos para imprimir ou compartilhar digitalmente</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section class="sec" id="features">
+  <div class="sec-inner">
+    <div class="sec-center fi">
+      <div class="sec-label">Funcionalidades</div>
+      <h2 class="sec-title">Tudo que você precisa<br>para a inclusão real</h2>
+      <p class="sec-sub">Ferramentas desenvolvidas por professores, para professores</p>
+    </div>
+    <div class="feat-grid">
+      <div class="feat-card fi d1">
+        <div class="feat-ic b">✨</div>
+        <h3>Adaptação automática com IA</h3>
+        <p>Material adaptado respeitando fragmentação de texto, nível de abstração, tipo de mediação e tipografia — configurável por aluno</p>
+      </div>
+      <div class="feat-card fi d2">
+        <div class="feat-ic p">📋</div>
+        <h3>Geração de PEI completo</h3>
+        <p>Plano Educacional Individualizado gerado com base no planejamento da turma, com todas as seções obrigatórias e espaço para assinaturas</p>
+      </div>
+      <div class="feat-card fi d3">
+        <div class="feat-ic t">🖼️</div>
+        <h3>Prancha ARASAAC</h3>
+        <p>Para alunos não alfabetizados, gera automaticamente pranchas de pictogramas do maior banco de CAA do mundo — imagem + palavra</p>
+      </div>
+      <div class="feat-card fi d1">
+        <div class="feat-ic g">📥</div>
+        <h3>Download em DOCX</h3>
+        <p>Exporte adaptações e PEIs em formato Word com formatação profissional, pronto para imprimir ou enviar para a família</p>
+      </div>
+      <div class="feat-card fi d2">
+        <div class="feat-ic y">⭐</div>
+        <h3>Suporte a altas habilidades</h3>
+        <p>Não só simplifica — para alunos superdotados aprofunda, desafia e enriquece com conexões interdisciplinares e fontes avançadas</p>
+      </div>
+      <div class="feat-card fi d3">
+        <div class="feat-ic o">🎯</div>
+        <h3>Personalização por interesses</h3>
+        <p>A IA usa os interesses e hiperfoco do aluno como contexto — se ele ama dinossauros, os exemplos usam dinossauros</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- LEI -->
+<section class="sec sec-gray" id="lei">
+  <div class="sec-inner">
+    <div class="sec-center fi">
+      <div class="sec-label">Conformidade legal</div>
+      <h2 class="sec-title">Desenvolvido para a<br>legislação brasileira</h2>
+      <p class="sec-sub">O Adapta Aí foi construído com base nas principais leis e diretrizes de inclusão educacional</p>
+    </div>
+    <div class="lei-hero fi">
+      <div class="lei-emoji">⚖️</div>
+      <div>
+        <h3>Lei Brasileira de Inclusão — Lei 13.146/2015</h3>
+        <p>Exige que escolas elaborem o PEI para alunos com deficiência em até 30 dias letivos do início do ano. O Adapta Aí gera o PEI completo com todas as seções obrigatórias: identificação, conteúdos adaptados, estratégias pedagógicas, critérios de avaliação e assinaturas.</p>
+      </div>
+    </div>
+    <div class="lei-badges">
+      <div class="lei-badge fi d1">
+        <div class="lb-ic">📚</div>
+        <h4>BNCC & Currículo Gaúcho</h4>
+        <p>As adaptações incluem habilidades e objetivos de aprendizagem alinhados à Base Nacional Comum Curricular</p>
+      </div>
+      <div class="lei-badge fi d2">
+        <div class="lb-ic">🔒</div>
+        <h4>LGPD — Dados protegidos</h4>
+        <p>Alunos cadastrados de forma anônima. Nenhum dado sensível é exposto ou compartilhado com terceiros</p>
+      </div>
+      <div class="lei-badge fi d3">
+        <div class="lb-ic">🧩</div>
+        <h4>UDL — Desenho Universal</h4>
+        <p>Baseado nos princípios do Universal Design for Learning — múltiplas formas de representação e engajamento</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-sec">
+  <h2>Comece agora, é gratuito</h2>
+  <p>Crie sua conta e adapte seu primeiro material em menos de 5 minutos</p>
+  <a href="/app" class="btn-cta-white">Criar conta grátis →</a>
+  <div class="cta-note">Sem cartão de crédito · Sem limite de alunos · Sem complicação</div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <img src="/logo.png" alt="Adapta Aí">
+    <span>© 2025 Adapta Aí — Adaptação pedagógica com IA</span>
+    <div class="footer-links">
+      <a href="/app">Entrar na plataforma</a>
+      <a href="#">Política de Privacidade</a>
+      <a href="#">Termos de Uso</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+const obs = new IntersectionObserver(entries => {
+  entries.forEach(e => { if(e.isIntersecting) e.target.classList.add('v'); });
+}, {threshold:0.1});
+document.querySelectorAll('.fi').forEach(el => obs.observe(el));
+
+window.addEventListener('scroll', () => {
+  document.getElementById('nav').classList.toggle('scrolled', window.scrollY > 40);
+});
+</script>
+</body>
+</html>
