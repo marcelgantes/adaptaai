@@ -593,7 +593,7 @@ async function doEmailAuth() {
   document.getElementById('btn-auth').disabled = false;
 }
 
-async function doGoogleLogin() { await sb.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: window.location.origin } }); }
+async function doGoogleLogin() { await sb.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: window.location.origin + '/app' } }); }
 async function doLogout() { await sb.auth.signOut(); }
 
 async function criarTurma() {
