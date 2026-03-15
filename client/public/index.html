@@ -655,7 +655,8 @@ async function criarTurma() {
   state.turmas.push(data);
   closeModal('modal-nova-turma');
   ['nt-nome','nt-disciplina'].forEach(id => document.getElementById(id).value = '');
-  renderTurmas(); renderDashboard(); populateAdaptarTurmas(); populatePeiTurmas();
+  document.getElementById('nt-etapa').value = '';
+  renderAll();
   showToast('✅ Turma criada!');
 }
  
