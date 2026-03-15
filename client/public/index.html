@@ -244,6 +244,12 @@
     <div class="field"><label>E-mail</label><input type="email" id="login-email" placeholder="professor@escola.edu.br"></div>
     <div class="field" id="field-senha"><label>Senha</label><input type="password" id="login-pass" placeholder="••••••••"></div>
     <div class="field" id="field-nome" style="display:none"><label>Seu nome</label><input type="text" id="login-nome" placeholder="Prof. Marcel Gantes"></div>
+    <div class="field" id="field-termos" style="display:none">
+      <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;text-transform:none;letter-spacing:0;font-size:13px;color:var(--text)">
+        <input type="checkbox" id="aceite-termos" style="width:16px;height:16px;margin-top:2px;accent-color:var(--accent);flex-shrink:0">
+        <span>Li e aceito a <a href="/privacidade.html" target="_blank" style="color:var(--accent);font-weight:500">Política de Privacidade</a> e os <a href="/privacidade.html#s9" target="_blank" style="color:var(--accent);font-weight:500">Termos de Uso</a></span>
+      </label>
+    </div>
     <button class="btn btn-primary" onclick="doEmailAuth()" style="margin-top:8px" id="btn-auth">Entrar na plataforma →</button>
     <div class="login-divider"><span>ou</span></div>
     <button class="btn btn-google" onclick="doGoogleLogin()">
@@ -553,6 +559,7 @@ function toggleLoginMode() {
   document.getElementById('login-sub').textContent = loginMode === 'login' ? 'Acesse sua conta' : 'Crie sua conta gratuita';
   document.getElementById('btn-auth').textContent = loginMode === 'login' ? 'Entrar na plataforma →' : 'Criar conta →';
   document.getElementById('field-nome').style.display = loginMode === 'signup' ? 'block' : 'none';
+  document.getElementById('field-termos').style.display = loginMode === 'signup' ? 'block' : 'none';
   document.querySelector('.login-toggle').innerHTML = loginMode === 'login'
     ? '<a onclick="toggleLoginMode()">Não tem conta? <strong>Criar agora</strong></a>'
     : '<a onclick="toggleLoginMode()">Já tem conta? <strong>Fazer login</strong></a>';
@@ -574,6 +581,8 @@ async function doEmailAuth() {
       if (error) showLoginError('E-mail ou senha incorretos.');
     } else {
       const nome = document.getElementById('login-nome').value.trim();
+      const aceite = document.getElementById('aceite-termos')?.checked;
+      if (!aceite) { showLoginError('Você precisa aceitar os Termos de Uso e a Política de Privacidade para criar uma conta.'); document.getElementById('btn-auth').textContent = 'Criar conta →'; document.getElementById('btn-auth').disabled = false; return; }
       const { error } = await sb.auth.signUp({ email, password: pass, options: { data: { name: nome || email.split('@')[0] } } });
       if (error) showLoginError(error.message);
       else showLoginError('✅ Conta criada! Tente fazer login.');
