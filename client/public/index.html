@@ -974,6 +974,7 @@ async function gerarAdaptacoes() {
     progFill.style.width=`${Math.round((done/total)*100)}%`;
     const turma=state.turmas.find(t=>t.id===aluno.turma_id);
     await salvarHistorico({aluno_id:aluno.id,aluno_nome:aluno.nome,titulo:nomeAtiv||disciplina,disciplina,turma_nome:turma?.nome||''});
+    if (done < total) await new Promise(r => setTimeout(r, 2000));
   }
   progBar.classList.remove('show'); progFill.style.width='0%';
   document.getElementById('btn-gerar').disabled=false;
