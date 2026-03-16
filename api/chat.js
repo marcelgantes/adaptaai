@@ -14,7 +14,7 @@ export default async function handler(req, res) {
     }
     const groqRequest = {
       model: 'llama-3.3-70b-versatile',
-      max_tokens: 1000,
+      max_tokens: 2000,
       temperature: 0.7,
       messages: [
         ...(system ? [{ role: 'system', content: system }] : []),
