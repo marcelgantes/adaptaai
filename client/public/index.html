@@ -22,20 +22,20 @@
   .page.active { display: flex; }
   h1,h2,h3,h4 { font-family: 'Syne', sans-serif; }
 
-  /* LOGIN & ESTRUTURA GERAL */
+  /* LOGIN */
   #page-login { background: var(--bg); align-items: center; justify-content: center; }
   .login-box { background:var(--surface); border:1px solid var(--border); border-radius:20px; padding:48px 44px; width:440px; }
   .field { margin-bottom:18px; }
   .field label { display:block; font-size:12px; font-weight:500; color:var(--muted); margin-bottom:7px; text-transform:uppercase; }
   .field input, .field select, .field textarea { width:100%; padding:12px 14px; background:var(--bg); border:1px solid var(--border); border-radius:10px; font-size:14px; outline:none; }
   
-  .btn { display:inline-flex; align-items:center; justify-content:center; gap:8px; padding:12px 20px; border-radius:10px; font-family:'Syne',sans-serif; font-weight:700; cursor:pointer; border:none; transition:0.2s; }
+  .btn { display:inline-flex; align-items:center; justify-content:center; gap:8px; padding:12px 20px; border-radius:10px; font-family:'Syne',sans-serif; font-weight:700; cursor:pointer; border:none; transition:0.2s; text-decoration:none; }
   .btn-primary { background:var(--accent); color:white; width:100%; }
+  .btn-google { background:white; color:#333; border:1px solid var(--border); width:100%; margin-top:10px; }
   .btn-success { background:var(--accent3); color:white; }
   .btn-secondary { background:var(--surface2); color:var(--text); border:1px solid var(--border); }
-  .btn-accent2 { background:var(--accent2); color:white; }
 
-  /* SIDEBAR */
+  /* SIDEBAR & LAYOUT */
   .main-layout { display:flex; flex:1; overflow:hidden; height:100vh; }
   .sidebar { width:240px; background:var(--surface); border-right:1px solid var(--border); display:flex; flex-direction:column; padding:24px 0; }
   .nav-item { display:flex; align-items:center; gap:10px; padding:10px 12px; border-radius:10px; cursor:pointer; font-size:14px; color:var(--muted); margin: 0 12px 2px; }
@@ -44,21 +44,16 @@
   .content-panel { display:none; }
   .content-panel.active { display:block; }
 
-  /* CARDS & GRIDS */
+  /* GRIDS & UPLOAD */
   .param-grid { display:grid; grid-template-columns:1fr 1fr; gap:20px; }
   .param-card { background:var(--card); border:1px solid var(--border); border-radius:14px; padding:20px; }
-  .check-group { display:flex; flex-direction:column; gap:10px; margin-top:10px; }
-  .check-item { display:flex; align-items:center; gap:8px; font-size:14px; cursor:pointer; }
-  
-  .upload-zone { border:2px dashed var(--border); border-radius:14px; padding:32px; text-align:center; cursor:pointer; }
+  .upload-zone { border:2px dashed var(--border); border-radius:14px; padding:32px; text-align:center; cursor:pointer; margin-bottom:15px; }
   .progress-bar { height:6px; background:var(--border); border-radius:3px; margin:20px 0; display:none; }
   .progress-bar.show { display:block; }
   .progress-fill { height:100%; background:var(--accent2); width:0%; transition:0.3s; }
-
-  /* MODALS */
-  .modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.6); display:none; align-items:center; justify-content:center; z-index:100; }
-  .modal-overlay.open { display:flex; }
-  .modal { background:white; padding:32px; border-radius:20px; width:450px; }
+  
+  .check-group { display:flex; flex-direction:column; gap:10px; margin-top:10px; }
+  .check-item { display:flex; align-items:center; gap:8px; font-size:14px; cursor:pointer; }
 
   #loading-overlay { position:fixed; inset:0; background:white; z-index:999; display:flex; align-items:center; justify-content:center; }
   #loading-overlay.hidden { display:none; }
@@ -72,10 +67,14 @@
   <div class="page active" id="page-login">
     <div class="login-box">
       <h2 style="margin-bottom:20px">Acesse o Adapta Aí</h2>
-      <div id="login-error" style="color:red; margin-bottom:10px; display:none"></div>
       <div class="field"><label>E-mail</label><input type="email" id="login-email"></div>
       <div class="field"><label>Senha</label><input type="password" id="login-pass"></div>
       <button class="btn btn-primary" onclick="doEmailAuth()">Entrar</button>
+      <div style="text-align:center; margin:15px 0; color:var(--muted); font-size:12px">OU</div>
+      <button class="btn btn-google" onclick="doGoogleLogin()">
+        <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#4285F4" d="M47.5 24.6c0-1.6-.1-3.1-.4-4.6H24v8.7h13.2c-.6 3-2.3 5.5-4.9 7.2v6h8c4.7-4.3 7.2-10.7 7.2-17.3z"/><path fill="#34A853" d="M24 48c6.5 0 11.9-2.1 15.9-5.8l-8-6c-2.1 1.4-4.8 2.3-7.9 2.3-6.1 0-11.2-4.1-13.1-9.6H2.6v6.2C6.5 42.8 14.7 48 24 48z"/><path fill="#FBBC05" d="M10.9 28.9c-.5-1.4-.7-2.8-.7-4.4s.3-3 .7-4.4v-6.2H2.6C1 17.2 0 20.5 0 24s1 6.8 2.6 9.9l8.3-5z"/><path fill="#EA4335" d="M24 9.5c3.4 0 6.5 1.2 8.9 3.5l6.7-6.7C35.9 2.5 30.4 0 24 0 14.7 0 6.5 5.2 2.6 14.1l8.3 6.2C12.8 13.6 17.9 9.5 24 9.5z"/></svg>
+        Entrar com Google
+      </button>
       <div style="text-align:center; margin-top:15px; font-size:13px">
         <a onclick="toggleLoginMode()" id="toggle-text" style="cursor:pointer; color:var(--accent)">Não tem conta? Criar agora</a>
       </div>
@@ -102,7 +101,7 @@
         <div class="content-panel" id="panel-turmas">
           <div style="display:flex; justify-content:space-between; margin-bottom:20px">
             <h2>Suas Turmas</h2>
-            <button class="btn btn-accent2" onclick="openModal('modal-nova-turma')">+ Nova Turma</button>
+            <button class="btn btn-secondary" onclick="openModal('modal-nova-turma')">+ Nova Turma</button>
           </div>
           <div id="turmas-grid" class="param-grid"></div>
         </div>
@@ -111,34 +110,32 @@
           <h2>✨ Adaptar Material</h2>
           <div class="param-grid">
             <div>
-              <div class="field"><label>Disciplina</label><input type="text" id="mat-disciplina" placeholder="Ex: Biologia"></div>
+              <div class="field"><label>Disciplina</label><input type="text" id="mat-disciplina"></div>
               <div class="upload-zone" onclick="document.getElementById('file-input').click()">
                 <input type="file" id="file-input" style="display:none" onchange="handleFileSelect(this.files[0])">
-                <p>Clique para subir PDF ou DOCX</p>
+                <p id="upload-status">📎 Clique para subir PDF, DOCX ou TXT</p>
               </div>
-              <textarea id="mat-texto" rows="10" style="margin-top:15px" placeholder="Ou cole o texto aqui..."></textarea>
+              <textarea id="mat-texto" rows="10" placeholder="Texto extraído ou colado aparecerá aqui..."></textarea>
             </div>
             <div>
-              <div class="field"><label>Selecione a Turma</label><select id="adapt-turma-sel" onchange="loadAlunosAdaptar()"></select></div>
+              <div class="field"><label>Turma</label><select id="adapt-turma-sel" onchange="loadAlunosAdaptar()"></select></div>
               <div id="alunos-check-list" class="check-group"></div>
             </div>
           </div>
-          <button class="btn btn-primary" style="margin-top:20px" onclick="gerarAdaptacoes()">🤖 Iniciar Adaptação Inteligente</button>
+          <button class="btn btn-primary" style="margin-top:20px" onclick="gerarAdaptacoes()">🤖 Adaptar para Alunos Inclusos</button>
           <div class="progress-bar" id="prog-bar"><div class="progress-fill" id="prog-fill"></div></div>
         </div>
 
         <div class="content-panel" id="panel-perfil-config">
           <h2>👤 Meu Perfil Profissional</h2>
-          <p>Configure seus dados para agilizar o processo de adaptação.</p>
           <div class="param-grid" style="margin-top:20px">
             <div class="param-card">
-              <h4>Dados Básicos</h4>
-              <div class="field"><label>Nome de Exibição</label><input type="text" id="prof-nome-input"></div>
-              <div class="field"><label>Sua Instituição</label><input type="text" id="prof-escola-input"></div>
+              <h4>Dados</h4>
+              <div class="field"><label>Nome</label><input type="text" id="prof-nome-input"></div>
+              <div class="field"><label>Escola</label><input type="text" id="prof-escola-input"></div>
             </div>
             <div class="param-card">
-              <h4>Minhas Áreas (STEM)</h4>
-              <p style="font-size:12px; color:var(--muted)">Marque suas disciplinas de Natureza ou Exatas:</p>
+              <h4>Áreas de Atuação (STEM)</h4>
               <div class="check-group">
                 <label class="check-item"><input type="checkbox" class="prof-area" value="biologia"> Biologia</label>
                 <label class="check-item"><input type="checkbox" class="prof-area" value="quimica"> Química</label>
@@ -154,34 +151,39 @@
   </div>
 </div>
 
-<div class="modal-overlay" id="modal-nova-turma">
-  <div class="modal">
-    <h3>Nova Turma</h3>
-    <div class="field"><label>Nome</label><input type="text" id="nt-nome"></div>
-    <div class="field"><label>Disciplina</label><input type="text" id="nt-disc"></div>
-    <button class="btn btn-primary" onclick="criarTurma()">Criar Turma</button>
-    <button class="btn btn-secondary" onclick="closeModal('modal-nova-turma')" style="margin-top:10px; width:100%">Cancelar</button>
-  </div>
-</div>
-
 <script>
 const SUPABASE_URL = 'https://ttyxcayltmgdtshohxzk.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_uPQpcbgyBu9X0xJmfd9bdA_yOr53tnI';
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-let state = { 
-  user: null, 
-  turmas: [], 
-  alunos: [], 
-  perfilProf: { nome: '', escola: '', areas: [] },
-  loginMode: 'login'
-};
+let state = { user: null, turmas: [], alunos: [], perfilProf: { areas: [] } };
 
 async function init() {
   const { data: { session } } = await sb.auth.getSession();
   if (session) { state.user = session.user; await loadData(); showApp(); }
   document.getElementById('loading-overlay').classList.add('hidden');
+  
+  sb.auth.onAuthStateChange((event, session) => {
+    if (event === 'SIGNED_IN') { state.user = session.user; loadData().then(showApp); }
+  });
 }
+
+// LOGIN GOOGLE RESTAURADO
+async function doGoogleLogin() { 
+  await sb.auth.signInWithOAuth({ 
+    provider: 'google', 
+    options: { redirectTo: window.location.origin } 
+  }); 
+}
+
+async function doEmailAuth() {
+  const email = document.getElementById('login-email').value;
+  const pass = document.getElementById('login-pass').value;
+  const { error } = await sb.auth.signInWithPassword({ email, password: pass });
+  if (error) alert(error.message);
+}
+
+async function doLogout() { await sb.auth.signOut(); window.location.reload(); }
 
 async function loadData() {
   const uid = state.user.id;
@@ -194,48 +196,60 @@ async function loadData() {
   state.alunos = a || [];
   if (p) {
     state.perfilProf = p;
-    preencherCamposPerfil();
+    document.getElementById('prof-nome-input').value = p.nome || '';
+    document.getElementById('prof-escola-input').value = p.escola || '';
+    document.getElementById('dash-nome-prof').textContent = p.nome || 'Professor';
+    document.querySelectorAll('.prof-area').forEach(c => {
+      if (p.areas?.includes(c.value)) c.checked = true;
+    });
   }
   renderTurmas();
   populateDropdowns();
 }
 
-// PERFIL PROFESSOR
-function preencherCamposPerfil() {
-  document.getElementById('prof-nome-input').value = state.perfilProf.nome || '';
-  document.getElementById('prof-escola-input').value = state.perfilProf.escola || '';
-  document.getElementById('dash-nome-prof').textContent = state.perfilProf.nome || 'Professor';
-  const checks = document.querySelectorAll('.prof-area');
-  checks.forEach(c => {
-    if (state.perfilProf.areas?.includes(c.value)) c.checked = true;
-  });
+// LEITURA DE ARQUIVOS RESTAURADA
+async function handleFileSelect(file) {
+  if(!file) return;
+  document.getElementById('upload-status').textContent = "⌛ Lendo arquivo...";
+  const ext = file.name.split('.').pop().toLowerCase();
+  let texto = "";
+
+  try {
+    if(ext === 'pdf') {
+      pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+      const ab = await file.arrayBuffer();
+      const pdf = await pdfjsLib.getDocument({data: ab}).promise;
+      for(let i=1; i<=pdf.numPages; i++){
+        const p = await pdf.getPage(i);
+        const c = await p.getTextContent();
+        texto += c.items.map(x => x.str).join(' ') + '\n';
+      }
+    } else if(ext === 'docx') {
+      const ab = await file.arrayBuffer();
+      const res = await mammoth.extractRawText({arrayBuffer: ab});
+      texto = res.value;
+    } else {
+      texto = await file.text();
+    }
+    document.getElementById('mat-texto').value = texto;
+    document.getElementById('upload-status').textContent = "✅ " + file.name;
+  } catch(e) {
+    alert("Erro ao ler arquivo");
+    document.getElementById('upload-status').textContent = "❌ Erro no upload";
+  }
 }
 
 async function salvarPerfilProfessor() {
   const nome = document.getElementById('prof-nome-input').value;
   const escola = document.getElementById('prof-escola-input').value;
   const areas = Array.from(document.querySelectorAll('.prof-area:checked')).map(c => c.value);
-  
-  const { error } = await sb.from('perfis_professores').upsert({
-    user_id: state.user.id,
-    nome,
-    escola,
-    areas
-  });
-
-  if (!error) {
-    state.perfilProf = { nome, escola, areas };
-    document.getElementById('dash-nome-prof').textContent = nome;
-    showToast("Perfil salvo com sucesso!");
-  }
+  const { error } = await sb.from('perfis_professores').upsert({ user_id: state.user.id, nome, escola, areas });
+  if (!error) { alert("Perfil salvo!"); state.perfilProf = { nome, escola, areas }; }
 }
 
-// NAVEGAÇÃO E UI
 function showPanel(id) {
   document.querySelectorAll('.content-panel').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
   document.getElementById('panel-' + id).classList.add('active');
-  // Se for para a aba adaptar, já sugere a primeira área do professor
   if (id === 'adaptar' && state.perfilProf.areas?.length > 0) {
       document.getElementById('mat-disciplina').value = state.perfilProf.areas[0].toUpperCase();
   }
@@ -246,46 +260,9 @@ function showApp() {
   document.getElementById('page-app').classList.add('active');
 }
 
-function toggleLoginMode() {
-  state.loginMode = state.loginMode === 'login' ? 'signup' : 'login';
-  document.getElementById('toggle-text').textContent = state.loginMode === 'login' ? 'Não tem conta? Criar agora' : 'Já tem conta? Entrar';
-}
-
-async function doEmailAuth() {
-  const email = document.getElementById('login-email').value;
-  const pass = document.getElementById('login-pass').value;
-  if (state.loginMode === 'login') {
-    const { error } = await sb.auth.signInWithPassword({ email, password: pass });
-    if (error) alert(error.message);
-  } else {
-    const { error } = await sb.auth.signUp({ email, password: pass });
-    if (error) alert(error.message);
-    else alert("Conta criada! Verifique seu e-mail.");
-  }
-}
-
-async function doLogout() { await sb.auth.signOut(); window.location.reload(); }
-
-// TURMAS
-async function criarTurma() {
-  const nome = document.getElementById('nt-nome').value;
-  const disciplina = document.getElementById('nt-disc').value;
-  const { data, error } = await sb.from('turmas').insert({ user_id: state.user.id, nome, disciplina }).select().single();
-  if (!error) {
-    state.turmas.push(data);
-    renderTurmas();
-    closeModal('modal-nova-turma');
-    populateDropdowns();
-  }
-}
-
 function renderTurmas() {
   const grid = document.getElementById('turmas-grid');
-  grid.innerHTML = state.turmas.map(t => `
-    <div class="param-card">
-      <strong>${t.nome}</strong><br><small>${t.disciplina}</small>
-    </div>
-  `).join('');
+  grid.innerHTML = state.turmas.map(t => `<div class="param-card"><strong>${t.nome}</strong><br>${t.disciplina}</div>`).join('');
 }
 
 function populateDropdowns() {
@@ -295,36 +272,16 @@ function populateDropdowns() {
 
 function loadAlunosAdaptar() {
   const tid = document.getElementById('adapt-turma-sel').value;
-  const list = document.getElementById('alunos-check-list');
   const filtered = state.alunos.filter(a => a.turma_id == tid);
-  list.innerHTML = filtered.map(a => `<label class="check-item"><input type="checkbox" value="${a.id}" checked> ${a.nome}</label>`).join('');
+  document.getElementById('alunos-check-list').innerHTML = filtered.map(a => `<label class="check-item"><input type="checkbox" value="${a.id}" checked> ${a.nome}</label>`).join('');
 }
 
-// ADAPTAÇÃO (A LÓGICA DO ORQUESTRADOR)
 async function gerarAdaptacoes() {
-    const texto = document.getElementById('mat-texto').value;
-    const disciplina = document.getElementById('mat-disciplina').value;
-    if (!texto) return alert("Cole o texto primeiro!");
-
-    const isSTEM = state.perfilProf.areas.includes(disciplina.toLowerCase()) || 
-                   ['física', 'química', 'matemática', 'biologia'].some(d => disciplina.toLowerCase().includes(d));
-
-    document.getElementById('prog-bar').classList.add('show');
-    document.getElementById('prog-fill').style.width = "50%";
-
-    // Aqui você chamaria seu endpoint de IA (Gemini ou Groq)
-    console.log("Iniciando adaptação...", isSTEM ? "Usando modo STEM" : "Usando modo Texto");
-    
-    setTimeout(() => {
-        document.getElementById('prog-fill').style.width = "100%";
-        alert("Adaptação concluída! (Simulação)");
-        document.getElementById('prog-bar').classList.remove('show');
-    }, 2000);
+  // Lógica de orquestração discutida
+  document.getElementById('prog-bar').classList.add('show');
+  document.getElementById('prog-fill').style.width = "100%";
+  setTimeout(() => alert("Simulando envio para Groq/Gemini..."), 500);
 }
-
-function openModal(id) { document.getElementById(id).classList.add('open'); }
-function closeModal(id) { document.getElementById(id).classList.remove('open'); }
-function showToast(m) { alert(m); }
 
 init();
 </script>
