@@ -234,7 +234,6 @@
 
 <div class="app">
 
-<!-- LOGIN -->
 <div class="page" id="page-login">
   <div class="login-box">
     <div class="login-logo"><img src="/logo.png" alt="Adapta Aí" style="height:44px;object-fit:contain"></div>
@@ -261,7 +260,6 @@
   </div>
 </div>
 
-<!-- APP -->
 <div class="page" id="page-app">
   <div class="mobile-topbar">
     <div class="logo-mark"><img src="/logo.png" alt="Adapta Aí" style="height:28px;object-fit:contain"></div>
@@ -296,7 +294,6 @@
 
     <div class="main-content">
 
-      <!-- DASHBOARD -->
       <div class="content-panel active" id="panel-dashboard">
         <div style="margin-bottom:32px">
           <h2 style="font-size:24px;font-weight:800;margin-bottom:4px">Olá, <span id="dash-nome-prof">Professor</span>! 👋</h2>
@@ -333,7 +330,6 @@
         </div>
       </div>
 
-      <!-- TURMAS -->
       <div class="content-panel" id="panel-turmas">
         <div class="page-header" style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:12px">
           <div><h2>Turmas</h2><p>Gerencie suas turmas e alunos inclusos</p></div>
@@ -342,7 +338,6 @@
         <div class="cards-grid" id="turmas-grid"></div>
       </div>
 
-      <!-- DETALHE TURMA -->
       <div class="content-panel" id="panel-turma-detalhe">
         <button class="back-btn" onclick="showPanel('turmas')">← Voltar para turmas</button>
         <div class="page-header" style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:12px">
@@ -352,7 +347,6 @@
         <div class="aluno-list" id="alunos-list"></div>
       </div>
 
-      <!-- PERFIL ALUNO -->
       <div class="content-panel" id="panel-aluno-perfil">
         <button class="back-btn" id="back-to-turma">← Voltar para turma</button>
         <div class="page-header"><div><h2 id="aluno-nome-titulo">Aluno</h2><p style="color:var(--muted);font-size:14px">Perfil anônimo — parâmetros de adaptação</p></div></div>
@@ -363,7 +357,6 @@
         </div>
       </div>
 
-      <!-- ALUNOS -->
       <div class="content-panel" id="panel-alunos">
         <div class="page-header"><div><h2>👥 Alunos Inclusos</h2><p>Todos os alunos cadastrados nas suas turmas</p></div></div>
         <div class="field" style="margin-bottom:16px">
@@ -373,7 +366,6 @@
         <div id="alunos-painel-list"></div>
       </div>
 
-      <!-- ADAPTAR -->
       <div class="content-panel" id="panel-adaptar">
         <div class="page-header"><h2>✨ Adaptar Material</h2><p>Envie um conteúdo e gere adaptações individualizadas para cada aluno</p></div>
         <div class="adaptar-layout">
@@ -419,7 +411,6 @@
         </div>
       </div>
 
-      <!-- PEI -->
       <div class="content-panel" id="panel-pei">
         <div class="page-header"><h2>📋 PEI — Plano Educacional Individualizado</h2><p>Gerado a partir do planejamento da turma, adaptado para cada aluno incluso</p></div>
         <div class="alert alert-info">⚖️ <strong>Obrigação legal:</strong> O PEI deve ser elaborado em até 30 dias letivos do início do ano (Lei 13.146/2015).</div>
@@ -432,7 +423,6 @@
           <div class="field"><label>Disciplina</label><input type="text" id="pei-disciplina" placeholder="Ex: Biologia..."></div>
         </div>
 
-        <!-- UPLOAD PLANEJAMENTO -->
         <div class="field" style="margin-bottom:16px">
           <label>📚 Planejamento da turma neurotípica</label>
           <label for="pei-file-input" class="upload-zone upload-zone-sm" id="pei-upload-zone" style="margin-bottom:12px"
@@ -467,7 +457,6 @@
         </div>
       </div>
 
-      <!-- HISTÓRICO -->
       <div class="content-panel" id="panel-historico">
         <div class="page-header"><h2>📁 Histórico de Atividades</h2><p>Registro de tudo que foi gerado</p></div>
         <div id="historico-list"></div>
@@ -477,7 +466,6 @@
   </div>
 </div>
 
-<!-- MODALS -->
 <div class="modal-overlay" id="modal-nova-turma">
   <div class="modal">
     <h3>Nova turma</h3><p class="modal-sub">Crie uma turma para organizar seus alunos inclusos</p>
@@ -498,9 +486,7 @@
   </div>
 </div>
 
-</div><!-- .app -->
-
-<nav class="bottom-nav">
+</div><nav class="bottom-nav">
   <div class="bottom-nav-inner">
     <button class="bnav-item active" id="bnav-dashboard" onclick="showPanel('dashboard');setBottomNav('dashboard')"><span class="bicon">🏠</span><span class="blabel">Início</span></button>
     <button class="bnav-item" id="bnav-turmas" onclick="showPanel('turmas');setBottomNav('turmas')"><span class="bicon">🏫</span><span class="blabel">Turmas</span></button>
@@ -1007,6 +993,11 @@ function renderPrancha(adapt, container) {
 }
 
 // ======================== GERADOR DOCX via JSZip ========================
+function esc(str) {
+  if (!str) return "";
+  return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&apos;');
+}
+
 function markdownParaHtml(texto) {
   return texto
     .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
@@ -1274,6 +1265,89 @@ async function handlePeiFileSelect(file) {
     setPeiUploadState('success');
   } catch(err) { setPeiUploadState('error'); document.getElementById('pei-upload-errmsg').textContent='Erro ao ler: '+err.message; }
 }
+
+// ======================== NOVO: PERFIL DO PROFESSOR ========================
+
+// 1. Inserir botão na sidebar
+const sidebarNav = document.querySelector('.sidebar .nav-section:first-of-type');
+const profileNavItem = document.createElement('div');
+profileNavItem.className = 'nav-item';
+profileNavItem.id = 'nav-perfil-config';
+profileNavItem.onclick = () => showPanel('perfil-config');
+profileNavItem.innerHTML = '<span class="nav-icon">👤</span> Meu Perfil';
+sidebarNav.appendChild(profileNavItem);
+
+// 2. Inserir Painel de Perfil no Main Content
+const mainContent = document.querySelector('.main-content');
+const profilePanel = document.createElement('div');
+profilePanel.className = 'content-panel';
+profilePanel.id = 'panel-perfil-config';
+profilePanel.innerHTML = `
+  <div class="page-header">
+    <h2>👤 Meu Perfil Profissional</h2>
+    <p>Configure suas áreas de atuação para adaptações automáticas.</p>
+  </div>
+  <div class="param-grid">
+    <div class="param-card">
+      <h4>Identificação</h4>
+      <div class="field"><label>Nome Completo</label><input type="text" id="prof-nome-input" placeholder="Seu nome"></div>
+      <div class="field"><label>Instituição</label><input type="text" id="prof-escola-input" placeholder="Sua escola"></div>
+    </div>
+    <div class="param-card">
+      <h4>Áreas de Atuação (Natureza/Exatas)</h4>
+      <p style="font-size:12px;color:var(--muted);margin-bottom:12px">Marque suas disciplinas:</p>
+      <div class="check-group">
+        <label class="check-item"><input type="checkbox" class="prof-area" value="biologia"> <span>Biologia</span></label>
+        <label class="check-item"><input type="checkbox" class="prof-area" value="quimica"> <span>Química</span></label>
+        <label class="check-item"><input type="checkbox" class="prof-area" value="fisica"> <span>Física</span></label>
+        <label class="check-item"><input type="checkbox" class="prof-area" value="matematica"> <span>Matemática</span></label>
+      </div>
+    </div>
+  </div>
+  <div style="margin-top:24px">
+    <button class="btn btn-success" style="width:auto" onclick="salvarPerfilProfessor()">💾 Salvar Perfil</button>
+  </div>
+`;
+mainContent.appendChild(profilePanel);
+
+// 3. Funções de Dados do Perfil
+async function salvarPerfilProfessor() {
+  const nome = document.getElementById('prof-nome-input').value;
+  const escola = document.getElementById('prof-escola-input').value;
+  const areas = Array.from(document.querySelectorAll('.prof-area:checked')).map(cb => cb.value);
+  
+  const { error } = await sb.from('perfis_professores').upsert({
+    user_id: state.user.id,
+    nome,
+    escola,
+    areas
+  });
+
+  if (error) return showToast('❌ Erro ao salvar perfil', 'warn');
+  state.perfilProf = { nome, escola, areas };
+  document.getElementById('dash-nome-prof').textContent = nome || 'Professor';
+  showToast('✅ Perfil salvo com sucesso!');
+}
+
+async function carregarPerfilProfessor() {
+  const { data, error } = await sb.from('perfis_professores').select('*').eq('user_id', state.user.id).maybeSingle();
+  if (data) {
+    state.perfilProf = data;
+    document.getElementById('prof-nome-input').value = data.nome || '';
+    document.getElementById('prof-escola-input').value = data.escola || '';
+    document.querySelectorAll('.prof-area').forEach(cb => {
+      if (data.areas?.includes(cb.value)) cb.checked = true;
+    });
+    document.getElementById('dash-nome-prof').textContent = data.nome || 'Professor';
+  }
+}
+
+// Injetar chamada no loadData original sem apagar o que já existia
+const originalLoadData = loadData;
+loadData = async function() {
+  await originalLoadData();
+  await carregarPerfilProfessor();
+};
 
 // ======================== NAVIGATION ========================
 function showPanel(id) {
