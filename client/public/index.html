@@ -306,7 +306,7 @@
           <div style="font-size:52px;margin-bottom:16px">🎒</div>
           <h3 style="font-size:20px;font-weight:800;margin-bottom:8px">Vamos começar?</h3>
           <p style="color:var(--muted);font-size:14px;max-width:360px;margin:0 auto 24px">Cadastre sua primeira turma e seus alunos inclusos para começar.</p>
-          <button class="btn btn-primary" style="width:auto;padding:12px 28px" onclick="showPanel('turmas')">🏫 Criar minha primeira turma</button>
+          <button class="btn btn-primary" style="width:auto;padding:12px 28px" onclick="openModal('modal-nova-turma')">🏫 Criar minha primeira turma</button>
         </div>
         <div id="dash-acoes" style="display:none">
           <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px">
@@ -983,7 +983,7 @@ async function gerarAdaptacoes() {
   const primeiraAdapt=state.adaptacoes[alunosParaAdaptar[0]?.id];
   const box=document.getElementById('resultado-text');
   if(primeiraAdapt&&primeiraAdapt.tipo==='pictograma') renderPrancha(primeiraAdapt,box);
-  else box.textContent=primeiraAdapt||'';
+  else box.innerHTML=primeiraAdapt?markdownParaHtml(primeiraAdapt):'';
   document.getElementById('resultado-area').style.display='block';
 }
 
@@ -992,7 +992,7 @@ function mostrarAdaptacao(alunoId, el) {
   el.classList.add('active'); state.alunoAdaptacaoAtual=alunoId;
   const adapt=state.adaptacoes[alunoId]; const box=document.getElementById('resultado-text');
   if(adapt&&adapt.tipo==='pictograma') renderPrancha(adapt,box);
-  else box.textContent=adapt||'Aguardando...';
+  else box.innerHTML=adapt?markdownParaHtml(adapt):'Aguardando...';
 }
 
 function renderPrancha(adapt, container) {
@@ -1007,20 +1007,41 @@ function renderPrancha(adapt, container) {
 }
 
 // ======================== GERADOR DOCX via JSZip ========================
-function esc(t) { return String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function markdownParaHtml(texto) {
+  return texto
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>')
+    .replace(/\*(.+?)\*/g,'<em>$1</em>')
+    .replace(/^#{3}\s(.+)$/gm,'<h3 style="font-family:\'Syne\',sans-serif;font-weight:700;font-size:15px;margin:12px 0 4px">$1</h3>')
+    .replace(/^#{2}\s(.+)$/gm,'<h2 style="font-family:\'Syne\',sans-serif;font-weight:800;font-size:17px;margin:16px 0 6px;color:var(--accent2)">$1</h2>')
+    .replace(/^#{1}\s(.+)$/gm,'<h1 style="font-family:\'Syne\',sans-serif;font-weight:800;font-size:19px;margin:20px 0 8px;color:var(--accent)">$1</h1>')
+    .replace(/^---(.+?)---$/gm,'<h2 style="font-family:\'Syne\',sans-serif;font-weight:800;font-size:16px;margin:20px 0 8px;color:var(--accent2);border-bottom:2px solid var(--border);padding-bottom:6px">$1</h2>')
+    .replace(/\n/g,'<br>');
+}
+
+function linhaParaRuns(linha) {
+  const partes = linha.split(/(\*\*.*?\*\*)/g);
+  return partes.map(p => {
+    if (p.startsWith('**') && p.endsWith('**')) {
+      const txt = esc(p.slice(2,-2));
+      return `<w:r><w:rPr><w:b/><w:sz w:val="24"/><w:szCs w:val="24"/></w:rPr><w:t xml:space="preserve">${txt}</w:t></w:r>`;
+    }
+    return p ? `<w:r><w:rPr><w:sz w:val="24"/><w:szCs w:val="24"/></w:rPr><w:t xml:space="preserve">${esc(p)}</w:t></w:r>` : '';
+  }).join('');
+}
 
 function gerarXmlDocx(titulo, texto) {
   let p = `<w:p><w:pPr><w:pStyle w:val="H1"/><w:jc w:val="center"/></w:pPr><w:r><w:t>${esc(titulo)}</w:t></w:r></w:p>`;
   texto.split('\n').forEach(l => {
     const linha = l.trim();
     if (!linha) { p += `<w:p/>`; return; }
-    if (linha.match(/^=+$/) || linha.match(/^-+$/)) return;
-    const ehSecao = linha.match(/^---(.+)---$/) || (linha === linha.toUpperCase() && linha.length > 6 && !linha.includes('.') && !linha.includes(':'));
+    if (linha.match(/^=+$/) || linha.match(/^-{5,}$/)) return;
+    const ehSecao = linha.match(/^---(.+)---$/) || (linha === linha.toUpperCase() && linha.length > 6 && !linha.includes('.') && !linha.includes(':') && linha.replace(/[^a-zA-ZÀ-ÿ]/g,'').length > 3);
     if (ehSecao) {
       const txt = linha.replace(/---/g,'').trim();
       p += `<w:p><w:pPr><w:pStyle w:val="H2"/></w:pPr><w:r><w:t>${esc(txt)}</w:t></w:r></w:p>`;
     } else {
-      p += `<w:p><w:pPr><w:spacing w:after="100"/></w:pPr><w:r><w:rPr><w:sz w:val="24"/><w:szCs w:val="24"/></w:rPr><w:t xml:space="preserve">${esc(linha)}</w:t></w:r></w:p>`;
+      p += `<w:p><w:pPr><w:spacing w:after="100"/></w:pPr>${linhaParaRuns(linha)}</w:p>`;
     }
   });
   return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:body>${p}<w:sectPr><w:pgSz w:w="12240" w:h="15840"/><w:pgMar w:top="1440" w:right="1440" w:bottom="1440" w:left="1440"/></w:sectPr></w:body></w:document>`;
@@ -1045,10 +1066,16 @@ async function criarDocx(nomeArquivo, titulo, texto) {
 
 async function baixarDocx() {
   const txt = state.adaptacoes[state.alunoAdaptacaoAtual];
-  if (!txt) return showToast('\u26a0\ufe0f Nenhuma adaptação selecionada','warn');
-  if (typeof txt !== 'string') return showToast('\u26a0\ufe0f Prancha não suporta DOCX','warn');
+  if (!txt) return showToast('⚠️ Nenhuma adaptação selecionada','warn');
   const aluno = state.alunos.find(a => a.id === state.alunoAdaptacaoAtual);
   const nome = aluno?.nome || 'aluno';
+  if (typeof txt !== 'string') {
+    const adapt = txt;
+    const linhas = adapt.conceitos.map(c => `**${c.palavra}** — ${c.contexto||''}`).join('\n');
+    try { await criarDocx(`Prancha_${nome}.docx`, `Prancha de Pictogramas — ${nome}`, `Material: ${adapt.nomeAtiv||adapt.disciplina}\n\n` + linhas); showToast('📥 DOCX da prancha baixado!'); }
+    catch(e) { showToast('❌ Erro ao gerar DOCX','warn'); console.error(e); }
+    return;
+  }
   try { await criarDocx(`Adaptacao_${nome}.docx`, `Adaptação — ${nome}`, txt); showToast('📥 DOCX baixado!'); }
   catch(e) { showToast('❌ Erro ao gerar DOCX','warn'); console.error(e); }
 }
