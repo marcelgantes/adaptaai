@@ -279,11 +279,11 @@
         <div class="nav-item" onclick="showPanel('adaptar')" id="nav-adaptar"><span class="nav-icon">✨</span> Adaptar Material</div>
         <div class="nav-item" onclick="showPanel('pei')" id="nav-pei"><span class="nav-icon">📋</span> Gerar PEI</div>
         <div class="nav-item" onclick="showPanel('historico')" id="nav-historico"><span class="nav-icon">📁</span> Histórico</div>
+        <div class="nav-item" onclick="showPanel('perfil-professor')" id="nav-perfil-professor"><span class="nav-icon">👨‍🏫</span> Perfil do professor</div>
       </div>
       <div class="nav-section">
         <div class="nav-label">Suporte</div>
         <div class="nav-item" onclick="alert('Em breve!')"><span class="nav-icon">📖</span> Guia de uso</div>
-        <div class="nav-item" onclick="alert('Em breve!')"><span class="nav-icon">⚙️</span> Configurações</div>
       </div>
       <div class="sidebar-bottom">
         <div class="user-chip">
@@ -473,6 +473,31 @@
         <div id="historico-list"></div>
       </div>
 
+      <!-- PERFIL PROFESSOR -->
+      <div class="content-panel" id="panel-perfil-professor">
+        <div class="page-header"><h2>👨‍🏫 Perfil do Professor</h2><p>Esses dados ajudam a IA a respeitar o referencial curricular do seu estado (ex.: Referencial Gaúcho).</p></div>
+        <div class="param-card" style="max-width:780px">
+          <div class="field"><label>Nome</label><input type="text" id="pp-nome" placeholder="Ex: Prof. Maria Oliveira"></div>
+          <div class="field"><label>E-mail</label><input type="email" id="pp-email" disabled></div>
+          <div class="field">
+            <label>Estado onde leciona</label>
+            <select id="pp-estado">
+              <option value="">Selecione...</option>
+              <option value="AC">Acre (AC)</option><option value="AL">Alagoas (AL)</option><option value="AP">Amapá (AP)</option><option value="AM">Amazonas (AM)</option>
+              <option value="BA">Bahia (BA)</option><option value="CE">Ceará (CE)</option><option value="DF">Distrito Federal (DF)</option><option value="ES">Espírito Santo (ES)</option>
+              <option value="GO">Goiás (GO)</option><option value="MA">Maranhão (MA)</option><option value="MT">Mato Grosso (MT)</option><option value="MS">Mato Grosso do Sul (MS)</option>
+              <option value="MG">Minas Gerais (MG)</option><option value="PA">Pará (PA)</option><option value="PB">Paraíba (PB)</option><option value="PR">Paraná (PR)</option>
+              <option value="PE">Pernambuco (PE)</option><option value="PI">Piauí (PI)</option><option value="RJ">Rio de Janeiro (RJ)</option><option value="RN">Rio Grande do Norte (RN)</option>
+              <option value="RS">Rio Grande do Sul (RS)</option><option value="RO">Rondônia (RO)</option><option value="RR">Roraima (RR)</option><option value="SC">Santa Catarina (SC)</option>
+              <option value="SP">São Paulo (SP)</option><option value="SE">Sergipe (SE)</option><option value="TO">Tocantins (TO)</option>
+            </select>
+          </div>
+          <div class="field"><label>Disciplinas que leciona</label><input type="text" id="pp-disciplinas" placeholder="Ex: Biologia, Ciências, Projeto de Vida"></div>
+          <p style="font-size:12px;color:var(--muted);margin-top:8px">Dica: separe por vírgula quando lecionar mais de uma disciplina.</p>
+          <div class="modal-footer" style="margin-top:10px;justify-content:flex-start"><button class="btn btn-primary" style="width:auto" onclick="salvarPerfilProfessor()">💾 Salvar perfil</button></div>
+        </div>
+      </div>
+
     </div>
   </div>
 </div>
@@ -545,7 +570,38 @@ function showApp() {
   document.getElementById('sidebar-avatar').textContent = nome.charAt(0).toUpperCase();
   document.getElementById('sidebar-name').textContent = nome;
   document.getElementById('sidebar-email').textContent = state.user.email;
+  preencherPerfilProfessor();
   renderAll();
+}
+
+function preencherPerfilProfessor() {
+  const meta = state.user?.user_metadata || {};
+  document.getElementById('pp-nome').value = meta.name || '';
+  document.getElementById('pp-email').value = state.user?.email || '';
+  document.getElementById('pp-estado').value = meta.estado || '';
+  document.getElementById('pp-disciplinas').value = meta.disciplinas || '';
+}
+
+async function salvarPerfilProfessor() {
+  const nome = document.getElementById('pp-nome').value.trim();
+  const estado = document.getElementById('pp-estado').value;
+  const disciplinas = document.getElementById('pp-disciplinas').value.trim();
+  if (!nome) return showToast('⚠️ Informe seu nome', 'warn');
+  if (!estado) return showToast('⚠️ Selecione o estado onde você leciona', 'warn');
+  if (!disciplinas) return showToast('⚠️ Informe ao menos uma disciplina', 'warn');
+  const { data, error } = await sb.auth.updateUser({ data: { ...state.user.user_metadata, name: nome, estado, disciplinas } });
+  if (error) return showToast('❌ Erro ao salvar perfil', 'warn');
+  if (data?.user) state.user = data.user;
+  document.getElementById('sidebar-avatar').textContent = nome.charAt(0).toUpperCase();
+  document.getElementById('sidebar-name').textContent = nome;
+  document.getElementById('dash-nome-prof').textContent = nome;
+  showToast('✅ Perfil do professor salvo!');
+}
+
+function referencialPorEstado(estado) {
+  if (!estado) return 'BNCC nacional e currículo/referencial local da rede.';
+  if (estado === 'RS') return 'Referencial Curricular Gaúcho + BNCC nacional.';
+  return `Currículo/referencial do estado ${estado} + BNCC nacional.`;
 }
 
 function showLogin() {
@@ -861,6 +917,8 @@ function loadAlunosPei() {
 }
 
 function buildPrompt(aluno, texto, disciplina, nomeAtiv) {
+  const profMeta = state.user?.user_metadata || {};
+  const diretrizCurricular = referencialPorEstado(profMeta.estado);
   const fragMap={baixa:'Texto contínuo e fluido.',media:'Parágrafos curtos, conceitos separados.',alta:'Blocos curtos, um conceito por bloco. Use tópicos e listas.'};
   const abstMap={alta:'Inclua inferências, analogias e exemplos.',media:'Explique com exemplos simples e diretos.',baixa:'Linguagem direta e concreta.',nao_abstrai:'Tudo literal. Sem inferências ou analogias.'};
   const medMap={autonomo:'Enunciado direto, sem instruções extras.',guiado:'Inclua instruções curtas e exemplos de apoio.',passo_a_passo:'Cada etapa explicada detalhadamente.'};
@@ -885,6 +943,12 @@ INTERESSES E HIPERFOCO DO ALUNO: ${aluno.interesses}
 Use esses interesses como contexto e exemplos ao longo do material. Se o aluno gosta de dinossauros, use dinossauros como exemplo. Se gosta de futebol, use futebol. Isso aumenta o engajamento e facilita a compreensão.` : '';
 
   return `Você é um especialista em educação inclusiva. Adapte o material abaixo para um aluno com o seguinte perfil. Siga as instruções à risca.
+
+CONTEXTO DO PROFESSOR:
+- Professor(a): ${profMeta.name || 'Não informado'}
+- Estado: ${profMeta.estado || 'Não informado'}
+- Disciplinas: ${profMeta.disciplinas || disciplina || 'Não informado'}
+- Diretriz curricular de referência: ${diretrizCurricular}
 
 PERFIL DO ALUNO:
 - Fragmentação: ${fragMap[aluno.fragmentacao]||aluno.fragmentacao}
@@ -1145,6 +1209,8 @@ async function gerarPei() {
 }
 
 function buildPromptPei(aluno, turma, planejamento, periodo, professor, disciplina) {
+  const profMeta = state.user?.user_metadata || {};
+  const diretrizCurricular = referencialPorEstado(profMeta.estado);
   const fragMap={baixa:'Texto contínuo',media:'Parágrafos curtos',alta:'Blocos curtos e tópicos',nao_alfabetizado:'Comunicação por pictogramas'};
   const abstMap={alta:'Alta',media:'Média',baixa:'Baixa — linguagem direta',nao_abstrai:'Não abstrai — tudo literal'};
   const medMap={autonomo:'Autônomo',guiado:'Guiado',passo_a_passo:'Passo a passo'};
@@ -1154,6 +1220,11 @@ function buildPromptPei(aluno, turma, planejamento, periodo, professor, discipli
 DADOS GERAIS:
 - Aluno: ${aluno.nome} (perfil anônimo) | Turma: ${turma.nome} | Etapa: ${turma.etapa.toUpperCase()}
 - Disciplina: ${disciplina||turma.disciplina} | Professor(a): ${professor||'Não informado'} | Período: ${periodo||'Não informado'}
+
+REFERÊNCIA CURRICULAR:
+- Estado de atuação docente: ${profMeta.estado || 'Não informado'}
+- Disciplinas do professor: ${profMeta.disciplinas || 'Não informado'}
+- Base orientadora para habilidades/objetivos: ${diretrizCurricular}
 
 PERFIL DE APRENDIZAGEM:
 - Leitura/Fragmentação: ${fragMap[aluno.fragmentacao]||aluno.fragmentacao}
