@@ -23,18 +23,22 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
 .page { display: none; flex-direction: column; min-height: 100vh; }
 .page.active { display: flex; }
 h1,h2,h3,h4 { font-family: 'Syne', sans-serif; }
+
+/* FONTE PARA DISLEXIA */
 @font-face {
-font-family: 'OpenDyslexic';
-src: url('https://cdn.jsdelivr.net/gh/antijingoist/opendyslexic@master/opendyslexic-regular.ttf') format('truetype');
-font-weight: normal;
-font-style: normal;
+    font-family: 'OpenDyslexic';
+    src: url('https://cdn.jsdelivr.net/gh/antijingoist/opendyslexic@master/opendyslexic-regular.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
 }
 .font-dyslexic {
-font-family: 'OpenDyslexic', 'Verdana', sans-serif !important;
-line-height: 1.6 !important;
-letter-spacing: 0.05em !important;
-word-spacing: 0.1em !important;
+    font-family: 'OpenDyslexic', 'Verdana', sans-serif !important;
+    line-height: 1.6 !important;
+    letter-spacing: 0.05em !important;
+    word-spacing: 0.1em !important;
 }
+
+/* LOGIN */
 #page-login { background: var(--bg); align-items: center; justify-content: center; position: relative; overflow: hidden; }
 #page-login::before { content:''; position:absolute; width:600px; height:600px; background:radial-gradient(circle,rgba(79,156,249,0.12) 0%,transparent 70%); top:-150px; right:-150px; pointer-events:none; }
 #page-login::after { content:''; position:absolute; width:400px; height:400px; background:radial-gradient(circle,rgba(167,139,250,0.1) 0%,transparent 70%); bottom:-100px; left:-100px; pointer-events:none; }
@@ -65,13 +69,14 @@ word-spacing: 0.1em !important;
 .btn-danger { background:var(--surface2); color:var(--danger); border:1px solid var(--border); }
 .btn-danger:hover { border-color:var(--danger); }
 .btn-sm { padding:7px 14px; font-size:12px; border-radius:8px; }
-.btn:disabled { opacity:0.6; cursor:not-allowed; transform:none !important; }
 .login-divider { display:flex; align-items:center; gap:12px; margin:20px 0; }
 .login-divider::before, .login-divider::after { content:''; flex:1; height:1px; background:var(--border); }
 .login-divider span { font-size:12px; color:var(--muted); }
 .login-toggle { text-align:center; margin-top:20px; font-size:13px; color:var(--muted); }
 .login-toggle a { color:var(--accent); cursor:pointer; font-weight:500; }
 #login-error { display:none; padding:12px 14px; background:rgba(220,38,38,0.08); border:1px solid rgba(220,38,38,0.2); border-radius:8px; color:var(--danger); font-size:13px; margin-bottom:16px; }
+
+/* MAIN LAYOUT */
 .main-layout { display:flex; flex:1; overflow:hidden; height:100vh; }
 .sidebar { width:240px; background:var(--surface); border-right:1px solid var(--border); display:flex; flex-direction:column; padding:24px 0; flex-shrink:0; }
 .sidebar-logo { padding:0 20px 24px; border-bottom:1px solid var(--border); margin-bottom:16px; }
@@ -96,6 +101,8 @@ word-spacing: 0.1em !important;
 .main-content { flex:1; overflow-y:auto; padding:32px; }
 .content-panel { display:none; }
 .content-panel.active { display:block; animation:fadeIn 0.3s ease; }
+
+/* DASHBOARD */
 .page-header { margin-bottom:28px; }
 .page-header h2 { font-size:26px; font-weight:800; }
 .page-header p { color:var(--muted); font-size:14px; margin-top:4px; }
@@ -115,12 +122,16 @@ word-spacing: 0.1em !important;
 .action-card { transition:transform 0.2s; }
 .action-card:hover { transform:translateY(-2px); opacity:0.92; }
 .dash-card:hover { border-color:var(--accent); transform:translateY(-2px); }
+
+/* MODAL */
 .modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.7); z-index:100; display:none; align-items:center; justify-content:center; backdrop-filter:blur(4px); }
 .modal-overlay.open { display:flex; }
 .modal { background:var(--surface); border:1px solid var(--border); border-radius:20px; padding:32px; width:500px; max-width:95vw; max-height:90vh; overflow-y:auto; animation:fadeUp 0.3s ease; }
 .modal h3 { font-size:20px; font-weight:800; margin-bottom:6px; }
 .modal .modal-sub { color:var(--muted); font-size:13px; margin-bottom:24px; }
 .modal-footer { display:flex; gap:10px; justify-content:flex-end; margin-top:24px; }
+
+/* ALUNOS */
 .aluno-list { display:flex; flex-direction:column; gap:10px; }
 .aluno-row { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:16px 20px; display:flex; align-items:center; gap:16px; cursor:pointer; transition:all 0.2s; }
 .aluno-row:hover { border-color:var(--accent2); }
@@ -133,16 +144,20 @@ word-spacing: 0.1em !important;
 .tag-purple { background:rgba(167,139,250,0.15); color:var(--accent2); }
 .tag-green { background:rgba(52,211,153,0.15); color:var(--accent3); }
 .tag-orange { background:rgba(251,146,60,0.15); color:var(--warn); }
+
+/* PARAMS */
 .param-grid { display:grid; grid-template-columns:1fr 1fr; gap:20px; }
 .param-card { background:var(--card); border:1px solid var(--border); border-radius:14px; padding:20px; }
 .param-card h4 { font-size:13px; font-weight:600; color:var(--muted); margin-bottom:14px; display:flex; align-items:center; gap:6px; }
 .param-select-wrap { display:flex; flex-direction:column; gap:10px; }
-.param-select { width:100%; padding:11px 14px; background:var(--bg); border:1px solid var(--border); border-radius:10px; color:var(--text); font-family:'DM Sans',sans-serif; font-size:14px; font-weight:500; cursor:pointer; outline:none; transition:border-color 0.2s; -webkit-appearance:none; appearance:none; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%238b92a8' d='M6 8L1 3h10z'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:right 14px center; padding-right:36px; }
+.param-select { width:100%; padding:11px 14px; background:var(--bg); border:1px solid var(--border); border-radius:10px; color:var(--text); font-family:'DM Sans',sans-serif; font-size:14px; font-weight:500; cursor:pointer; outline:none; transition:border-color 0.2s; -webkit-appearance:none; appearance:none; background-image:url("image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%238b92a8' d='M6 8L1 3h10z'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:right 14px center; padding-right:36px; }
 .param-select:focus { border-color:var(--accent); }
 .param-desc-box { padding:10px 14px; background:rgba(79,156,249,0.07); border:1px solid rgba(79,156,249,0.15); border-radius:8px; font-size:12px; color:var(--muted); line-height:1.6; min-height:42px; }
 .check-group { display:flex; flex-direction:column; gap:8px; }
 .check-item { display:flex; align-items:center; gap:8px; cursor:pointer; font-size:13px; }
 .check-item input { width:16px; height:16px; accent-color:var(--accent); cursor:pointer; }
+
+/* UPLOAD */
 .adaptar-layout { display:grid; grid-template-columns:1fr 1fr; gap:24px; }
 .upload-zone { border:2px dashed var(--border); border-radius:14px; padding:32px 24px; text-align:center; cursor:pointer; transition:all 0.2s; min-height:110px; display:flex; align-items:center; justify-content:center; }
 .upload-zone:hover { border-color:var(--accent); background:rgba(79,156,249,0.04); }
@@ -156,6 +171,8 @@ word-spacing: 0.1em !important;
 .aluno-check-row { display:flex; align-items:center; gap:10px; padding:10px 14px; background:var(--bg); border:1px solid var(--border); border-radius:10px; cursor:pointer; transition:all 0.2s; }
 .aluno-check-row:hover { border-color:var(--accent2); }
 .aluno-check-row input[type=checkbox] { accent-color:var(--accent2); width:16px; height:16px; }
+
+/* RESULTADO */
 .resultado-tabs { display:flex; gap:8px; margin-bottom:20px; flex-wrap:wrap; }
 .rtab { padding:8px 16px; border-radius:8px; border:1px solid var(--border); background:var(--bg); color:var(--muted); font-size:13px; cursor:pointer; transition:all 0.2s; }
 .rtab.active { background:rgba(167,139,250,0.15); border-color:var(--accent2); color:var(--accent2); font-weight:500; }
@@ -168,6 +185,8 @@ word-spacing: 0.1em !important;
 .progress-bar { height:4px; background:var(--border); border-radius:2px; overflow:hidden; margin-top:16px; display:none; }
 .progress-bar.show { display:block; }
 .progress-fill { height:100%; background:linear-gradient(90deg,var(--accent),var(--accent2)); border-radius:2px; transition:width 0.5s; }
+
+/* MISC */
 .historico-item { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:16px 20px; margin-bottom:10px; display:flex; align-items:center; gap:16px; }
 .hist-icon { width:38px; height:38px; background:rgba(167,139,250,0.15); border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:16px; flex-shrink:0; }
 .hist-info { flex:1; }
@@ -176,7 +195,6 @@ word-spacing: 0.1em !important;
 .alert { padding:14px 16px; border-radius:10px; font-size:13px; margin-bottom:16px; display:flex; align-items:flex-start; gap:10px; }
 .alert-info { background:rgba(37,99,235,0.08); border:1px solid rgba(37,99,235,0.2); color:#1d4ed8; }
 .alert-success { background:rgba(5,150,105,0.08); border:1px solid rgba(5,150,105,0.2); color:#065f46; }
-.alert-warn { background:rgba(234,88,12,0.08); border:1px solid rgba(234,88,12,0.2); color:#c2410c; }
 .section-title { font-size:16px; font-weight:700; margin-bottom:16px; display:flex; align-items:center; gap:8px; }
 .divider { height:1px; background:var(--border); margin:24px 0; }
 .empty-state { text-align:center; padding:60px 20px; color:var(--muted); }
@@ -184,6 +202,8 @@ word-spacing: 0.1em !important;
 .empty-state p { font-size:14px; }
 .back-btn { display:inline-flex; align-items:center; gap:6px; color:var(--muted); font-size:13px; cursor:pointer; margin-bottom:20px; transition:color 0.2s; background:none; border:none; }
 .back-btn:hover { color:var(--text); }
+
+/* MOBILE */
 .mobile-topbar { display:none; align-items:center; justify-content:space-between; padding:14px 16px; background:var(--surface); border-bottom:1px solid var(--border); position:sticky; top:0; z-index:50; flex-shrink:0; }
 .mobile-topbar .logo-mark { display:flex; align-items:center; gap:8px; }
 .mobile-topbar .mark { width:30px; height:30px; background:linear-gradient(135deg,var(--accent),var(--accent2)); border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:14px; }
@@ -198,6 +218,8 @@ word-spacing: 0.1em !important;
 .bnav-item.active { color:var(--accent); }
 .bnav-item .bicon { font-size:20px; }
 .bnav-item .blabel { font-size:9px; font-weight:600; text-transform:uppercase; letter-spacing:0.05em; }
+
+/* LOADING */
 #loading-overlay { position:fixed; inset:0; background:var(--bg); z-index:999; display:flex; align-items:center; justify-content:center; flex-direction:column; gap:16px; }
 #loading-overlay.hidden { display:none; }
 #loading-overlay .spinner { width:40px; height:40px; border:3px solid var(--border); border-top-color:var(--accent); border-radius:50%; animation:spin 0.8s linear infinite; }
@@ -250,6 +272,7 @@ Entrar com Google
 <div class="login-toggle"><a onclick="toggleLoginMode()">Não tem conta? <strong>Criar agora</strong></a></div>
 </div>
 </div>
+
 <!-- APP -->
 <div class="page" id="page-app">
 <div class="mobile-topbar">
@@ -320,6 +343,7 @@ Entrar com Google
 </div>
 </div>
 </div>
+
 <!-- TURMAS -->
 <div class="content-panel" id="panel-turmas">
 <div class="page-header" style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:12px">
@@ -328,6 +352,7 @@ Entrar com Google
 </div>
 <div class="cards-grid" id="turmas-grid"></div>
 </div>
+
 <!-- DETALHE TURMA -->
 <div class="content-panel" id="panel-turma-detalhe">
 <button class="back-btn" onclick="showPanel('turmas')">← Voltar para turmas</button>
@@ -337,6 +362,7 @@ Entrar com Google
 </div>
 <div class="aluno-list" id="alunos-list"></div>
 </div>
+
 <!-- PERFIL ALUNO -->
 <div class="content-panel" id="panel-aluno-perfil">
 <button class="back-btn" id="back-to-turma">← Voltar para turma</button>
@@ -347,6 +373,7 @@ Entrar com Google
 <button class="back-btn" style="margin:0" onclick="openTurma(state.turmaSelecionada)">← Voltar sem salvar</button>
 </div>
 </div>
+
 <!-- ALUNOS -->
 <div class="content-panel" id="panel-alunos">
 <div class="page-header"><div><h2>👥 Alunos Inclusos</h2><p>Todos os alunos cadastrados nas suas turmas</p></div></div>
@@ -356,6 +383,7 @@ Entrar com Google
 </div>
 <div id="alunos-painel-list"></div>
 </div>
+
 <!-- PERFIL PROFESSOR -->
 <div class="content-panel" id="panel-perfil">
 <div class="page-header"><h2>👤 Meu Perfil</h2><p>Configure suas informações para personalizar as adaptações</p></div>
@@ -389,6 +417,7 @@ Entrar com Google
 </div>
 </div>
 </div>
+
 <!-- ADAPTAR -->
 <div class="content-panel" id="panel-adaptar">
 <div class="page-header"><h2>✨ Adaptar Material</h2><p>Envie um conteúdo e gere adaptações individualizadas para cada aluno</p></div>
@@ -434,6 +463,7 @@ ondrop="handleDrop(event)">
 </div>
 </div>
 </div>
+
 <!-- PEI -->
 <div class="content-panel" id="panel-pei">
 <div class="page-header"><h2>📋 PEI — Plano Educacional Individualizado</h2><p>Gerado a partir do planejamento da turma, adaptado para cada aluno incluso</p></div>
@@ -446,6 +476,7 @@ ondrop="handleDrop(event)">
 <div class="field"><label>Professor(a)</label><input type="text" id="pei-professor" placeholder="Prof. Marcel Gantes"></div>
 <div class="field"><label>Disciplina</label><input type="text" id="pei-disciplina" placeholder="Ex: Biologia..."></div>
 </div>
+<!-- UPLOAD PLANEJAMENTO -->
 <div class="field" style="margin-bottom:16px">
 <label>📚 Planejamento da turma neurotípica</label>
 <label for="pei-file-input" class="upload-zone upload-zone-sm" id="pei-upload-zone" style="margin-bottom:12px"
@@ -478,6 +509,7 @@ ondrop="handlePeiDrop(event)">
 </div>
 </div>
 </div>
+
 <!-- HISTÓRICO -->
 <div class="content-panel" id="panel-historico">
 <div class="page-header"><h2>📁 Histórico de Atividades</h2><p>Registro de tudo que foi gerado</p></div>
@@ -486,6 +518,7 @@ ondrop="handlePeiDrop(event)">
 </div>
 </div>
 </div>
+
 <!-- MODALS -->
 <div class="modal-overlay" id="modal-nova-turma">
 <div class="modal">
@@ -497,6 +530,7 @@ ondrop="handlePeiDrop(event)">
 <div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal('modal-nova-turma')">Cancelar</button><button class="btn btn-primary" style="width:auto" onclick="criarTurma()">Criar turma →</button></div>
 </div>
 </div>
+
 <div class="modal-overlay" id="modal-novo-aluno">
 <div class="modal">
 <h3>Novo aluno incluso</h3><p class="modal-sub">O cadastro é anônimo — use um apelido ou código</p>
@@ -505,7 +539,8 @@ ondrop="handlePeiDrop(event)">
 <div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal('modal-novo-aluno')">Cancelar</button><button class="btn btn-accent2" style="width:auto" onclick="criarAluno()">Criar aluno →</button></div>
 </div>
 </div>
-</div>
+</div><!-- .app -->
+
 <nav class="bottom-nav">
 <div class="bottom-nav-inner">
 <button class="bnav-item active" id="bnav-dashboard" onclick="showPanel('dashboard');setBottomNav('dashboard')"><span class="bicon">🏠</span><span class="blabel">Início</span></button>
@@ -515,16 +550,17 @@ ondrop="handlePeiDrop(event)">
 <button class="bnav-item" id="bnav-historico" onclick="showPanel('historico');setBottomNav('historico')"><span class="bicon">📁</span><span class="blabel">Histórico</span></button>
 </div>
 </nav>
+
 <script>
 const SUPABASE_URL = 'https://ttyxcayltmgdtshohxzk.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_uPQpcbgyBu9X0xJmfd9bdA_yOr53tnI';
-const API_CHAT_URL = '/api/chat';
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 let state = { user:null, turmas:[], alunos:[], historico:[], turmaSelecionada:null, alunoSelecionado:null, adaptacoes:{}, alunoAdaptacaoAtual:null, peiAtual:null };
+
 pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
 async function init() {
-const { data: { session } } = await sb.auth.getSession();
+const {  { session } } = await sb.auth.getSession();
 if (session) { state.user = session.user; await loadData(); showApp(); }
 else showLogin();
 document.getElementById('loading-overlay').classList.add('hidden');
@@ -536,7 +572,7 @@ else if (event === 'SIGNED_OUT') { state.user=null; state.turmas=[]; state.aluno
 
 async function loadData() {
 const uid = state.user.id;
-const [{ data: turmas }, { data: alunos }, { data: historico }] = await Promise.all([
+const [{  turmas }, {  alunos }, {  historico }] = await Promise.all([
 sb.from('turmas').select('*').eq('user_id', uid).order('created_at'),
 sb.from('alunos').select('*').eq('user_id', uid).order('created_at'),
 sb.from('historico').select('*').eq('user_id', uid).order('created_at', { ascending: false }).limit(50),
@@ -582,11 +618,13 @@ const email = document.getElementById('login-email').value.trim();
 const pass = document.getElementById('login-pass').value;
 hideLoginError();
 if (!email || !pass) return showLoginError('Preencha e-mail e senha.');
+
 if (loginMode === 'signup') {
 const confirmPass = document.getElementById('login-pass-confirm').value;
 if (pass !== confirmPass) return showLoginError('As senhas não conferem.');
 if (pass.length < 6) return showLoginError('A senha deve ter pelo menos 6 caracteres.');
 }
+
 document.getElementById('btn-auth').textContent = 'Aguarde...';
 document.getElementById('btn-auth').disabled = true;
 try {
@@ -631,7 +669,7 @@ const nome = document.getElementById('na-nome').value.trim();
 const turmaId = document.getElementById('na-turma').value;
 if (!nome) return showToast('⚠️ Informe um identificador', 'warn');
 if (!turmaId) return showToast('⚠️ Selecione uma turma', 'warn');
-const { data, error } = await sb.from('alunos').insert({ user_id:state.user.id, turma_id:turmaId, nome, fragmentacao:'media', abstracao:'media', mediacao:'guiado', tipografia:'normal', dislexia:false, tdah:false, tea:false, baixa_visao:false, obs:'', altas_habilidades:false, interesses:'', bloom_nivel:'media', bloom_nivel_alvo:'media' }).select().single();
+const { data, error } = await sb.from('alunos').insert({ user_id:state.user.id, turma_id:turmaId, nome, fragmentacao:'media', abstracao:'media', mediacao:'guiado', tipografia:'normal', dislexia:false, tdah:false, tea:false, baixa_visao:false, obs:'' }).select().single();
 if (error) return showToast('❌ Erro ao criar aluno', 'warn');
 state.alunos.push(data);
 closeModal('modal-novo-aluno');
@@ -657,8 +695,6 @@ baixa_visao:  document.getElementById('p-baixa-visao')?.checked|| false,
 altas_habilidades: document.getElementById('p-altas-habilidades')?.checked || false,
 interesses:   document.getElementById('p-interesses')?.value   || '',
 obs:          document.getElementById('p-obs')?.value          || '',
-bloom_nivel:  document.getElementById('p-bloom-nivel')?.value  || 'media',
-bloom_nivel_alvo: document.getElementById('p-bloom-nivel-alvo')?.value || 'media',
 };
 const { error } = await sb.from('alunos').update(updates).eq('id', a.id);
 if (error) return showToast('❌ Erro ao salvar', 'warn');
@@ -673,16 +709,23 @@ if (data) state.historico.unshift(data);
 renderHistorico();
 }
 
+// PERFIL DO PROFESSOR
 async function salvarPerfilProfessor() {
 const estado = document.getElementById('perfil-estado').value;
 const materia = document.getElementById('perfil-materia').value;
 const escola = document.getElementById('perfil-escola').value;
-const { error } = await sb.auth.updateUser({ data: { estado, materia, escola } });
+
+const { error } = await sb.auth.updateUser({
+  { estado, materia, escola }
+});
+
 if (error) return showToast('❌ Erro ao salvar', 'warn');
+
 if (!state.user.user_metadata) state.user.user_metadata = {};
 state.user.user_metadata.estado = estado;
 state.user.user_metadata.materia = materia;
 state.user.user_metadata.escola = escola;
+
 showToast('✅ Perfil atualizado!');
 carregarDadosPerfil();
 }
@@ -768,7 +811,7 @@ function renderAlunosList(turmaId) {
 const alunos = state.alunos.filter(a => a.turma_id === turmaId);
 const list = document.getElementById('alunos-list');
 if(!alunos.length) { list.innerHTML=`<div class="empty-state"><div class="empty-icon">👥</div><p>Nenhum aluno incluso cadastrado ainda.</p></div>`; return; }
-const fragLabel={baixa:'Frag. Baixa',media:'Frag. Média',alta:'Frag. Alta',nao_alfabetizado:'📝 Pré-silábico'};
+const fragLabel={baixa:'Frag. Baixa',media:'Frag. Média',alta:'Frag. Alta',nao_alfabetizado:'🖼️ Não alfab.'};
 const abstLabel={alta:'Abstr. Alta',media:'Abstr. Média',baixa:'Abstr. Baixa',nao_abstrai:'Não abstrai'};
 const medLabel={autonomo:'Autônomo',guiado:'Guiado',passo_a_passo:'Passo a passo'};
 list.innerHTML = alunos.map((a,i) => {
@@ -798,11 +841,10 @@ document.getElementById('back-to-turma').onclick = () => openTurma(state.turmaSe
 renderParamGrid(a); showPanel('aluno-perfil');
 }
 
-const fragOpts=[{value:'baixa',label:'📄 Baixa',desc:'Texto contínuo e fluido, sem divisões.'},{value:'media',label:'📋 Média',desc:'Parágrafos curtos, conceitos separados.'},{value:'alta',label:'📌 Alta',desc:'Blocos curtos, um conceito por bloco.'},{value:'nao_alfabetizado',label:'📝 Pré-silábico',desc:'Atividade sensorial e oral (sem pictogramas).'}];
+const fragOpts=[{value:'baixa',label:'📄 Baixa',desc:'Texto contínuo e fluido, sem divisões.'},{value:'media',label:'📋 Média',desc:'Parágrafos curtos, conceitos separados.'},{value:'alta',label:'📌 Alta',desc:'Blocos curtos, um conceito por bloco.'},{value:'nao_alfabetizado',label:'🖼️ Não alfabetizado',desc:'Material convertido em prancha de pictogramas (ARASAAC).'}];
 const abstOpts=[{value:'alta',label:'🔭 Alta',desc:'Inclui inferências, analogias e exemplos.'},{value:'media',label:'🔬 Média',desc:'Explica com exemplos simples e diretos.'},{value:'baixa',label:'🧱 Baixa',desc:'Linguagem direta e concreta.'},{value:'nao_abstrai',label:'🔤 Não abstrai',desc:'Tudo literal. Sem inferências ou analogias.'}];
 const medOpts=[{value:'autonomo',label:'🦅 Autônomo',desc:'Enunciado direto, sem instruções extras.'},{value:'guiado',label:'🤝 Guiado',desc:'Inclui instruções e exemplos de apoio.'},{value:'passo_a_passo',label:'📋 Passo a passo',desc:'Cada etapa explicada detalhadamente.'}];
 const tipoOpts=[{value:'normal',label:'Abc Normal',desc:'Fonte padrão com maiúsculas e minúsculas.'},{value:'bastao',label:'ABC Bastão',desc:'Texto em caixa alta.'}];
-const bloomOpts=[{value:'lembrar',label:'📖 Lembrar',desc:'Recall de fatos e conceitos básicos'},{value:'entender',label:'💡 Entender',desc:'Explicar ideias e conceitos'},{value:'aplicar',label:'🔧 Aplicar',desc:'Usar informação em novas situações'},{value:'analisar',label:'🔍 Analisar',desc:'Conectar ideias e encontrar relações'},{value:'avaliar',label:'⚖️ Avaliar',desc:'Justificar decisões e criticar'},{value:'criar',label:'🎨 Criar',desc:'Produzir novo trabalho original'},{value:'media',label:'📊 Médio (padrão)',desc:'Equilíbrio entre recall e compreensão'}];
 
 function paramSelect(id, label, icon, desc, options, currentVal) {
 return `<div class="param-card"><h4>${icon} ${label}</h4><p style="font-size:12px;color:var(--muted);margin-bottom:14px">${desc}</p><div class="param-select-wrap"><select id="${id}" class="param-select" onchange="updateParamDesc('${id}')">${options.map(o=>`<option value="${o.value}" ${currentVal===o.value?'selected':''}>${o.label}</option>`).join('')}</select><div class="param-desc-box" id="desc-${id}">${options.find(o=>o.value===currentVal)?.desc||''}</div></div></div>`;
@@ -810,7 +852,7 @@ return `<div class="param-card"><h4>${icon} ${label}</h4><p style="font-size:12p
 
 function updateParamDesc(id) {
 const val = document.getElementById(id).value;
-const maps = {'p-fragmentacao':fragOpts,'p-abstracao':abstOpts,'p-mediacao':medOpts,'p-tipografia':tipoOpts,'p-bloom-nivel':bloomOpts,'p-bloom-nivel-alvo':bloomOpts};
+const maps = {'p-fragmentacao':fragOpts,'p-abstracao':abstOpts,'p-mediacao':medOpts,'p-tipografia':tipoOpts};
 const found = maps[id]?.find(o=>o.value===val);
 if(found) document.getElementById('desc-'+id).textContent = found.desc;
 }
@@ -822,8 +864,6 @@ paramSelect('p-fragmentacao','Nível de leitura / Fragmentação','📝','Define
 (!isNaoAlf ? paramSelect('p-abstracao','Nível de abstração','🧩','Define se usa analogias ou mantém tudo literal.',abstOpts,a.abstracao) : '') +
 (!isNaoAlf ? paramSelect('p-mediacao','Mediação / Autonomia','🧭','Define se o aluno precisa de instruções detalhadas.',medOpts,a.mediacao||'guiado') : '') +
 (!isNaoAlf ? paramSelect('p-tipografia','Tipo de letra','🔤','Define o formato de texto.',tipoOpts,a.tipografia) : '') +
-(!isNaoAlf ? paramSelect('p-bloom-nivel','Nível Cognitivo Atual','🧠','Nível em que o conteúdo original está.',bloomOpts,a.bloom_nivel||'media') : '') +
-(!isNaoAlf ? paramSelect('p-bloom-nivel-alvo','Nível Cognitivo Alvo','🎯','Para qual nível adaptar o conteúdo.',bloomOpts,a.bloom_nivel_alvo||'media') : '') +
 `<div class="param-card" ${isNaoAlf?'style="grid-column:1/-1"':''}>
 <h4>📚 Condições adicionais</h4>
 <div class="check-group">
@@ -840,7 +880,7 @@ paramSelect('p-fragmentacao','Nível de leitura / Fragmentação','📝','Define
 <div class="param-card" style="grid-column:1/-1">
 <h4>🎯 Interesses e hiperfoco</h4>
 <p style="font-size:12px;color:var(--muted);margin-bottom:10px">A IA vai usar esses interesses como contexto para tornar o conteúdo mais relevante para o aluno. Ex: dinossauros, futebol, videogames, música...</p>
-<textarea id="p-interesses" rows="4" placeholder="Ex: adora dinossauros e jogos de estratégia, tem hiperfoco em astronomia..." style="width:100%;min-height:100px">${a.intereses||''}</textarea>
+<textarea id="p-interesses" rows="4" placeholder="Ex: adora dinossauros e jogos de estratégia, tem hiperfoco em astronomia..." style="width:100%;min-height:100px">${a.interesses||''}</textarea>
 </div>
 <div class="param-card" style="grid-column:1/-1">
 <h4>📌 Observações pedagógicas</h4>
@@ -854,9 +894,9 @@ renderParamGrid({...state.alunos.find(x=>x.id===state.alunoSelecionado), fragmen
 
 function openModalNovoAluno() {
 const sel = document.getElementById('na-turma');
-sel.innerHTML = '<option value="">Selecione uma turma...</option>';
-if(state.turmas.length === 0) { showToast('⚠️ Crie uma turma primeiro!', 'warn'); return; }
-state.turmas.forEach(t => { sel.innerHTML += `<option value="${t.id}">${t.nome} — ${t.disciplina}</option>`; });
+let html = '<option value="">Selecione uma turma...</option>';
+state.turmas.forEach(t => { html+=`<option value="${t.id}">${t.nome} — ${t.disciplina}</option>`; });
+sel.innerHTML = html;
 if(state.turmaSelecionada) sel.value = state.turmaSelecionada;
 openModal('modal-novo-aluno');
 }
@@ -901,13 +941,15 @@ container.innerHTML = alunos.map(a => `<label style="display:flex;align-items:ce
 function buildPrompt(aluno, texto, disciplina, nomeAtiv) {
 const fragMap={baixa:'Texto contínuo e fluido.',media:'Parágrafos curtos, conceitos separados.',alta:'Blocos curtos, um conceito por bloco. Use tópicos e listas.'};
 const abstMap={alta:'Inclua inferências, analogias e exemplos.',media:'Explique com exemplos simples e diretos.',baixa:'Linguagem direta e concreta.',nao_abstrai:'Tudo literal. Sem inferências ou analogias.'};
-const medMap={autonomo:'Enunciado direto, sem instruções extras.',guiado:'Inclui instruções curtas e exemplos de apoio.',passo_a_passo:'Cada etapa explicada detalhadamente.'};
+const medMap={autonomo:'Enunciado direto, sem instruções extras.',guiado:'Inclua instruções curtas e exemplos de apoio.',passo_a_passo:'Cada etapa explicada detalhadamente.'};
 const tipoMap={normal:'Fonte padrão.',bastao:'Escreva tudo em CAIXA ALTA.'};
 const conds=[];
 if(aluno.dislexia) conds.push('Dislexia: frases curtas, espaçamento claro.');
 if(aluno.tdah) conds.push('TDAH: blocos muito curtos, um item por vez, elimine distrações.');
 if(aluno.tea) conds.push('TEA: linguagem totalmente literal, sem metáforas ou expressões idiomáticas.');
 if(aluno.baixa_visao) conds.push('Baixa visão: texto simples, sem tabelas complexas, legende todo conteúdo visual.');
+
+// DADOS DO PROFESSOR
 const estadoProf = state.user.user_metadata?.estado || 'BNCC';
 const materiaProf = state.user.user_metadata?.materia || disciplina;
 const escolaProf = state.user.user_metadata?.escola || 'Escola';
@@ -915,86 +957,70 @@ let referenciaCurricular = 'BNCC (Base Nacional Comum)';
 if (estadoProf === 'SP') referenciaCurricular = 'Currículo Paulista';
 if (estadoProf === 'RS') referenciaCurricular = 'Referencial Curricular Gaúcho';
 if (estadoProf === 'RJ') referenciaCurricular = 'Currículo Carioca';
+
+// INSTRUÇÕES POR MATÉRIA
 let instrucaoMateria = '';
 const discLower = (disciplina || '').toLowerCase();
 if (discLower.includes('matemática') || discLower.includes('física') || discLower.includes('química')) {
-instrucaoMateria = `⚠️ ATENÇÃO PARA EXATAS: Mantenha fórmulas claras. Em Física/Química, descreva experimentos com segurança. Não omita cálculos.`;
+    instrucaoMateria = `⚠️ ATENÇÃO PARA EXATAS: Mantenha fórmulas claras. Em Física/Química, descreva experimentos com segurança. Não omita cálculos.`;
 } else if (discLower.includes('biologia') || discLower.includes('ciências')) {
-instrucaoMateria = `⚠️ ATENÇÃO PARA CIÊNCIAS: Use analogias com corpo humano/natureza. Em procedimentos práticos, destaque avisos de segurança.`;
+    instrucaoMateria = `⚠️ ATENÇÃO PARA CIÊNCIAS: Use analogias com corpo humano/natureza. Em procedimentos práticos, destaque avisos de segurança.`;
 }
+
 const altasHabilidades = aluno.altas_habilidades ? `
 ATENÇÃO — ALTAS HABILIDADES/SUPERDOTAÇÃO:
 Este aluno tem altas habilidades. NÃO simplifique o conteúdo. Em vez disso:
 - Aprofunde os conceitos além do previsto para a série
 - Inclua conexões interdisciplinares e curiosidades avançadas
 - Proponha desafios extras e questões que estimulem o pensamento crítico` : '';
-const interessesTexto = aluno.intereses ? `
-INTERESSES E HIPERFOCO DO ALUNO: ${aluno.intereses}
+
+const interessesTexto = aluno.interesses ? `
+INTERESSES E HIPERFOCO DO ALUNO: ${aluno.interesses}
 Use esses interesses como contexto e exemplos ao longo do material.` : '';
-const bloomNivel = aluno.bloom_nivel_alvo || aluno.bloom_nivel || 'media';
-const bloomMap = {lembrar:'Lembrar',entender:'Entender',aplicar:'Aplicar',analisar:'Analisar',avaliar:'Avaliar',criar:'Criar',media:'Entender'};
-const bloomInstrucoes = {lembrar:'Use perguntas diretas de recall.',entender:'Peça para explicar com próprias palavras.',aplicar:'Crie situações práticas.',analisar:'Peça comparações e causas.',avaliar:'Inclua julgamentos de valor.',criar:'Proponha produção original.',media:'Equilibre recall e compreensão.'};
-const bloomTexto = `
-NÍVEL COGNITIVO (Taxonomia de Bloom):
-- Nível original: ${bloomMap[aluno.bloom_nivel] || 'Médio'}
-- Nível alvo: ${bloomMap[bloomNivel] || 'Médio'}
-- Instrução: ${bloomInstrucoes[bloomNivel] || bloomInstrucoes.media}`;
-return `Você é um especialista em educação inclusiva com 15+ anos de experiência. Adapte o material abaixo para um aluno com o seguinte perfil.
+
+return `Você é um especialista em educação inclusiva. Adapte o material abaixo para um aluno com o seguinte perfil.
 CONTEXTO DO PROFESSOR:
 - Estado/Referência: ${referenciaCurricular}
 - Escola: ${escolaProf}
 - Matéria Focus: ${materiaProf}
 ${instrucaoMateria}
+
 PERFIL DO ALUNO:
 - Fragmentação: ${fragMap[aluno.fragmentacao]||aluno.fragmentacao}
 - Abstração: ${abstMap[aluno.abstracao]||aluno.abstracao}
 - Mediação/Autonomia: ${medMap[aluno.mediacao]||medMap['guiado']}
 - Tipo de letra: ${tipoMap[aluno.tipografia]||'Padrão'}
-${bloomTexto}
 ${conds.length?'- Condições especiais:\n• '+conds.join('\n• '):''}
 ${aluno.obs?'- Observações pedagógicas: '+aluno.obs:''}
 ${altasHabilidades}
 ${interessesTexto}
-EXEMPLOS DE ADAPTAÇÃO:
-❌ RUIM (simplificação excessiva): "Plantas fazem comida com sol"
-✅ BOM (adaptação acessível mantendo conteúdo): "A fotossíntese é como uma fábrica na planta: entrada (CO2 + água), energia (sol), saída (açúcar)"
-⚠️ REGRA: Nunca omita conceitos-chave. Apenas mude a FORMA de apresentar.
-RESTRIÇÕES (NÃO FAÇA):
-- NÃO omita informações do original
-- NÃO mude valores numéricos
-- NÃO use linguagem infantilizada (exceto EF1)
-- NÃO adicione conteúdo novo não presente no original
-- NÃO use expressões idiomáticas
-- NÃO gere mais de 20% a mais de texto que o original
-FORMATO DA SAÍDA (obrigatório):
-1. Use ### para seções principais
-2. Use **negrito** para termos importantes
-3. Use listas com - para itens sequenciais
-4. Não inclua introduções como "Aqui está a adaptação"
-5. Não inclua conclusões como "Espero que ajude"
+
+Fidelidade: mantenha TODAS as informações do original. Apenas adapte linguagem, estrutura e acessibilidade.
+Não gere introdução ou comentários. Apenas o material adaptado.
 MATERIAL ORIGINAL (Disciplina: ${disciplina}${nomeAtiv?', Atividade: '+nomeAtiv:''}):
 ${texto}`;
 }
 
-function buildPromptPreSilabico(aluno, texto, disciplina, nomeAtiv) {
-return `Você é especialista em educação infantil e alfabetização. Crie uma ATIVIDADE SENSORIAL E ORAL para aluno PRÉ-SILÁBICO (não alfabetizado).
-PERFIL DO ALUNO:
-${aluno.obs ? '- Observações: ' + aluno.obs : ''}
-${aluno.intereses ? '- Interesses: ' + aluno.intereses : ''}
-CONTEÚDO ORIGINAL (${disciplina}${nomeAtiv ? ' — ' + nomeAtiv : ''}):
+function buildPromptPictogramas(aluno, texto, disciplina, nomeAtiv) {
+return `Você é especialista em CAA. Extraia 8-16 conceitos concretos do material para um aluno NÃO ALFABETIZADO.
+${aluno.obs?'Observações: '+aluno.obs:''}
+MATERIAL (${disciplina}${nomeAtiv?' — '+nomeAtiv:''}):
 ${texto}
-Crie uma atividade com:
-1. **Objetivo oral/sensorial** (o que o aluno vai experimentar/falar)
-2. **Materiais concretos** (o que o professor precisa preparar)
-3. **Passo a passo da atividade** (máximo 5 etapas simples)
-4. **Perguntas orais** para fazer durante a atividade (3-5 perguntas)
-5. **Registro alternativo** (como o aluno demonstra aprendizado sem escrever)
-IMPORTANTE:
-- Não use pictogramas ou imagens
-- Foque em experiência prática, manipulação, oralidade
-- Use linguagem simples para o PROFESSOR seguir
-- A atividade deve durar 15-30 minutos
-Responda em português do Brasil, formatado para leitura fácil.`;
+Responda SOMENTE com JSON:
+[{"palavra": "célula", "contexto": "unidade da vida", "busca_en": "cell"}]`;
+}
+
+async function buscarPictogramas(conceitos) {
+const resultados=[];
+for(const c of conceitos) {
+try {
+let resp = await fetch(`https://api.arasaac.org/api/pictograms/pt/search/${encodeURIComponent(c.palavra)}`);
+let data = await resp.json();
+if(!data||!data.length) { resp=await fetch(`https://api.arasaac.org/api/pictograms/en/search/${encodeURIComponent(c.busca_en||c.palavra)}`); data=await resp.json(); }
+resultados.push(data&&data.length?data[0]:null);
+} catch(e) { resultados.push(null); }
+}
+return resultados;
 }
 
 async function gerarAdaptacoes() {
@@ -1006,71 +1032,73 @@ const checkboxes = document.querySelectorAll('#aluno-select-list input[type=chec
 if(!checkboxes.length) return showToast('⚠️ Selecione pelo menos um aluno','warn');
 const alunosParaAdaptar = state.alunos.filter(a=>Array.from(checkboxes).map(c=>c.value).includes(a.id));
 document.getElementById('btn-gerar').disabled=true;
-document.getElementById('btn-gerar').textContent='⏳ Gerando...';
 document.getElementById('resultado-area').style.display='none';
 const progBar=document.getElementById('prog-bar'); const progFill=document.getElementById('prog-fill');
 progBar.classList.add('show'); progFill.style.width='5%';
 state.adaptacoes={};
-const total=alunosParaAdaptar.length; let done=0; let erros=0;
+const total=alunosParaAdaptar.length; let done=0;
 for(const aluno of alunosParaAdaptar) {
-try {
-let resultado;
 if(aluno.fragmentacao==='nao_alfabetizado') {
-resultado = await fetch(API_CHAT_URL, {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({messages:[{role:'user', content:buildPromptPreSilabico(aluno,texto,disciplina,nomeAtiv)}]})});
-const d = await resultado.json();
-resultado = d.choices?.[0]?.message?.content || 'Erro ao gerar.';
-state.adaptacoes[aluno.id]={tipo:'sensorial',texto:resultado,nomeAtiv,disciplina};
+try {
+const r=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({messages:[{role:'user',content:buildPromptPictogramas(aluno,texto,disciplina,nomeAtiv)}]})});
+const d=await r.json();
+let conceitos=[];
+try{conceitos=JSON.parse((d.content?.[0]?.text||'[]').replace(/```json|```/g,'').trim());}catch(e){}
+const pictogramas=await buscarPictogramas(conceitos);
+state.adaptacoes[aluno.id]={tipo:'pictograma',conceitos,pictogramas,nomeAtiv,disciplina};
+} catch(e){state.adaptacoes[aluno.id]={tipo:'pictograma',conceitos:[],pictogramas:[],nomeAtiv,disciplina};}
 } else {
-const r = await fetch(API_CHAT_URL, {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({messages:[{role:'user', content:buildPrompt(aluno,texto,disciplina,nomeAtiv)}]})});
-const d = await r.json();
-resultado = d.choices?.[0]?.message?.content || 'Erro ao gerar.';
-state.adaptacoes[aluno.id]=resultado;
+try {
+const r=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({messages:[{role:'user',content:buildPrompt(aluno,texto,disciplina,nomeAtiv)}]})});
+const d=await r.json();
+state.adaptacoes[aluno.id]=d.content?.[0]?.text||'Erro ao gerar.';
+} catch(e){state.adaptacoes[aluno.id]=`Erro: ${e.message}`;}
 }
 done++;
 progFill.style.width=`${Math.round((done/total)*100)}%`;
 const turma=state.turmas.find(t=>t.id===aluno.turma_id);
 await salvarHistorico({aluno_id:aluno.id,aluno_nome:aluno.nome,titulo:nomeAtiv||disciplina,disciplina,turma_nome:turma?.nome||''});
-if (done < total) await new Promise(r => setTimeout(r, 1500));
-} catch(e) {
-console.error(`Erro ao adaptar para ${aluno.nome}:`, e);
-state.adaptacoes[aluno.id]=`⚠️ Erro ao gerar adaptação: ${e.message}`;
-erros++;
-done++;
-progFill.style.width=`${Math.round((done/total)*100)}%`;
-}
+if (done < total) await new Promise(r => setTimeout(r, 2000));
 }
 progBar.classList.remove('show'); progFill.style.width='0%';
 document.getElementById('btn-gerar').disabled=false;
-document.getElementById('btn-gerar').textContent='🤖 Gerar adaptações com IA';
-if(erros > 0) showToast(`⚠️ ${erros} adaptação(ões) falharam`, 'warn');
 document.getElementById('resultado-tabs').innerHTML=alunosParaAdaptar.map((a,i)=>`<div class="rtab ${i===0?'active':''}" onclick="mostrarAdaptacao('${a.id}',this)">${a.nome}</div>`).join('');
 state.alunoAdaptacaoAtual=alunosParaAdaptar[0]?.id;
 const primeiraAdapt=state.adaptacoes[alunosParaAdaptar[0]?.id];
 const box=document.getElementById('resultado-text');
-if(primeiraAdapt && primeiraAdapt.tipo === 'sensorial') {
-box.innerHTML=markdownParaHtml(primeiraAdapt.texto);
-} else {
-box.innerHTML=primeiraAdapt?markdownParaHtml(primeiraAdapt):'';
-}
+if(primeiraAdapt&&primeiraAdapt.tipo==='pictograma') renderPrancha(primeiraAdapt,box);
+else box.innerHTML=primeiraAdapt?markdownParaHtml(primeiraAdapt):'';
 document.getElementById('resultado-area').style.display='block';
-showToast(`✅ ${done} adaptação(ões) gerada(s)!`);
 }
 
 function mostrarAdaptacao(alunoId, el) {
 document.querySelectorAll('.rtab').forEach(t=>t.classList.remove('active'));
 el.classList.add('active'); state.alunoAdaptacaoAtual=alunoId;
 const adapt=state.adaptacoes[alunoId]; const box=document.getElementById('resultado-text');
+// VERIFICA DISLEXIA PARA APLICAR FONTE NA TELA
 const aluno = state.alunos.find(a => a.id === alunoId);
-if (aluno?.dislexia) { box.classList.add('font-dyslexic'); } else { box.classList.remove('font-dyslexic'); }
-if(adapt && adapt.tipo === 'sensorial') {
-box.innerHTML=markdownParaHtml(adapt.texto);
+if (aluno?.dislexia) {
+    box.classList.add('font-dyslexic');
 } else {
-box.innerHTML=adapt?markdownParaHtml(adapt):'Aguardando...';
+    box.classList.remove('font-dyslexic');
 }
+if(adapt&&adapt.tipo==='pictograma') renderPrancha(adapt,box);
+else box.innerHTML=adapt?markdownParaHtml(adapt):'Aguardando...';
 }
 
+function renderPrancha(adapt, container) {
+const {conceitos,pictogramas,nomeAtiv,disciplina}=adapt;
+if(!conceitos.length) { container.innerHTML=`<div class="empty-state"><div class="empty-icon">⚠️</div><p>Não foi possível gerar a prancha.</p></div>`; return; }
+let html=`<div style="margin-bottom:16px"><div style="font-weight:800;font-size:16px;margin-bottom:4px">🖼️ Prancha de Pictogramas</div><div style="font-size:12px;color:var(--muted)">ARASAAC · ${nomeAtiv||disciplina}</div></div><div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:12px;">`;
+conceitos.forEach((c,i)=>{
+const pic=pictogramas[i]; const imgUrl=pic?`https://static.arasaac.org/pictograms/${pic._id}/${pic._id}_500.png`:null;
+html+=`<div style="background:white;border-radius:12px;padding:10px 8px;text-align:center;border:2px solid #e5e7eb;">${imgUrl?`<img src="${imgUrl}" alt="${c.palavra}" style="width:80px;height:80px;object-fit:contain;display:block;margin:0 auto 8px" onerror="this.style.display='none'">`:''}<div style="font-size:12px;font-weight:700;color:#111;text-transform:uppercase">${c.palavra}</div>${c.contexto?`<div style="font-size:10px;color:#6b7280;margin-top:3px">${c.contexto}</div>`:''}</div>`;
+});
+container.innerHTML=html+'</div>';
+}
+
+// ======================== GERADOR DOCX via JSZip ========================
 function esc(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
-
 function markdownParaHtml(texto) {
 return DOMPurify.sanitize(texto
 .replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>')
@@ -1094,18 +1122,21 @@ return p ? `<w:r><w:rPr><w:sz w:val="24"/><w:szCs w:val="24"/></w:rPr><w:t xml:s
 }
 
 function gerarXmlDocx(titulo, texto, aluno) {
+// CABEÇALHO PADRÃO
 const meta = state.user.user_metadata || {};
-const cabecalho = `ESCOLA: ${meta.escola || '__________________'}
-PROFESSOR(A): ${state.user.user_metadata?.name || state.user.email}
-ESTADO/REF: ${meta.estado || 'BNCC'}
-DATA: ${new Date().toLocaleDateString('pt-BR')}
-----------------------------------------
-`;
+const cabecalho = `ESCOLA: ${meta.escola || '__________________'}\nPROFESSOR(A): ${state.user.user_metadata?.name || state.user.email}\nESTADO/REF: ${meta.estado || 'BNCC'}\nDATA: ${new Date().toLocaleDateString('pt-BR')}\n----------------------------------------\n`;
+
+// FONTE BASEADA NA DISLEXIA
 const fontName = (aluno?.dislexia) ? 'OpenDyslexic' : 'Calibri';
+const fontFallback = (aluno?.dislexia) ? 'Verdana' : 'Arial';
+
 let p = `<w:p><w:pPr><w:pStyle w:val="H1"/><w:jc w:val="center"/></w:pPr><w:r><w:t>${esc(titulo)}</w:t></w:r></w:p>`;
+
+// Adiciona cabeçalho
 cabecalho.split('\n').forEach(l => {
-if(l.trim()) p += `<w:p><w:pPr><w:spacing w:after="50"/></w:pPr><w:r><w:t>${esc(l)}</w:t></w:r></w:p>`;
+    if(l.trim()) p += `<w:p><w:pPr><w:spacing w:after="50"/></w:pPr><w:r><w:t>${esc(l)}</w:t></w:r></w:p>`;
 });
+
 texto.split('\n').forEach(l => {
 const linha = l.trim();
 if (!linha) { p += `<w:p/>`; return; }
@@ -1118,13 +1149,16 @@ p += `<w:p><w:pPr><w:pStyle w:val="H2"/></w:pPr><w:r><w:t>${esc(txt)}</w:t></w:r
 p += `<w:p><w:pPr><w:spacing w:after="100"/></w:pPr>${linhaParaRuns(linha)}</w:p>`;
 }
 });
+
 const xmlStyles = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:styles xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:style w:type="paragraph" w:styleId="Normal"><w:name w:val="Normal"/><w:rPr><w:rFonts w:ascii="${fontName}" w:hAnsi="${fontName}" w:cs="${fontName}"/><w:sz w:val="24"/><w:szCs w:val="24"/></w:rPr></w:style><w:style w:type="paragraph" w:styleId="H1"><w:name w:val="heading 1"/><w:basedOn w:val="Normal"/><w:pPr><w:spacing w:before="240" w:after="120"/></w:pPr><w:rPr><w:b/><w:rFonts w:ascii="${fontName}" w:hAnsi="${fontName}"/><w:sz w:val="36"/><w:szCs w:val="36"/><w:color w:val="2563EB"/></w:rPr></w:style><w:style w:type="paragraph" w:styleId="H2"><w:name w:val="heading 2"/><w:basedOn w:val="Normal"/><w:pPr><w:spacing w:before="200" w:after="80"/></w:pPr><w:rPr><w:b/><w:rFonts w:ascii="${fontName}" w:hAnsi="${fontName}"/><w:sz w:val="28"/><w:szCs w:val="28"/><w:color w:val="7C3AED"/></w:rPr></w:style></w:styles>`;
+
 return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:body>${p}<w:sectPr><w:pgSz w:w="12240" w:h="15840"/><w:pgMar w:top="1440" w:right="1440" w:bottom="1440" w:left="1440"/></w:sectPr></w:body></w:document>`;
 }
 
 async function criarDocx(nomeArquivo, titulo, texto, aluno) {
 const xmlDoc = gerarXmlDocx(titulo, texto, aluno);
 const xmlStyles = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:styles xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:style w:type="paragraph" w:styleId="Normal"><w:name w:val="Normal"/><w:rPr><w:rFonts w:ascii="${aluno?.dislexia?'OpenDyslexic':'Calibri'}" w:hAnsi="${aluno?.dislexia?'OpenDyslexic':'Calibri'}" w:cs="${aluno?.dislexia?'OpenDyslexic':'Calibri'}"/><w:sz w:val="24"/><w:szCs w:val="24"/></w:rPr></w:style><w:style w:type="paragraph" w:styleId="H1"><w:name w:val="heading 1"/><w:basedOn w:val="Normal"/><w:pPr><w:spacing w:before="240" w:after="120"/></w:pPr><w:rPr><w:b/><w:rFonts w:ascii="${aluno?.dislexia?'OpenDyslexic':'Calibri'}" w:hAnsi="${aluno?.dislexia?'OpenDyslexic':'Calibri'}"/><w:sz w:val="36"/><w:szCs w:val="36"/><w:color w:val="2563EB"/></w:rPr></w:style><w:style w:type="paragraph" w:styleId="H2"><w:name w:val="heading 2"/><w:basedOn w:val="Normal"/><w:pPr><w:spacing w:before="200" w:after="80"/></w:pPr><w:rPr><w:b/><w:rFonts w:ascii="${aluno?.dislexia?'OpenDyslexic':'Calibri'}" w:hAnsi="${aluno?.dislexia?'OpenDyslexic':'Calibri'}"/><w:sz w:val="28"/><w:szCs w:val="28"/><w:color w:val="7C3AED"/></w:rPr></w:style></w:styles>`;
+
 const xmlCT = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/><Override PartName="/word/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.styles+xml"/></Types>`;
 const xmlRelsMain = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/></Relationships>`;
 const xmlRelsWord = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/></Relationships>`;
@@ -1144,12 +1178,13 @@ const txt = state.adaptacoes[state.alunoAdaptacaoAtual];
 if (!txt) return showToast('⚠️ Nenhuma adaptação selecionada','warn');
 const aluno = state.alunos.find(a => a.id === state.alunoAdaptacaoAtual);
 const nome = aluno?.nome || 'aluno';
-if (typeof txt !== 'string' && txt.tipo === 'sensorial') {
-try { await criarDocx(`Atividade_${nome}.docx`, `Atividade Sensorial — ${nome}`, txt.texto, aluno); showToast('📥 DOCX baixado!'); }
+if (typeof txt !== 'string') {
+const adapt = txt;
+const linhas = adapt.conceitos.map(c => `**${c.palavra}** — ${c.contexto||''}`).join('\n');
+try { await criarDocx(`Prancha_${nome}.docx`, `Prancha de Pictogramas — ${nome}`, `Material: ${adapt.nomeAtiv||adapt.disciplina}\n` + linhas, aluno); showToast('📥 DOCX da prancha baixado!'); }
 catch(e) { showToast('❌ Erro ao gerar DOCX','warn'); console.error(e); }
 return;
 }
-if (typeof txt !== 'string') { showToast('⚠️ Formato não suportado','warn'); return; }
 try { await criarDocx(`Adaptacao_${nome}.docx`, `Adaptação — ${nome}`, txt, aluno); showToast('📥 DOCX baixado!'); }
 catch(e) { showToast('❌ Erro ao gerar DOCX','warn'); console.error(e); }
 }
@@ -1159,9 +1194,8 @@ let baixados = 0;
 for (const id of Object.keys(state.adaptacoes)) {
 const aluno = state.alunos.find(x => x.id === id);
 const txt = state.adaptacoes[id];
-if (typeof txt !== 'string' && txt.tipo !== 'sensorial') continue;
-const texto = txt.tipo === 'sensorial' ? txt.texto : txt;
-try { await criarDocx(`Adaptacao_${aluno?.nome||id}.docx`, `Adaptação — ${aluno?.nome||id}`, texto, aluno); baixados++; await new Promise(r=>setTimeout(r,600)); }
+if (typeof txt !== 'string') continue;
+try { await criarDocx(`Adaptacao_${aluno?.nome||id}.docx`, `Adaptação — ${aluno?.nome||id}`, txt, aluno); baixados++; await new Promise(r=>setTimeout(r,600)); }
 catch(e) { console.error(e); }
 }
 showToast(`📦 ${baixados} DOCX baixados!`);
@@ -1202,7 +1236,6 @@ if(!checkboxes.length) return showToast('⚠️ Selecione pelo menos um aluno','
 const alunosSel=Array.from(checkboxes).map(cb=>state.alunos.find(a=>a.id===cb.value)).filter(Boolean);
 const turma=state.turmas.find(t=>t.id===turmaId);
 document.getElementById('btn-gerar-pei').disabled=true;
-document.getElementById('btn-gerar-pei').textContent='⏳ Gerando...';
 document.getElementById('pei-resultado').style.display='none';
 const progBar=document.getElementById('prog-bar-pei'); const progFill=document.getElementById('prog-fill-pei');
 progBar.classList.add('show');
@@ -1211,26 +1244,17 @@ for(let i=0;i<alunosSel.length;i++) {
 const aluno=alunosSel[i];
 progFill.style.width=`${Math.round(((i+0.5)/alunosSel.length)*100)}%`;
 try {
-const r=await fetch(API_CHAT_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({messages:[{role:'user',content:buildPromptPei(aluno,turma,planejamento,periodo,professor,disciplina)}]})});
+const r=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({messages:[{role:'user',content:buildPromptPei(aluno,turma,planejamento,periodo,professor,disciplina)}]})});
 const d=await r.json();
-state.peiAtual.alunos[aluno.id]={aluno,texto:d.choices?.[0]?.message?.content||'Erro ao gerar.'};
-} catch(e){
-console.error(e);
-state.peiAtual.alunos[aluno.id]={aluno,texto:'Erro ao gerar PEI.'};
-}
+state.peiAtual.alunos[aluno.id]={aluno,texto:d.content?.[0]?.text||'Erro ao gerar.'};
+} catch(e){state.peiAtual.alunos[aluno.id]={aluno,texto:'Erro ao gerar PEI.'};}
 progFill.style.width=`${Math.round(((i+1)/alunosSel.length)*100)}%`;
 }
-setTimeout(()=>{
-progBar.classList.remove('show');
-progFill.style.width='0%';
-document.getElementById('btn-gerar-pei').disabled=false;
-document.getElementById('btn-gerar-pei').textContent='📋 Gerar PEI com IA';
-renderPeiResultado();
-},400);
+setTimeout(()=>{progBar.classList.remove('show');progFill.style.width='0%';document.getElementById('btn-gerar-pei').disabled=false;renderPeiResultado();},400);
 }
 
 function buildPromptPei(aluno, turma, planejamento, periodo, professor, disciplina) {
-const fragMap={baixa:'Texto contínuo',media:'Parágrafos curtos',alta:'Blocos curtos e tópicos',nao_alfabetizado:'Atividade sensorial/oral'};
+const fragMap={baixa:'Texto contínuo',media:'Parágrafos curtos',alta:'Blocos curtos e tópicos',nao_alfabetizado:'Comunicação por pictogramas'};
 const abstMap={alta:'Alta',media:'Média',baixa:'Baixa — linguagem direta',nao_abstrai:'Não abstrai — tudo literal'};
 const medMap={autonomo:'Autônomo',guiado:'Guiado',passo_a_passo:'Passo a passo'};
 const conds=[]; if(aluno.dislexia) conds.push('Dislexia'); if(aluno.tdah) conds.push('TDAH'); if(aluno.tea) conds.push('TEA'); if(aluno.baixa_visao) conds.push('Baixa visão');
@@ -1301,9 +1325,9 @@ if(!state.historico.length) { list.innerHTML=`<div class="empty-state"><div clas
 list.innerHTML=state.historico.map(h=>`<div class="historico-item"><div class="hist-icon">📄</div><div class="hist-info"><div class="hist-title">${h.titulo}</div><div class="hist-meta">${h.aluno_nome||'Aluno'} · ${h.turma_nome||''} · ${h.created_at?new Date(h.created_at).toLocaleDateString('pt-BR'):''}</div><div style="margin-top:4px"><span class="tag tag-blue">${h.disciplina}</span></div></div></div>`).join('');
 }
 
+// ======================== UPLOAD ADAPTAR ========================
 function setUploadState(s) { ['idle','loading','success','error'].forEach(x=>document.getElementById('upload-'+x).style.display=s===x?'block':'none'); }
 function handleDrop(e) { e.preventDefault(); document.getElementById('upload-zone').classList.remove('dragover'); const file=e.dataTransfer.files[0]; if(file) handleFileSelect(file); }
-
 async function lerArquivo(file) {
 const ext=file.name.split('.').pop().toLowerCase();
 if(!['pdf','docx','doc','txt'].includes(ext)) throw new Error(`Formato .${ext} não suportado.`);
@@ -1317,7 +1341,6 @@ for(let i=1;i<=pdf.numPages;i++){const p=await pdf.getPage(i);const c=await p.ge
 }
 return texto.trim();
 }
-
 async function handleFileSelect(file) {
 if(!file) return;
 if(file.size>10*1024*1024) { setUploadState('error'); document.getElementById('upload-errmsg').textContent='Arquivo muito grande. Máximo: 10MB.'; return; }
@@ -1333,9 +1356,9 @@ const nomeInput=document.getElementById('material-nome'); if(!nomeInput.value) n
 } catch(err) { setUploadState('error'); document.getElementById('upload-errmsg').textContent='Erro ao ler: '+err.message; }
 }
 
+// ======================== UPLOAD PEI ========================
 function setPeiUploadState(s) { ['idle','loading','success','error'].forEach(x=>document.getElementById('pei-upload-'+x).style.display=s===x?'block':'none'); }
 function handlePeiDrop(e) { e.preventDefault(); document.getElementById('pei-upload-zone').classList.remove('dragover'); const file=e.dataTransfer.files[0]; if(file) handlePeiFileSelect(file); }
-
 async function handlePeiFileSelect(file) {
 if(!file) return;
 if(file.size>10*1024*1024) { setPeiUploadState('error'); document.getElementById('pei-upload-errmsg').textContent='Arquivo muito grande. Máximo: 10MB.'; return; }
@@ -1349,6 +1372,7 @@ setPeiUploadState('success');
 } catch(err) { setPeiUploadState('error'); document.getElementById('pei-upload-errmsg').textContent='Erro ao ler: '+err.message; }
 }
 
+// ======================== NAVIGATION ========================
 function showPanel(id) {
 closeSidebar();
 document.querySelectorAll('.content-panel').forEach(p=>p.classList.remove('active'));
@@ -1359,24 +1383,20 @@ if(id==='alunos') renderPainelAlunos();
 if(id==='dashboard') renderDashboard();
 if(id==='perfil') carregarDadosPerfil();
 }
-
 function openModal(id) { document.getElementById(id).classList.add('open'); }
 function closeModal(id) { document.getElementById(id).classList.remove('open'); }
 function toggleSidebar() { document.getElementById('main-sidebar').classList.toggle('open'); document.getElementById('sidebar-overlay').classList.toggle('open'); }
 function closeSidebar() { document.getElementById('main-sidebar').classList.remove('open'); document.getElementById('sidebar-overlay').classList.remove('open'); }
 function setBottomNav(id) { document.querySelectorAll('.bnav-item').forEach(b=>b.classList.remove('active')); const el=document.getElementById('bnav-'+id); if(el) el.classList.add('active'); }
-
 function showToast(msg, type) {
 const t=document.createElement('div');
 t.style.cssText=`position:fixed;bottom:24px;right:24px;padding:14px 20px;border-radius:12px;font-size:14px;font-weight:500;z-index:9999;animation:fadeUp 0.3s ease;background:${type==='warn'?'#fb923c22':'#34d39922'};border:1px solid ${type==='warn'?'#fb923c':'#34d399'};color:${type==='warn'?'#fb923c':'#34d399'};font-family:DM Sans,sans-serif;backdrop-filter:blur(10px);`;
 t.textContent=msg; document.body.appendChild(t); setTimeout(()=>t.remove(),3000);
 }
-
 function confirmarApagarAluno(id, nome) {
 if (!confirm(`Apagar o aluno "${nome}"?\nEssa ação não pode ser desfeita.`)) return;
 apagarAluno(id);
 }
-
 async function apagarAluno(id) {
 const { error } = await sb.from('alunos').delete().eq('id', id);
 if (error) return showToast('❌ Erro ao apagar aluno', 'warn');
@@ -1386,14 +1406,12 @@ renderPainelAlunos();
 updateStats();
 showToast('✅ Aluno apagado.');
 }
-
 function confirmarApagarTurma(id, nome) {
 const alunos = state.alunos.filter(a => a.turma_id === id);
 const aviso = alunos.length > 0 ? `\n⚠️ Isso também apagará ${alunos.length} aluno(s) incluso(s).` : '';
 if (!confirm(`Apagar a turma "${nome}"?${aviso}\nEssa ação não pode ser desfeita.`)) return;
 apagarTurma(id);
 }
-
 async function apagarTurma(id) {
 const { error } = await sb.from('turmas').delete().eq('id', id);
 if (error) return showToast('❌ Erro ao apagar turma', 'warn');
@@ -1402,7 +1420,6 @@ state.alunos = state.alunos.filter(a => a.turma_id !== id);
 renderAll();
 showToast('✅ Turma apagada.');
 }
-
 window.addEventListener('click',e=>{if(e.target.classList.contains('modal-overlay')) e.target.classList.remove('open');});
 init();
 </script>
