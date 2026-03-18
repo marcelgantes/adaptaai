@@ -23,22 +23,18 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
 .page { display: none; flex-direction: column; min-height: 100vh; }
 .page.active { display: flex; }
 h1,h2,h3,h4 { font-family: 'Syne', sans-serif; }
-
-/* FONTE PARA DISLEXIA */
 @font-face {
-    font-family: 'OpenDyslexic';
-    src: url('https://cdn.jsdelivr.net/gh/antijingoist/opendyslexic@master/opendyslexic-regular.ttf') format('truetype');
-    font-weight: normal;
-    font-style: normal;
+font-family: 'OpenDyslexic';
+src: url('https://cdn.jsdelivr.net/gh/antijingoist/opendyslexic@master/opendyslexic-regular.ttf') format('truetype');
+font-weight: normal;
+font-style: normal;
 }
 .font-dyslexic {
-    font-family: 'OpenDyslexic', 'Verdana', sans-serif !important;
-    line-height: 1.6 !important;
-    letter-spacing: 0.05em !important;
-    word-spacing: 0.1em !important;
+font-family: 'OpenDyslexic', 'Verdana', sans-serif !important;
+line-height: 1.6 !important;
+letter-spacing: 0.05em !important;
+word-spacing: 0.1em !important;
 }
-
-/* LOGIN */
 #page-login { background: var(--bg); align-items: center; justify-content: center; position: relative; overflow: hidden; }
 #page-login::before { content:''; position:absolute; width:600px; height:600px; background:radial-gradient(circle,rgba(79,156,249,0.12) 0%,transparent 70%); top:-150px; right:-150px; pointer-events:none; }
 #page-login::after { content:''; position:absolute; width:400px; height:400px; background:radial-gradient(circle,rgba(167,139,250,0.1) 0%,transparent 70%); bottom:-100px; left:-100px; pointer-events:none; }
@@ -75,8 +71,6 @@ h1,h2,h3,h4 { font-family: 'Syne', sans-serif; }
 .login-toggle { text-align:center; margin-top:20px; font-size:13px; color:var(--muted); }
 .login-toggle a { color:var(--accent); cursor:pointer; font-weight:500; }
 #login-error { display:none; padding:12px 14px; background:rgba(220,38,38,0.08); border:1px solid rgba(220,38,38,0.2); border-radius:8px; color:var(--danger); font-size:13px; margin-bottom:16px; }
-
-/* MAIN LAYOUT */
 .main-layout { display:flex; flex:1; overflow:hidden; height:100vh; }
 .sidebar { width:240px; background:var(--surface); border-right:1px solid var(--border); display:flex; flex-direction:column; padding:24px 0; flex-shrink:0; }
 .sidebar-logo { padding:0 20px 24px; border-bottom:1px solid var(--border); margin-bottom:16px; }
@@ -101,8 +95,6 @@ h1,h2,h3,h4 { font-family: 'Syne', sans-serif; }
 .main-content { flex:1; overflow-y:auto; padding:32px; }
 .content-panel { display:none; }
 .content-panel.active { display:block; animation:fadeIn 0.3s ease; }
-
-/* DASHBOARD */
 .page-header { margin-bottom:28px; }
 .page-header h2 { font-size:26px; font-weight:800; }
 .page-header p { color:var(--muted); font-size:14px; margin-top:4px; }
@@ -122,16 +114,12 @@ h1,h2,h3,h4 { font-family: 'Syne', sans-serif; }
 .action-card { transition:transform 0.2s; }
 .action-card:hover { transform:translateY(-2px); opacity:0.92; }
 .dash-card:hover { border-color:var(--accent); transform:translateY(-2px); }
-
-/* MODAL */
 .modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.7); z-index:100; display:none; align-items:center; justify-content:center; backdrop-filter:blur(4px); }
 .modal-overlay.open { display:flex; }
 .modal { background:var(--surface); border:1px solid var(--border); border-radius:20px; padding:32px; width:500px; max-width:95vw; max-height:90vh; overflow-y:auto; animation:fadeUp 0.3s ease; }
 .modal h3 { font-size:20px; font-weight:800; margin-bottom:6px; }
 .modal .modal-sub { color:var(--muted); font-size:13px; margin-bottom:24px; }
 .modal-footer { display:flex; gap:10px; justify-content:flex-end; margin-top:24px; }
-
-/* ALUNOS */
 .aluno-list { display:flex; flex-direction:column; gap:10px; }
 .aluno-row { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:16px 20px; display:flex; align-items:center; gap:16px; cursor:pointer; transition:all 0.2s; }
 .aluno-row:hover { border-color:var(--accent2); }
@@ -144,8 +132,6 @@ h1,h2,h3,h4 { font-family: 'Syne', sans-serif; }
 .tag-purple { background:rgba(167,139,250,0.15); color:var(--accent2); }
 .tag-green { background:rgba(52,211,153,0.15); color:var(--accent3); }
 .tag-orange { background:rgba(251,146,60,0.15); color:var(--warn); }
-
-/* PARAMS */
 .param-grid { display:grid; grid-template-columns:1fr 1fr; gap:20px; }
 .param-card { background:var(--card); border:1px solid var(--border); border-radius:14px; padding:20px; }
 .param-card h4 { font-size:13px; font-weight:600; color:var(--muted); margin-bottom:14px; display:flex; align-items:center; gap:6px; }
@@ -156,8 +142,6 @@ h1,h2,h3,h4 { font-family: 'Syne', sans-serif; }
 .check-group { display:flex; flex-direction:column; gap:8px; }
 .check-item { display:flex; align-items:center; gap:8px; cursor:pointer; font-size:13px; }
 .check-item input { width:16px; height:16px; accent-color:var(--accent); cursor:pointer; }
-
-/* UPLOAD */
 .adaptar-layout { display:grid; grid-template-columns:1fr 1fr; gap:24px; }
 .upload-zone { border:2px dashed var(--border); border-radius:14px; padding:32px 24px; text-align:center; cursor:pointer; transition:all 0.2s; min-height:110px; display:flex; align-items:center; justify-content:center; }
 .upload-zone:hover { border-color:var(--accent); background:rgba(79,156,249,0.04); }
@@ -171,8 +155,6 @@ h1,h2,h3,h4 { font-family: 'Syne', sans-serif; }
 .aluno-check-row { display:flex; align-items:center; gap:10px; padding:10px 14px; background:var(--bg); border:1px solid var(--border); border-radius:10px; cursor:pointer; transition:all 0.2s; }
 .aluno-check-row:hover { border-color:var(--accent2); }
 .aluno-check-row input[type=checkbox] { accent-color:var(--accent2); width:16px; height:16px; }
-
-/* RESULTADO */
 .resultado-tabs { display:flex; gap:8px; margin-bottom:20px; flex-wrap:wrap; }
 .rtab { padding:8px 16px; border-radius:8px; border:1px solid var(--border); background:var(--bg); color:var(--muted); font-size:13px; cursor:pointer; transition:all 0.2s; }
 .rtab.active { background:rgba(167,139,250,0.15); border-color:var(--accent2); color:var(--accent2); font-weight:500; }
@@ -185,8 +167,6 @@ h1,h2,h3,h4 { font-family: 'Syne', sans-serif; }
 .progress-bar { height:4px; background:var(--border); border-radius:2px; overflow:hidden; margin-top:16px; display:none; }
 .progress-bar.show { display:block; }
 .progress-fill { height:100%; background:linear-gradient(90deg,var(--accent),var(--accent2)); border-radius:2px; transition:width 0.5s; }
-
-/* MISC */
 .historico-item { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:16px 20px; margin-bottom:10px; display:flex; align-items:center; gap:16px; }
 .hist-icon { width:38px; height:38px; background:rgba(167,139,250,0.15); border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:16px; flex-shrink:0; }
 .hist-info { flex:1; }
@@ -202,8 +182,6 @@ h1,h2,h3,h4 { font-family: 'Syne', sans-serif; }
 .empty-state p { font-size:14px; }
 .back-btn { display:inline-flex; align-items:center; gap:6px; color:var(--muted); font-size:13px; cursor:pointer; margin-bottom:20px; transition:color 0.2s; background:none; border:none; }
 .back-btn:hover { color:var(--text); }
-
-/* MOBILE */
 .mobile-topbar { display:none; align-items:center; justify-content:space-between; padding:14px 16px; background:var(--surface); border-bottom:1px solid var(--border); position:sticky; top:0; z-index:50; flex-shrink:0; }
 .mobile-topbar .logo-mark { display:flex; align-items:center; gap:8px; }
 .mobile-topbar .mark { width:30px; height:30px; background:linear-gradient(135deg,var(--accent),var(--accent2)); border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:14px; }
@@ -218,8 +196,6 @@ h1,h2,h3,h4 { font-family: 'Syne', sans-serif; }
 .bnav-item.active { color:var(--accent); }
 .bnav-item .bicon { font-size:20px; }
 .bnav-item .blabel { font-size:9px; font-weight:600; text-transform:uppercase; letter-spacing:0.05em; }
-
-/* LOADING */
 #loading-overlay { position:fixed; inset:0; background:var(--bg); z-index:999; display:flex; align-items:center; justify-content:center; flex-direction:column; gap:16px; }
 #loading-overlay.hidden { display:none; }
 #loading-overlay .spinner { width:40px; height:40px; border:3px solid var(--border); border-top-color:var(--accent); border-radius:50%; animation:spin 0.8s linear infinite; }
@@ -272,7 +248,6 @@ Entrar com Google
 <div class="login-toggle"><a onclick="toggleLoginMode()">Não tem conta? <strong>Criar agora</strong></a></div>
 </div>
 </div>
-
 <!-- APP -->
 <div class="page" id="page-app">
 <div class="mobile-topbar">
@@ -343,7 +318,6 @@ Entrar com Google
 </div>
 </div>
 </div>
-
 <!-- TURMAS -->
 <div class="content-panel" id="panel-turmas">
 <div class="page-header" style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:12px">
@@ -352,7 +326,6 @@ Entrar com Google
 </div>
 <div class="cards-grid" id="turmas-grid"></div>
 </div>
-
 <!-- DETALHE TURMA -->
 <div class="content-panel" id="panel-turma-detalhe">
 <button class="back-btn" onclick="showPanel('turmas')">← Voltar para turmas</button>
@@ -362,7 +335,6 @@ Entrar com Google
 </div>
 <div class="aluno-list" id="alunos-list"></div>
 </div>
-
 <!-- PERFIL ALUNO -->
 <div class="content-panel" id="panel-aluno-perfil">
 <button class="back-btn" id="back-to-turma">← Voltar para turma</button>
@@ -373,7 +345,6 @@ Entrar com Google
 <button class="back-btn" style="margin:0" onclick="openTurma(state.turmaSelecionada)">← Voltar sem salvar</button>
 </div>
 </div>
-
 <!-- ALUNOS -->
 <div class="content-panel" id="panel-alunos">
 <div class="page-header"><div><h2>👥 Alunos Inclusos</h2><p>Todos os alunos cadastrados nas suas turmas</p></div></div>
@@ -383,7 +354,6 @@ Entrar com Google
 </div>
 <div id="alunos-painel-list"></div>
 </div>
-
 <!-- PERFIL PROFESSOR -->
 <div class="content-panel" id="panel-perfil">
 <div class="page-header"><h2>👤 Meu Perfil</h2><p>Configure suas informações para personalizar as adaptações</p></div>
@@ -417,7 +387,6 @@ Entrar com Google
 </div>
 </div>
 </div>
-
 <!-- ADAPTAR -->
 <div class="content-panel" id="panel-adaptar">
 <div class="page-header"><h2>✨ Adaptar Material</h2><p>Envie um conteúdo e gere adaptações individualizadas para cada aluno</p></div>
@@ -463,7 +432,6 @@ ondrop="handleDrop(event)">
 </div>
 </div>
 </div>
-
 <!-- PEI -->
 <div class="content-panel" id="panel-pei">
 <div class="page-header"><h2>📋 PEI — Plano Educacional Individualizado</h2><p>Gerado a partir do planejamento da turma, adaptado para cada aluno incluso</p></div>
@@ -476,7 +444,6 @@ ondrop="handleDrop(event)">
 <div class="field"><label>Professor(a)</label><input type="text" id="pei-professor" placeholder="Prof. Marcel Gantes"></div>
 <div class="field"><label>Disciplina</label><input type="text" id="pei-disciplina" placeholder="Ex: Biologia..."></div>
 </div>
-<!-- UPLOAD PLANEJAMENTO -->
 <div class="field" style="margin-bottom:16px">
 <label>📚 Planejamento da turma neurotípica</label>
 <label for="pei-file-input" class="upload-zone upload-zone-sm" id="pei-upload-zone" style="margin-bottom:12px"
@@ -509,7 +476,6 @@ ondrop="handlePeiDrop(event)">
 </div>
 </div>
 </div>
-
 <!-- HISTÓRICO -->
 <div class="content-panel" id="panel-historico">
 <div class="page-header"><h2>📁 Histórico de Atividades</h2><p>Registro de tudo que foi gerado</p></div>
@@ -518,29 +484,6 @@ ondrop="handlePeiDrop(event)">
 </div>
 </div>
 </div>
-
-<!-- MODALS -->
-<div class="modal-overlay" id="modal-nova-turma">
-<div class="modal">
-<h3>Nova turma</h3><p class="modal-sub">Crie uma turma para organizar seus alunos inclusos</p>
-<div class="field"><label>Nome da turma</label><input type="text" id="nt-nome" placeholder="Ex: 8º ano B, 3º EM Tarde..."></div>
-<div class="field"><label>Etapa de ensino</label><select id="nt-etapa"><option value="">Selecione...</option><option value="ef1">Ensino Fundamental I (1º–5º ano)</option><option value="ef2">Ensino Fundamental II (6º–9º ano)</option><option value="em">Ensino Médio</option></select></div>
-<div class="field"><label>Disciplina principal</label><input type="text" id="nt-disciplina" placeholder="Ex: Biologia, Matemática..."></div>
-<div class="field"><label>Ano letivo</label><input type="text" id="nt-ano" placeholder="2026" value="2026"></div>
-<div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal('modal-nova-turma')">Cancelar</button><button class="btn btn-primary" style="width:auto" onclick="criarTurma()">Criar turma →</button></div>
-</div>
-</div>
-
-<div class="modal-overlay" id="modal-novo-aluno">
-<div class="modal">
-<h3>Novo aluno incluso</h3><p class="modal-sub">O cadastro é anônimo — use um apelido ou código</p>
-<div class="field"><label>Identificação</label><input type="text" id="na-nome" placeholder="Ex: Aluno A, Código 04..."></div>
-<div class="field"><label>Turma</label><select id="na-turma"><option value="">Selecione uma turma...</option></select></div>
-<div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal('modal-novo-aluno')">Cancelar</button><button class="btn btn-accent2" style="width:auto" onclick="criarAluno()">Criar aluno →</button></div>
-</div>
-</div>
-</div><!-- .app -->
-
 <nav class="bottom-nav">
 <div class="bottom-nav-inner">
 <button class="bnav-item active" id="bnav-dashboard" onclick="showPanel('dashboard');setBottomNav('dashboard')"><span class="bicon">🏠</span><span class="blabel">Início</span></button>
@@ -550,14 +493,85 @@ ondrop="handlePeiDrop(event)">
 <button class="bnav-item" id="bnav-historico" onclick="showPanel('historico');setBottomNav('historico')"><span class="bicon">📁</span><span class="blabel">Histórico</span></button>
 </div>
 </nav>
-
 <script>
 const SUPABASE_URL = 'https://ttyxcayltmgdtshohxzk.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_uPQpcbgyBu9X0xJmfd9bdA_yOr53tnI';
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 let state = { user:null, turmas:[], alunos:[], historico:[], turmaSelecionada:null, alunoSelecionado:null, adaptacoes:{}, alunoAdaptacaoAtual:null, peiAtual:null };
-
 pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+// ==================== TAXONOMIA DE BLOOM ====================
+const bloomMap = {
+  lembrar: 'Lembrar - Recall de fatos e conceitos básicos',
+  entender: 'Entender - Explicar ideias e conceitos',
+  aplicar: 'Aplicar - Usar informação em novas situações',
+  analisar: 'Analisar - Conectar ideias e encontrar relações',
+  avaliar: 'Avaliar - Justificar decisões e criticar',
+  criar: 'Criar - Produzir novo trabalho original',
+  media: 'Entender - Nível padrão para maioria dos alunos'
+};
+
+const bloomInstrucoes = {
+  lembrar: 'Use perguntas diretas de recall. Evite inferências. Foque em fatos e definições.',
+  entender: 'Peça para explicar com próprias palavras. Use exemplos concretos.',
+  aplicar: 'Crie situações práticas para usar o conceito. Mostre aplicação no cotidiano.',
+  analisar: 'Peça comparações, causas e consequências. Conecte ideias.',
+  avaliar: 'Inclua julgamentos de valor e justificativas. Peça opinião fundamentada.',
+  criar: 'Proponha produção original (texto, projeto, solução). Estimule criatividade.',
+  media: 'Equilibre recall e compreensão. Use exemplos simples.'
+};
+
+// ==================== DETECÇÃO DE TIPO DE CONTEÚDO ====================
+function detectaTipoConteudo(texto) {
+  const ehQuestao = /(\bquestão\b|\bitem\b|\balternativa\b|\(a\)|\(b\)|\(c\)|\bmarque\b|\bassinale\b)/i.test(texto);
+  const ehListaExercicios = /(\bexercício\b|\batividade\b|\bresolva\b|\bcalcule\b)/i.test(texto);
+  if (ehQuestao) return 'questao';
+  if (ehListaExercicios) return 'exercicios';
+  return 'texto';
+}
+
+// ==================== INSTRUÇÕES POR DISCIPLINA ====================
+function instrucaoPorDisciplina(disciplina) {
+  const disc = (disciplina || '').toLowerCase();
+  
+  if (disc.includes('matemática') || disc.includes('física') || disc.includes('química')) {
+    return `EXATAS:
+- Mantenha TODOS os números e operações originais
+- Explique o "porquê" de cada passo, não apenas o "como"
+- Para discalculia: inclua apoio visual (reta numérica, tabelas)
+- Fórmulas: apresente em linha separada e explique cada variável
+- Não omita cálculos intermediários`;
+  }
+  
+  if (disc.includes('biologia') || disc.includes('ciências')) {
+    return `CIÊNCIAS/BIOLOGIA:
+- Use analogias com cotidiano do aluno
+- Procedimentos práticos: avisos de segurança em DESTAQUE
+- Termos técnicos: definição entre parênteses na primeira menção
+- Inclua referências visuais descritivas ("imagine uma célula como...")`;
+  }
+  
+  if (disc.includes('história') || disc.includes('geografia')) {
+    return `HUMANAS:
+- Contextualize temporalmente (linha do tempo quando relevante)
+- Para TEA: evite metáforas históricas ("foi um terremoto político")
+- Inclua conexões com o presente do aluno
+- Descreva verbalmente relações de mapas conceituais`;
+  }
+  
+  if (disc.includes('língua') || disc.includes('português') || disc.includes('redação')) {
+    return `LÍNGUA PORTUGUESA:
+- Para dislexia: evite trocadilhos e palavras homófonas sem contexto
+- Gramática: exemplos ANTES da regra
+- Interpretação: perguntas guiadas parágrafo por parágrafo
+- Redação: ofereça estrutura esqueleto (início-meio-fim)`;
+  }
+  
+  return `INSTRUÇÕES GERAIS:
+- Adapte linguagem mantendo rigor conceitual
+- Use exemplos do cotidiano brasileiro
+- Defina termos técnicos na primeira menção`;
+}
 
 async function init() {
 const { data: { session } } = await sb.auth.getSession();
@@ -618,13 +632,11 @@ const email = document.getElementById('login-email').value.trim();
 const pass = document.getElementById('login-pass').value;
 hideLoginError();
 if (!email || !pass) return showLoginError('Preencha e-mail e senha.');
-
 if (loginMode === 'signup') {
 const confirmPass = document.getElementById('login-pass-confirm').value;
 if (pass !== confirmPass) return showLoginError('As senhas não conferem.');
 if (pass.length < 6) return showLoginError('A senha deve ter pelo menos 6 caracteres.');
 }
-
 document.getElementById('btn-auth').textContent = 'Aguarde...';
 document.getElementById('btn-auth').disabled = true;
 try {
@@ -669,7 +681,7 @@ const nome = document.getElementById('na-nome').value.trim();
 const turmaId = document.getElementById('na-turma').value;
 if (!nome) return showToast('⚠️ Informe um identificador', 'warn');
 if (!turmaId) return showToast('⚠️ Selecione uma turma', 'warn');
-const { data, error } = await sb.from('alunos').insert({ user_id:state.user.id, turma_id:turmaId, nome, fragmentacao:'media', abstracao:'media', mediacao:'guiado', tipografia:'normal', dislexia:false, tdah:false, tea:false, baixa_visao:false, obs:'' }).select().single();
+const { data, error } = await sb.from('alunos').insert({ user_id:state.user.id, turma_id:turmaId, nome, fragmentacao:'media', abstracao:'media', mediacao:'guiado', tipografia:'normal', dislexia:false, tdah:false, tea:false, baixa_visao:false, obs:'', bloom_nivel:'media', bloom_nivel_alvo:'media' }).select().single();
 if (error) return showToast('❌ Erro ao criar aluno', 'warn');
 state.alunos.push(data);
 closeModal('modal-novo-aluno');
@@ -695,6 +707,8 @@ baixa_visao:  document.getElementById('p-baixa-visao')?.checked|| false,
 altas_habilidades: document.getElementById('p-altas-habilidades')?.checked || false,
 interesses:   document.getElementById('p-interesses')?.value   || '',
 obs:          document.getElementById('p-obs')?.value          || '',
+bloom_nivel:  document.getElementById('p-bloom-nivel')?.value  || 'media',
+bloom_nivel_alvo: document.getElementById('p-bloom-nivel-alvo')?.value || 'media',
 };
 const { error } = await sb.from('alunos').update(updates).eq('id', a.id);
 if (error) return showToast('❌ Erro ao salvar', 'warn');
@@ -709,23 +723,16 @@ if (data) state.historico.unshift(data);
 renderHistorico();
 }
 
-// PERFIL DO PROFESSOR
 async function salvarPerfilProfessor() {
 const estado = document.getElementById('perfil-estado').value;
 const materia = document.getElementById('perfil-materia').value;
 const escola = document.getElementById('perfil-escola').value;
-
-const { error } = await sb.auth.updateUser({
- data: { estado, materia, escola }
-});
-
+const { error } = await sb.auth.updateUser({ data: { estado, materia, escola } });
 if (error) return showToast('❌ Erro ao salvar', 'warn');
-
 if (!state.user.user_metadata) state.user.user_metadata = {};
 state.user.user_metadata.estado = estado;
 state.user.user_metadata.materia = materia;
 state.user.user_metadata.escola = escola;
-
 showToast('✅ Perfil atualizado!');
 carregarDadosPerfil();
 }
@@ -845,6 +852,7 @@ const fragOpts=[{value:'baixa',label:'📄 Baixa',desc:'Texto contínuo e fluido
 const abstOpts=[{value:'alta',label:'🔭 Alta',desc:'Inclui inferências, analogias e exemplos.'},{value:'media',label:'🔬 Média',desc:'Explica com exemplos simples e diretos.'},{value:'baixa',label:'🧱 Baixa',desc:'Linguagem direta e concreta.'},{value:'nao_abstrai',label:'🔤 Não abstrai',desc:'Tudo literal. Sem inferências ou analogias.'}];
 const medOpts=[{value:'autonomo',label:'🦅 Autônomo',desc:'Enunciado direto, sem instruções extras.'},{value:'guiado',label:'🤝 Guiado',desc:'Inclui instruções e exemplos de apoio.'},{value:'passo_a_passo',label:'📋 Passo a passo',desc:'Cada etapa explicada detalhadamente.'}];
 const tipoOpts=[{value:'normal',label:'Abc Normal',desc:'Fonte padrão com maiúsculas e minúsculas.'},{value:'bastao',label:'ABC Bastão',desc:'Texto em caixa alta.'}];
+const bloomOpts=[{value:'lembrar',label:'📖 Lembrar',desc:'Recall de fatos e conceitos básicos'},{value:'entender',label:'💡 Entender',desc:'Explicar ideias e conceitos'},{value:'aplicar',label:'🔧 Aplicar',desc:'Usar informação em novas situações'},{value:'analisar',label:'🔍 Analisar',desc:'Conectar ideias e encontrar relações'},{value:'avaliar',label:'⚖️ Avaliar',desc:'Justificar decisões e criticar'},{value:'criar',label:'🎨 Criar',desc:'Produzir novo trabalho original'},{value:'media',label:'📊 Médio (padrão)',desc:'Equilíbrio entre recall e compreensão'}];
 
 function paramSelect(id, label, icon, desc, options, currentVal) {
 return `<div class="param-card"><h4>${icon} ${label}</h4><p style="font-size:12px;color:var(--muted);margin-bottom:14px">${desc}</p><div class="param-select-wrap"><select id="${id}" class="param-select" onchange="updateParamDesc('${id}')">${options.map(o=>`<option value="${o.value}" ${currentVal===o.value?'selected':''}>${o.label}</option>`).join('')}</select><div class="param-desc-box" id="desc-${id}">${options.find(o=>o.value===currentVal)?.desc||''}</div></div></div>`;
@@ -852,7 +860,7 @@ return `<div class="param-card"><h4>${icon} ${label}</h4><p style="font-size:12p
 
 function updateParamDesc(id) {
 const val = document.getElementById(id).value;
-const maps = {'p-fragmentacao':fragOpts,'p-abstracao':abstOpts,'p-mediacao':medOpts,'p-tipografia':tipoOpts};
+const maps = {'p-fragmentacao':fragOpts,'p-abstracao':abstOpts,'p-mediacao':medOpts,'p-tipografia':tipoOpts,'p-bloom-nivel':bloomOpts,'p-bloom-nivel-alvo':bloomOpts};
 const found = maps[id]?.find(o=>o.value===val);
 if(found) document.getElementById('desc-'+id).textContent = found.desc;
 }
@@ -864,6 +872,8 @@ paramSelect('p-fragmentacao','Nível de leitura / Fragmentação','📝','Define
 (!isNaoAlf ? paramSelect('p-abstracao','Nível de abstração','🧩','Define se usa analogias ou mantém tudo literal.',abstOpts,a.abstracao) : '') +
 (!isNaoAlf ? paramSelect('p-mediacao','Mediação / Autonomia','🧭','Define se o aluno precisa de instruções detalhadas.',medOpts,a.mediacao||'guiado') : '') +
 (!isNaoAlf ? paramSelect('p-tipografia','Tipo de letra','🔤','Define o formato de texto.',tipoOpts,a.tipografia) : '') +
+(!isNaoAlf ? paramSelect('p-bloom-nivel','Nível Cognitivo Atual','🧠','Nível em que o conteúdo original está.',bloomOpts,a.bloom_nivel||'media') : '') +
+(!isNaoAlf ? paramSelect('p-bloom-nivel-alvo','Nível Cognitivo Alvo','🎯','Para qual nível adaptar o conteúdo.',bloomOpts,a.bloom_nivel_alvo||'media') : '') +
 `<div class="param-card" ${isNaoAlf?'style="grid-column:1/-1"':''}>
 <h4>📚 Condições adicionais</h4>
 <div class="check-group">
@@ -880,7 +890,7 @@ paramSelect('p-fragmentacao','Nível de leitura / Fragmentação','📝','Define
 <div class="param-card" style="grid-column:1/-1">
 <h4>🎯 Interesses e hiperfoco</h4>
 <p style="font-size:12px;color:var(--muted);margin-bottom:10px">A IA vai usar esses interesses como contexto para tornar o conteúdo mais relevante para o aluno. Ex: dinossauros, futebol, videogames, música...</p>
-<textarea id="p-interesses" rows="4" placeholder="Ex: adora dinossauros e jogos de estratégia, tem hiperfoco em astronomia..." style="width:100%;min-height:100px">${a.interesses||''}</textarea>
+<textarea id="p-interesses" rows="4" placeholder="Ex: adora dinossauros e jogos de estratégia, tem hiperfoco em astronomia..." style="width:100%;min-height:100px">${a.intereses||''}</textarea>
 </div>
 <div class="param-card" style="grid-column:1/-1">
 <h4>📌 Observações pedagógicas</h4>
@@ -938,18 +948,18 @@ if(!alunos.length) { container.innerHTML='<span style="color:var(--muted);font-s
 container.innerHTML = alunos.map(a => `<label style="display:flex;align-items:center;gap:8px;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:10px 14px;cursor:pointer;font-size:13px;font-weight:500"><input type="checkbox" value="${a.id}" style="accent-color:var(--accent2);width:16px;height:16px"> ${a.nome}</label>`).join('');
 }
 
+// ==================== PROMPT OTIMIZADO ====================
 function buildPrompt(aluno, texto, disciplina, nomeAtiv) {
 const fragMap={baixa:'Texto contínuo e fluido.',media:'Parágrafos curtos, conceitos separados.',alta:'Blocos curtos, um conceito por bloco. Use tópicos e listas.'};
 const abstMap={alta:'Inclua inferências, analogias e exemplos.',media:'Explique com exemplos simples e diretos.',baixa:'Linguagem direta e concreta.',nao_abstrai:'Tudo literal. Sem inferências ou analogias.'};
-const medMap={autonomo:'Enunciado direto, sem instruções extras.',guiado:'Inclua instruções curtas e exemplos de apoio.',passo_a_passo:'Cada etapa explicada detalhadamente.'};
+const medMap={autonomo:'Enunciado direto, sem instruções extras.',guiado:'Inclui instruções curtas e exemplos de apoio.',passo_a_passo:'Cada etapa explicada detalhadamente.'};
 const tipoMap={normal:'Fonte padrão.',bastao:'Escreva tudo em CAIXA ALTA.'};
 const conds=[];
-if(aluno.dislexia) conds.push('Dislexia: frases curtas, espaçamento claro.');
-if(aluno.tdah) conds.push('TDAH: blocos muito curtos, um item por vez, elimine distrações.');
+if(aluno.dislexia) conds.push('Dislexia: frases curtas, espaçamento claro, fonte OpenDyslexic se possível.');
+if(aluno.tdah) conds.push('TDAH: blocos muito curtos, um item por vez, elimine distrações visuais.');
 if(aluno.tea) conds.push('TEA: linguagem totalmente literal, sem metáforas ou expressões idiomáticas.');
 if(aluno.baixa_visao) conds.push('Baixa visão: texto simples, sem tabelas complexas, legende todo conteúdo visual.');
 
-// DADOS DO PROFESSOR
 const estadoProf = state.user.user_metadata?.estado || 'BNCC';
 const materiaProf = state.user.user_metadata?.materia || disciplina;
 const escolaProf = state.user.user_metadata?.escola || 'Escola';
@@ -958,14 +968,8 @@ if (estadoProf === 'SP') referenciaCurricular = 'Currículo Paulista';
 if (estadoProf === 'RS') referenciaCurricular = 'Referencial Curricular Gaúcho';
 if (estadoProf === 'RJ') referenciaCurricular = 'Currículo Carioca';
 
-// INSTRUÇÕES POR MATÉRIA
-let instrucaoMateria = '';
-const discLower = (disciplina || '').toLowerCase();
-if (discLower.includes('matemática') || discLower.includes('física') || discLower.includes('química')) {
-    instrucaoMateria = `⚠️ ATENÇÃO PARA EXATAS: Mantenha fórmulas claras. Em Física/Química, descreva experimentos com segurança. Não omita cálculos.`;
-} else if (discLower.includes('biologia') || discLower.includes('ciências')) {
-    instrucaoMateria = `⚠️ ATENÇÃO PARA CIÊNCIAS: Use analogias com corpo humano/natureza. Em procedimentos práticos, destaque avisos de segurança.`;
-}
+const instrucaoMateria = instrucaoPorDisciplina(disciplina);
+const tipoConteudo = detectaTipoConteudo(texto);
 
 const altasHabilidades = aluno.altas_habilidades ? `
 ATENÇÃO — ALTAS HABILIDADES/SUPERDOTAÇÃO:
@@ -978,11 +982,28 @@ const interessesTexto = aluno.interesses ? `
 INTERESSES E HIPERFOCO DO ALUNO: ${aluno.interesses}
 Use esses interesses como contexto e exemplos ao longo do material.` : '';
 
-return `Você é um especialista em educação inclusiva. Adapte o material abaixo para um aluno com o seguinte perfil.
+const bloomNivel = aluno.bloom_nivel_alvo || aluno.bloom_nivel || 'media';
+const bloomTexto = `
+NÍVEL COGNITIVO (Taxonomia de Bloom):
+- Nível original: ${bloomMap[aluno.bloom_nivel] || 'Médio'}
+- Nível alvo: ${bloomMap[bloomNivel] || 'Médio'}
+- Instrução: ${bloomInstrucoes[bloomNivel] || bloomInstrucoes.media}`;
+
+const instrucaoTipo = tipoConteudo === 'questao' ? `
+TIPO: QUESTÃO DE AVALIAÇÃO
+- Mantenha o enunciado central intacto
+- Adapte apenas a linguagem de apoio (não o núcleo da pergunta)
+- Para múltipla escolha: mantenha 4-5 alternativas
+- Para alternativas: adapte linguagem mas mantenha apenas 1 correta
+- Se aluno tem dislexia/TDAH: reduza texto por alternativa em 30%
+- Inclua tempo estimado de resolução baseado no perfil` : '';
+
+return `Você é um especialista em educação inclusiva com 15+ anos de experiência. Adapte o material abaixo para um aluno com o seguinte perfil.
+
 CONTEXTO DO PROFESSOR:
-- Estado/Referência: ${referenciaCurricular}
+- Estado/Referência Curricular: ${referenciaCurricular}
 - Escola: ${escolaProf}
-- Matéria Focus: ${materiaProf}
+- Matéria: ${materiaProf}
 ${instrucaoMateria}
 
 PERFIL DO ALUNO:
@@ -990,13 +1011,43 @@ PERFIL DO ALUNO:
 - Abstração: ${abstMap[aluno.abstracao]||aluno.abstracao}
 - Mediação/Autonomia: ${medMap[aluno.mediacao]||medMap['guiado']}
 - Tipo de letra: ${tipoMap[aluno.tipografia]||'Padrão'}
+${bloomTexto}
 ${conds.length?'- Condições especiais:\n• '+conds.join('\n• '):''}
 ${aluno.obs?'- Observações pedagógicas: '+aluno.obs:''}
 ${altasHabilidades}
 ${interessesTexto}
+${instrucaoTipo}
 
-Fidelidade: mantenha TODAS as informações do original. Apenas adapte linguagem, estrutura e acessibilidade.
-Não gere introdução ou comentários. Apenas o material adaptado.
+EXEMPLOS DE ADAPTAÇÃO:
+❌ RUIM (simplificação excessiva): "Plantas fazem comida com sol"
+✅ BOM (adaptação acessível mantendo conteúdo): "A fotossíntese é como uma fábrica na planta: entrada (CO2 + água), energia (sol), saída (açúcar)"
+⚠️ REGRA: Nunca omita conceitos-chave. Apenas mude a FORMA de apresentar.
+
+RESTRIÇÕES (NÃO FAÇA):
+- NÃO omita informações do original
+- NÃO mude valores numéricos (exceto se solicitado para adaptação de exercícios)
+- NÃO use linguagem infantilizada (a menos que aluno seja EF1)
+- NÃO adicione conteúdo novo não presente no original
+- NÃO use expressões idiomáticas ("chover a cântaros", "pé na jaca")
+- NÃO gere mais de 20% a mais de texto que o original (evite prolixidade)
+
+FORMATO DA SAÍDA (obrigatório):
+1. Comece com título da atividade (se houver nomeAtiv)
+2. Use ### para seções principais
+3. Use **negrito** para termos importantes
+4. Use listas com - para itens sequenciais
+5. Não inclua introduções como "Aqui está a adaptação"
+6. Não inclua conclusões como "Espero que ajude"
+7. Mantenha a mesma ordem de conteúdos do original
+
+AUTO-VALIDAÇÃO (antes de entregar, verifique):
+- [ ] Mantive todas as informações do original?
+- [ ] Usei linguagem adequada ao perfil do aluno?
+- [ ] Incluí exemplos concretos quando necessário?
+- [ ] Evitei expressões idiomáticas e metáforas (se TEA)?
+- [ ] Formatei com espaçamento adequado (se dislexia/TDAH)?
+- [ ] O nível cognitivo está adequado ao aluno?
+
 MATERIAL ORIGINAL (Disciplina: ${disciplina}${nomeAtiv?', Atividade: '+nomeAtiv:''}):
 ${texto}`;
 }
@@ -1075,13 +1126,8 @@ function mostrarAdaptacao(alunoId, el) {
 document.querySelectorAll('.rtab').forEach(t=>t.classList.remove('active'));
 el.classList.add('active'); state.alunoAdaptacaoAtual=alunoId;
 const adapt=state.adaptacoes[alunoId]; const box=document.getElementById('resultado-text');
-// VERIFICA DISLEXIA PARA APLICAR FONTE NA TELA
 const aluno = state.alunos.find(a => a.id === alunoId);
-if (aluno?.dislexia) {
-    box.classList.add('font-dyslexic');
-} else {
-    box.classList.remove('font-dyslexic');
-}
+if (aluno?.dislexia) { box.classList.add('font-dyslexic'); } else { box.classList.remove('font-dyslexic'); }
 if(adapt&&adapt.tipo==='pictograma') renderPrancha(adapt,box);
 else box.innerHTML=adapt?markdownParaHtml(adapt):'Aguardando...';
 }
@@ -1097,8 +1143,8 @@ html+=`<div style="background:white;border-radius:12px;padding:10px 8px;text-ali
 container.innerHTML=html+'</div>';
 }
 
-// ======================== GERADOR DOCX via JSZip ========================
 function esc(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
 function markdownParaHtml(texto) {
 return DOMPurify.sanitize(texto
 .replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>')
@@ -1122,21 +1168,19 @@ return p ? `<w:r><w:rPr><w:sz w:val="24"/><w:szCs w:val="24"/></w:rPr><w:t xml:s
 }
 
 function gerarXmlDocx(titulo, texto, aluno) {
-// CABEÇALHO PADRÃO
 const meta = state.user.user_metadata || {};
-const cabecalho = `ESCOLA: ${meta.escola || '__________________'}\nPROFESSOR(A): ${state.user.user_metadata?.name || state.user.email}\nESTADO/REF: ${meta.estado || 'BNCC'}\nDATA: ${new Date().toLocaleDateString('pt-BR')}\n----------------------------------------\n`;
-
-// FONTE BASEADA NA DISLEXIA
+const cabecalho = `ESCOLA: ${meta.escola || '__________________'}
+PROFESSOR(A): ${state.user.user_metadata?.name || state.user.email}
+ESTADO/REF: ${meta.estado || 'BNCC'}
+DATA: ${new Date().toLocaleDateString('pt-BR')}
+----------------------------------------
+`;
 const fontName = (aluno?.dislexia) ? 'OpenDyslexic' : 'Calibri';
 const fontFallback = (aluno?.dislexia) ? 'Verdana' : 'Arial';
-
 let p = `<w:p><w:pPr><w:pStyle w:val="H1"/><w:jc w:val="center"/></w:pPr><w:r><w:t>${esc(titulo)}</w:t></w:r></w:p>`;
-
-// Adiciona cabeçalho
 cabecalho.split('\n').forEach(l => {
-    if(l.trim()) p += `<w:p><w:pPr><w:spacing w:after="50"/></w:pPr><w:r><w:t>${esc(l)}</w:t></w:r></w:p>`;
+if(l.trim()) p += `<w:p><w:pPr><w:spacing w:after="50"/></w:pPr><w:r><w:t>${esc(l)}</w:t></w:r></w:p>`;
 });
-
 texto.split('\n').forEach(l => {
 const linha = l.trim();
 if (!linha) { p += `<w:p/>`; return; }
@@ -1149,16 +1193,13 @@ p += `<w:p><w:pPr><w:pStyle w:val="H2"/></w:pPr><w:r><w:t>${esc(txt)}</w:t></w:r
 p += `<w:p><w:pPr><w:spacing w:after="100"/></w:pPr>${linhaParaRuns(linha)}</w:p>`;
 }
 });
-
 const xmlStyles = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:styles xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:style w:type="paragraph" w:styleId="Normal"><w:name w:val="Normal"/><w:rPr><w:rFonts w:ascii="${fontName}" w:hAnsi="${fontName}" w:cs="${fontName}"/><w:sz w:val="24"/><w:szCs w:val="24"/></w:rPr></w:style><w:style w:type="paragraph" w:styleId="H1"><w:name w:val="heading 1"/><w:basedOn w:val="Normal"/><w:pPr><w:spacing w:before="240" w:after="120"/></w:pPr><w:rPr><w:b/><w:rFonts w:ascii="${fontName}" w:hAnsi="${fontName}"/><w:sz w:val="36"/><w:szCs w:val="36"/><w:color w:val="2563EB"/></w:rPr></w:style><w:style w:type="paragraph" w:styleId="H2"><w:name w:val="heading 2"/><w:basedOn w:val="Normal"/><w:pPr><w:spacing w:before="200" w:after="80"/></w:pPr><w:rPr><w:b/><w:rFonts w:ascii="${fontName}" w:hAnsi="${fontName}"/><w:sz w:val="28"/><w:szCs w:val="28"/><w:color w:val="7C3AED"/></w:rPr></w:style></w:styles>`;
-
 return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:body>${p}<w:sectPr><w:pgSz w:w="12240" w:h="15840"/><w:pgMar w:top="1440" w:right="1440" w:bottom="1440" w:left="1440"/></w:sectPr></w:body></w:document>`;
 }
 
 async function criarDocx(nomeArquivo, titulo, texto, aluno) {
 const xmlDoc = gerarXmlDocx(titulo, texto, aluno);
 const xmlStyles = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:styles xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:style w:type="paragraph" w:styleId="Normal"><w:name w:val="Normal"/><w:rPr><w:rFonts w:ascii="${aluno?.dislexia?'OpenDyslexic':'Calibri'}" w:hAnsi="${aluno?.dislexia?'OpenDyslexic':'Calibri'}" w:cs="${aluno?.dislexia?'OpenDyslexic':'Calibri'}"/><w:sz w:val="24"/><w:szCs w:val="24"/></w:rPr></w:style><w:style w:type="paragraph" w:styleId="H1"><w:name w:val="heading 1"/><w:basedOn w:val="Normal"/><w:pPr><w:spacing w:before="240" w:after="120"/></w:pPr><w:rPr><w:b/><w:rFonts w:ascii="${aluno?.dislexia?'OpenDyslexic':'Calibri'}" w:hAnsi="${aluno?.dislexia?'OpenDyslexic':'Calibri'}"/><w:sz w:val="36"/><w:szCs w:val="36"/><w:color w:val="2563EB"/></w:rPr></w:style><w:style w:type="paragraph" w:styleId="H2"><w:name w:val="heading 2"/><w:basedOn w:val="Normal"/><w:pPr><w:spacing w:before="200" w:after="80"/></w:pPr><w:rPr><w:b/><w:rFonts w:ascii="${aluno?.dislexia?'OpenDyslexic':'Calibri'}" w:hAnsi="${aluno?.dislexia?'OpenDyslexic':'Calibri'}"/><w:sz w:val="28"/><w:szCs w:val="28"/><w:color w:val="7C3AED"/></w:rPr></w:style></w:styles>`;
-
 const xmlCT = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/><Override PartName="/word/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.styles+xml"/></Types>`;
 const xmlRelsMain = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/></Relationships>`;
 const xmlRelsWord = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/></Relationships>`;
@@ -1316,7 +1357,7 @@ document.querySelectorAll('#pei-tabs .rtab').forEach(t=>t.classList.remove('acti
 const tab=document.getElementById(`pei-tab-${alunoId}`); if(tab) tab.classList.add('active');
 const dado=state.peiAtual?.alunos?.[alunoId];
 if(dado) document.getElementById('pei-texto').textContent=dado.texto;
-state.peiAtual.alunoAtivo=alunoId;
+state.peiAtual.alunoAtivo=alunoAtivo=alunoId;
 }
 
 function renderHistorico() {
@@ -1325,9 +1366,9 @@ if(!state.historico.length) { list.innerHTML=`<div class="empty-state"><div clas
 list.innerHTML=state.historico.map(h=>`<div class="historico-item"><div class="hist-icon">📄</div><div class="hist-info"><div class="hist-title">${h.titulo}</div><div class="hist-meta">${h.aluno_nome||'Aluno'} · ${h.turma_nome||''} · ${h.created_at?new Date(h.created_at).toLocaleDateString('pt-BR'):''}</div><div style="margin-top:4px"><span class="tag tag-blue">${h.disciplina}</span></div></div></div>`).join('');
 }
 
-// ======================== UPLOAD ADAPTAR ========================
 function setUploadState(s) { ['idle','loading','success','error'].forEach(x=>document.getElementById('upload-'+x).style.display=s===x?'block':'none'); }
 function handleDrop(e) { e.preventDefault(); document.getElementById('upload-zone').classList.remove('dragover'); const file=e.dataTransfer.files[0]; if(file) handleFileSelect(file); }
+
 async function lerArquivo(file) {
 const ext=file.name.split('.').pop().toLowerCase();
 if(!['pdf','docx','doc','txt'].includes(ext)) throw new Error(`Formato .${ext} não suportado.`);
@@ -1341,6 +1382,7 @@ for(let i=1;i<=pdf.numPages;i++){const p=await pdf.getPage(i);const c=await p.ge
 }
 return texto.trim();
 }
+
 async function handleFileSelect(file) {
 if(!file) return;
 if(file.size>10*1024*1024) { setUploadState('error'); document.getElementById('upload-errmsg').textContent='Arquivo muito grande. Máximo: 10MB.'; return; }
@@ -1356,9 +1398,9 @@ const nomeInput=document.getElementById('material-nome'); if(!nomeInput.value) n
 } catch(err) { setUploadState('error'); document.getElementById('upload-errmsg').textContent='Erro ao ler: '+err.message; }
 }
 
-// ======================== UPLOAD PEI ========================
 function setPeiUploadState(s) { ['idle','loading','success','error'].forEach(x=>document.getElementById('pei-upload-'+x).style.display=s===x?'block':'none'); }
 function handlePeiDrop(e) { e.preventDefault(); document.getElementById('pei-upload-zone').classList.remove('dragover'); const file=e.dataTransfer.files[0]; if(file) handlePeiFileSelect(file); }
+
 async function handlePeiFileSelect(file) {
 if(!file) return;
 if(file.size>10*1024*1024) { setPeiUploadState('error'); document.getElementById('pei-upload-errmsg').textContent='Arquivo muito grande. Máximo: 10MB.'; return; }
@@ -1372,7 +1414,6 @@ setPeiUploadState('success');
 } catch(err) { setPeiUploadState('error'); document.getElementById('pei-upload-errmsg').textContent='Erro ao ler: '+err.message; }
 }
 
-// ======================== NAVIGATION ========================
 function showPanel(id) {
 closeSidebar();
 document.querySelectorAll('.content-panel').forEach(p=>p.classList.remove('active'));
@@ -1383,20 +1424,24 @@ if(id==='alunos') renderPainelAlunos();
 if(id==='dashboard') renderDashboard();
 if(id==='perfil') carregarDadosPerfil();
 }
+
 function openModal(id) { document.getElementById(id).classList.add('open'); }
 function closeModal(id) { document.getElementById(id).classList.remove('open'); }
 function toggleSidebar() { document.getElementById('main-sidebar').classList.toggle('open'); document.getElementById('sidebar-overlay').classList.toggle('open'); }
 function closeSidebar() { document.getElementById('main-sidebar').classList.remove('open'); document.getElementById('sidebar-overlay').classList.remove('open'); }
 function setBottomNav(id) { document.querySelectorAll('.bnav-item').forEach(b=>b.classList.remove('active')); const el=document.getElementById('bnav-'+id); if(el) el.classList.add('active'); }
+
 function showToast(msg, type) {
 const t=document.createElement('div');
 t.style.cssText=`position:fixed;bottom:24px;right:24px;padding:14px 20px;border-radius:12px;font-size:14px;font-weight:500;z-index:9999;animation:fadeUp 0.3s ease;background:${type==='warn'?'#fb923c22':'#34d39922'};border:1px solid ${type==='warn'?'#fb923c':'#34d399'};color:${type==='warn'?'#fb923c':'#34d399'};font-family:DM Sans,sans-serif;backdrop-filter:blur(10px);`;
 t.textContent=msg; document.body.appendChild(t); setTimeout(()=>t.remove(),3000);
 }
+
 function confirmarApagarAluno(id, nome) {
 if (!confirm(`Apagar o aluno "${nome}"?\nEssa ação não pode ser desfeita.`)) return;
 apagarAluno(id);
 }
+
 async function apagarAluno(id) {
 const { error } = await sb.from('alunos').delete().eq('id', id);
 if (error) return showToast('❌ Erro ao apagar aluno', 'warn');
@@ -1406,12 +1451,14 @@ renderPainelAlunos();
 updateStats();
 showToast('✅ Aluno apagado.');
 }
+
 function confirmarApagarTurma(id, nome) {
 const alunos = state.alunos.filter(a => a.turma_id === id);
 const aviso = alunos.length > 0 ? `\n⚠️ Isso também apagará ${alunos.length} aluno(s) incluso(s).` : '';
 if (!confirm(`Apagar a turma "${nome}"?${aviso}\nEssa ação não pode ser desfeita.`)) return;
 apagarTurma(id);
 }
+
 async function apagarTurma(id) {
 const { error } = await sb.from('turmas').delete().eq('id', id);
 if (error) return showToast('❌ Erro ao apagar turma', 'warn');
@@ -1420,6 +1467,7 @@ state.alunos = state.alunos.filter(a => a.turma_id !== id);
 renderAll();
 showToast('✅ Turma apagada.');
 }
+
 window.addEventListener('click',e=>{if(e.target.classList.contains('modal-overlay')) e.target.classList.remove('open');});
 init();
 </script>
