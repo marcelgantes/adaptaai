@@ -954,33 +954,57 @@ MATERIAL ORIGINAL (${disciplina}${nomeAtiv?', '+nomeAtiv:''}):
 ${texto}
 
 FORMATO OBRIGATÓRIO:
----NOME DA ATIVIDADE---
-[Nome pedagógico]
----OBJETIVOS---
-[2-3 objetivos]
----HABILIDADES (${refCurr})---
-[2-3 habilidades com código]
----MATERIAL ADAPTADO---
-[Conteúdo adaptado completo]`;
+---REGISTRO PEDAGÓGICO---
+Nome da atividade: [Nome pedagógico]
+Objetivos: [2-3 objetivos de aprendizagem]
+Habilidades (${refCurr}): [2-3 habilidades com código]
+---FIM REGISTRO---
+
+---MATERIAL DO ALUNO---
+[Conteúdo adaptado completo — sem mencionar objetivos ou habilidades]
+---FIM MATERIAL---`;
 }
 
 function buildPromptPictogramas(aluno,texto,disciplina,nomeAtiv) {
-  return `Você é especialista em CAA. Extraia 8-16 conceitos concretos do material para um aluno NÃO ALFABETIZADO.
-${aluno.obs?'Observações: '+aluno.obs:''}
+  return `Você é especialista em CAA e ARASAAC. Extraia 8-14 conceitos do material para um aluno NÃO ALFABETIZADO.
+REGRAS IMPORTANTES:
+- Use APENAS palavras simples, concretas e visualmente representáveis
+- Prefira substantivos e verbos no infinitivo (ex: "comer", "água", "escola")
+- Evite palavras abstratas, conjunções, artigos
+- O campo "busca_en" deve ser uma palavra simples em inglês que o ARASAAC reconhece bem
+- Para conceitos científicos, use a palavra do cotidiano (ex: "coração" não "miocárdio")
+${aluno.obs?'Observações do aluno: '+aluno.obs:''}
 MATERIAL (${disciplina}${nomeAtiv?' — '+nomeAtiv:''}):
 ${texto}
-Responda SOMENTE com JSON válido, sem markdown:
-[{"palavra":"célula","contexto":"unidade da vida","busca_en":"cell"}]`;
+Responda SOMENTE com JSON válido, sem markdown, sem explicações:
+[{"palavra":"água","contexto":"beber água","busca_en":"water"},{"palavra":"escola","contexto":"ir à escola","busca_en":"school"}]`;
 }
 
 async function buscarPictogramas(conceitos) {
   const resultados=[];
   for(const c of conceitos){
     try{
+      // Tenta português primeiro
       let resp=await fetch(`https://api.arasaac.org/api/pictograms/pt/search/${encodeURIComponent(c.palavra)}`);
       let data=await resp.json();
-      if(!data||!data.length){resp=await fetch(`https://api.arasaac.org/api/pictograms/en/search/${encodeURIComponent(c.busca_en||c.palavra)}`);data=await resp.json();}
-      resultados.push(data&&data.length?data[0]:null);
+      // Se não encontrou em PT, tenta inglês com busca_en
+      if(!data||!data.length){
+        resp=await fetch(`https://api.arasaac.org/api/pictograms/en/search/${encodeURIComponent(c.busca_en||c.palavra)}`);
+        data=await resp.json();
+      }
+      // Se ainda não encontrou, tenta palavra simplificada em PT (remove acentos)
+      if(!data||!data.length){
+        const semAcento=c.palavra.normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+        resp=await fetch(`https://api.arasaac.org/api/pictograms/pt/search/${encodeURIComponent(semAcento)}`);
+        data=await resp.json();
+      }
+      // Escolhe o pictograma com maior schematic (mais simples e claro)
+      if(data&&data.length){
+        const melhor=data.find(p=>p.schematic)||data[0];
+        resultados.push(melhor);
+      } else {
+        resultados.push(null);
+      }
     }catch(e){resultados.push(null);}
   }
   return resultados;
@@ -1035,8 +1059,25 @@ async function gerarAdaptacoes() {
   const primeiraAdapt=state.adaptacoes[alunosParaAdaptar[0]?.id];
   const box=document.getElementById('resultado-text');
   if(primeiraAdapt&&primeiraAdapt.tipo==='pictograma') renderPrancha(primeiraAdapt,box);
-  else box.innerHTML=primeiraAdapt?markdownParaHtml(primeiraAdapt):'';
+  else if(primeiraAdapt){
+    const{registro,material}=extrairBlocos(primeiraAdapt);
+    box.innerHTML=
+      (registro?`<div style="background:rgba(37,99,235,0.06);border:1px solid rgba(37,99,235,0.2);border-radius:10px;padding:14px 16px;margin-bottom:16px;font-size:13px;">
+        <div style="font-weight:700;color:var(--accent);margin-bottom:6px;font-size:12px;text-transform:uppercase;letter-spacing:0.05em">📋 Registro Pedagógico (professor)</div>
+        ${markdownParaHtml(registro)}
+      </div>`:'')
+      +markdownParaHtml(material);
+  } else { box.innerHTML=''; }
   document.getElementById('resultado-area').style.display='block';
+}
+
+function extrairBlocos(texto) {
+  const regMatch = texto.match(/---REGISTRO PEDAGÓGICO---([\s\S]*?)---FIM REGISTRO---/);
+  const matMatch = texto.match(/---MATERIAL DO ALUNO---([\s\S]*?)---FIM MATERIAL---/);
+  return {
+    registro: regMatch ? regMatch[1].trim() : '',
+    material: matMatch ? matMatch[1].trim() : texto,
+  };
 }
 
 function mostrarAdaptacao(alunoId,el) {
@@ -1044,7 +1085,17 @@ function mostrarAdaptacao(alunoId,el) {
   el.classList.add('active');state.alunoAdaptacaoAtual=alunoId;
   const adapt=state.adaptacoes[alunoId];const box=document.getElementById('resultado-text');
   if(adapt&&adapt.tipo==='pictograma') renderPrancha(adapt,box);
-  else box.innerHTML=adapt?markdownParaHtml(adapt):'Aguardando...';
+  else if(adapt){
+    const{registro,material}=extrairBlocos(adapt);
+    box.innerHTML=
+      (registro?`<div style="background:rgba(37,99,235,0.06);border:1px solid rgba(37,99,235,0.2);border-radius:10px;padding:14px 16px;margin-bottom:16px;font-size:13px;">
+        <div style="font-weight:700;color:var(--accent);margin-bottom:6px;font-size:12px;text-transform:uppercase;letter-spacing:0.05em">📋 Registro Pedagógico (professor)</div>
+        ${markdownParaHtml(registro)}
+      </div>`:'')
+      +markdownParaHtml(material);
+  } else {
+    box.innerHTML='Aguardando...';
+  }
 }
 
 function renderPrancha(adapt,container) {
@@ -1127,14 +1178,163 @@ async function baixarDocx() {
   const aluno=state.alunos.find(a=>a.id===state.alunoAdaptacaoAtual);
   const nome=aluno?.nome||'aluno';
   if(typeof txt!=='string'){
-    const adapt=txt;
-    const linhas=adapt.conceitos.map(c=>`**${c.palavra}** — ${c.contexto||''}`).join('\n');
-    try{await criarDocx(`Prancha_${nome}.docx`,`Prancha — ${nome}`,`Material: ${adapt.nomeAtiv||adapt.disciplina}\n\n`+linhas);showToast('📥 DOCX baixado!');}
-    catch(e){showToast('❌ Erro ao gerar DOCX','warn');}
+    // PRANCHA COM IMAGENS
+    showToast('⏳ Gerando DOCX com imagens...','');
+    try{ await criarDocxPrancha(`Prancha_${nome}.docx`, `Prancha — ${nome}`, txt); showToast('📥 DOCX baixado!'); }
+    catch(e){ showToast('❌ Erro ao gerar DOCX','warn'); console.error(e); }
     return;
   }
-  try{await criarDocx(`Adaptacao_${nome}.docx`,`Adaptação — ${nome}`,txt);showToast('📥 DOCX baixado!');}
-  catch(e){showToast('❌ Erro ao gerar DOCX','warn');}
+  try{
+    const{material}=extrairBlocos(txt);
+    await criarDocx(`Adaptacao_${nome}.docx`,`Adaptação — ${nome}`,material);
+    showToast('📥 DOCX baixado!');
+  }catch(e){showToast('❌ Erro ao gerar DOCX','warn');}
+}
+
+async function imgParaBase64(url) {
+  try {
+    const resp = await fetch(url);
+    if(!resp.ok) return null;
+    const blob = await resp.blob();
+    return new Promise(res => {
+      const reader = new FileReader();
+      reader.onloadend = () => res(reader.result.split(',')[1]);
+      reader.onerror = () => res(null);
+      reader.readAsDataURL(blob);
+    });
+  } catch(e) { return null; }
+}
+
+async function criarDocxPrancha(nomeArquivo, titulo, adapt) {
+  const { conceitos, pictogramas, nomeAtiv, disciplina } = adapt;
+
+  // Baixa imagens como base64
+  const imagens = [];
+  for(let i=0;i<conceitos.length;i++){
+    const pic = pictogramas[i];
+    if(pic){
+      const url = `https://static.arasaac.org/pictograms/${pic._id}/${pic._id}_500.png`;
+      const b64 = await imgParaBase64(url);
+      imagens.push(b64);
+    } else {
+      imagens.push(null);
+    }
+  }
+
+  const zip = new JSZip();
+  const rels = [];
+  const wordRels = [];
+  let imgXml = '';
+  let rIdCounter = 1;
+
+  // Adiciona imagens ao zip e gera XML
+  conceitos.forEach((c, i) => {
+    const b64 = imagens[i];
+    const rId = `rId${rIdCounter++}`;
+    const imgName = `img${i}.png`;
+
+    if(b64){
+      zip.file(`word/media/${imgName}`, b64, {base64:true});
+      wordRels.push(`<Relationship Id="${rId}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/${imgName}"/>`);
+
+      imgXml += `
+        <w:tc><w:tcPr><w:tcW w:w="1800" w:type="dxa"/><w:vAlign w:val="center"/></w:tcPr>
+          <w:p><w:pPr><w:jc w:val="center"/></w:pPr>
+            <w:r><w:rPr><w:noProof/></w:rPr>
+              <w:drawing><wp:inline xmlns:wp="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing">
+                <wp:extent cx="914400" cy="914400"/>
+                <wp:docPr id="${i+1}" name="${imgName}"/>
+                <a:graphic xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main">
+                  <a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/picture">
+                    <pic:pic xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture">
+                      <pic:nvPicPr><pic:cNvPr id="${i+1}" name="${imgName}"/><pic:cNvPicPr/></pic:nvPicPr>
+                      <pic:blipFill>
+                        <a:blip r:embed="${rId}" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"/>
+                        <a:stretch><a:fillRect/></a:stretch>
+                      </pic:blipFill>
+                      <pic:spPr><a:xfrm><a:off x="0" y="0"/><a:ext cx="914400" cy="914400"/></a:xfrm>
+                        <a:prstGeom prst="rect"><a:avLst/></a:prstGeom>
+                      </pic:spPr>
+                    </pic:pic>
+                  </a:graphicData>
+                </a:graphic>
+              </wp:inline></w:drawing>
+            </w:r>
+          </w:p>
+          <w:p><w:pPr><w:jc w:val="center"/></w:pPr>
+            <w:r><w:rPr><w:b/><w:sz w:val="20"/></w:rPr><w:t>${esc(c.palavra.toUpperCase())}</w:t></w:r>
+          </w:p>
+          ${c.contexto?`<w:p><w:pPr><w:jc w:val="center"/></w:pPr><w:r><w:rPr><w:sz w:val="16"/><w:color w:val="64748B"/></w:rPr><w:t>${esc(c.contexto)}</w:t></w:r></w:p>`:''}
+        </w:tc>`;
+    } else {
+      imgXml += `
+        <w:tc><w:tcPr><w:tcW w:w="1800" w:type="dxa"/><w:vAlign w:val="center"/></w:tcPr>
+          <w:p><w:pPr><w:jc w:val="center"/></w:pPr>
+            <w:r><w:rPr><w:sz w:val="40"/></w:rPr><w:t>🖼️</w:t></w:r>
+          </w:p>
+          <w:p><w:pPr><w:jc w:val="center"/></w:pPr>
+            <w:r><w:rPr><w:b/><w:sz w:val="20"/></w:rPr><w:t>${esc(c.palavra.toUpperCase())}</w:t></w:r>
+          </w:p>
+        </w:tc>`;
+    }
+
+    // Quebra de linha a cada 4 pictogramas
+    if((i+1) % 4 === 0 && i < conceitos.length-1){
+      imgXml += '</w:tr><w:tr>';
+    }
+  });
+
+  // Preenche células vazias para completar última linha
+  const resto = conceitos.length % 4;
+  if(resto > 0){
+    for(let k=resto;k<4;k++){
+      imgXml += '<w:tc><w:tcPr><w:tcW w:w="1800" w:type="dxa"/></w:tcPr><w:p/></w:tc>';
+    }
+  }
+
+  const xmlDoc = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"
+  xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"
+  xmlns:wp="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing"
+  xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"
+  xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture">
+<w:body>
+  <w:p><w:pPr><w:jc w:val="center"/></w:pPr>
+    <w:r><w:rPr><w:b/><w:sz w:val="36"/><w:color w:val="2563EB"/></w:rPr><w:t>${esc(titulo)}</w:t></w:r>
+  </w:p>
+  <w:p><w:pPr><w:jc w:val="center"/></w:pPr>
+    <w:r><w:rPr><w:sz w:val="20"/><w:color w:val="64748B"/></w:rPr><w:t>Material: ${esc(nomeAtiv||disciplina)} · ARASAAC</w:t></w:r>
+  </w:p>
+  <w:p/>
+  <w:tbl>
+    <w:tblPr><w:tblW w:w="7200" w:type="dxa"/><w:tblBorders>
+      <w:top w:val="single" w:sz="4" w:color="D0DAE6"/>
+      <w:left w:val="single" w:sz="4" w:color="D0DAE6"/>
+      <w:bottom w:val="single" w:sz="4" w:color="D0DAE6"/>
+      <w:right w:val="single" w:sz="4" w:color="D0DAE6"/>
+      <w:insideH w:val="single" w:sz="4" w:color="D0DAE6"/>
+      <w:insideV w:val="single" w:sz="4" w:color="D0DAE6"/>
+    </w:tblBorders></w:tblPr>
+    <w:tblGrid><w:gridCol w:w="1800"/><w:gridCol w:w="1800"/><w:gridCol w:w="1800"/><w:gridCol w:w="1800"/></w:tblGrid>
+    <w:tr>${imgXml}</w:tr>
+  </w:tbl>
+  <w:sectPr><w:pgSz w:w="12240" w:h="15840"/><w:pgMar w:top="720" w:right="720" w:bottom="720" w:left="720"/></w:sectPr>
+</w:body></w:document>`;
+
+  const xmlStyles = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:styles xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:style w:type="paragraph" w:styleId="Normal"><w:name w:val="Normal"/><w:rPr><w:sz w:val="24"/></w:rPr></w:style></w:styles>`;
+  const xmlCT = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Default Extension="png" ContentType="image/png"/><Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/><Override PartName="/word/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.styles+xml"/></Types>`;
+  const xmlRelsMain = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/></Relationships>`;
+  const xmlRelsWord = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/>${wordRels.join('')}</Relationships>`;
+
+  zip.file('[Content_Types].xml', xmlCT);
+  zip.file('_rels/.rels', xmlRelsMain);
+  zip.file('word/document.xml', xmlDoc);
+  zip.file('word/styles.xml', xmlStyles);
+  zip.file('word/_rels/document.xml.rels', xmlRelsWord);
+
+  const blob = await zip.generateAsync({type:'blob', mimeType:'application/vnd.openxmlformats-officedocument.wordprocessingml.document'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href=url; a.download=nomeArquivo; a.click(); URL.revokeObjectURL(url);
 }
 
 async function baixarTodos() {
@@ -1143,8 +1343,11 @@ async function baixarTodos() {
     const aluno=state.alunos.find(x=>x.id===id);
     const txt=state.adaptacoes[id];
     if(typeof txt!=='string') continue;
-    try{await criarDocx(`Adaptacao_${aluno?.nome||id}.docx`,`Adaptação — ${aluno?.nome||id}`,txt);baixados++;await new Promise(r=>setTimeout(r,600));}
-    catch(e){console.error(e);}
+    try{
+      const{material}=extrairBlocos(txt);
+      await criarDocx(`Adaptacao_${aluno?.nome||id}.docx`,`Adaptação — ${aluno?.nome||id}`,material);
+      baixados++;await new Promise(r=>setTimeout(r,600));
+    }catch(e){console.error(e);}
   }
   showToast(`📦 ${baixados} DOCX baixados!`);
 }
