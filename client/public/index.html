@@ -1160,7 +1160,12 @@ function gerarXmlDocx(titulo, texto) {
   const coresFundo=['EFF6FF','F5F3FF','ECFDF5','FFF7ED','E0F2FE'];
   let corIdx=0;
 
-  const linhas=texto.split('\n');
+  const linhas=texto
+    // Converte **TITULO** sozinho numa linha em ---TITULO---
+    .replace(/^\*\*([^*\n]+)\*\*$/gm, '---$1---')
+    // Converte * item e - item de lista
+    .replace(/^\* /gm, '- ')
+    .split('\n');
   let dentroBloco=false;
 
   for(let i=0;i<linhas.length;i++){
