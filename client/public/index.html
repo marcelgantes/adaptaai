@@ -447,9 +447,13 @@ h1,h2,h3,h4{font-family:'Syne',sans-serif;}
           <div class="alert alert-success">✅ Adaptações prontas!</div>
           <div class="resultado-tabs" id="resultado-tabs"></div>
           <div class="resultado-box"><div class="resultado-content" id="resultado-text"></div></div>
-          <div style="display:flex;gap:10px;margin-top:16px;flex-wrap:wrap">
+          <div style="display:flex;gap:10px;margin-top:16px;flex-wrap:wrap;align-items:center">
             <button class="btn btn-success" style="width:auto" onclick="baixarDocx()">📥 Baixar DOCX do aluno selecionado</button>
             <button class="btn btn-primary" style="width:auto" onclick="baixarTodos()">📦 Baixar todos em DOCX</button>
+            <button class="btn btn-secondary" style="width:auto" onclick="togglePrevia()" id="btn-previa">👁 Prévia do DOCX</button>
+          </div>
+          <div id="previa-docx" style="display:none;margin-top:16px;background:white;border:2px solid var(--border);border-radius:14px;padding:32px 40px;font-family:'Calibri',sans-serif;font-size:14px;line-height:1.8;color:#1E293B;box-shadow:0 4px 20px rgba(0,0,0,0.08)">
+            <div id="previa-conteudo"></div>
           </div>
         </div>
       </div>
@@ -1010,6 +1014,34 @@ async function buscarPictogramas(conceitos) {
   return resultados;
 }
 
+// Divide texto longo em partes respeitando parágrafos
+function dividirTexto(texto, maxChars=6000) {
+  if(texto.length <= maxChars) return [texto];
+  const partes=[];
+  const paragrafos=texto.split(/\n\n+/);
+  let parteAtual='';
+  for(const par of paragrafos){
+    if((parteAtual+'\n\n'+par).length > maxChars && parteAtual){
+      partes.push(parteAtual.trim());
+      parteAtual=par;
+    } else {
+      parteAtual=parteAtual?parteAtual+'\n\n'+par:par;
+    }
+  }
+  if(parteAtual.trim()) partes.push(parteAtual.trim());
+  return partes;
+}
+
+async function chamarAPI(prompt) {
+  const r=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({messages:[{role:'user',content:prompt}]})});
+  if(!r.ok){
+    const txt=await r.text().catch(()=>'');
+    throw new Error(txt.includes('rate')||txt.includes('Rate')?'rate_limit':'server_error');
+  }
+  const d=await r.json();
+  return d.content?.[0]?.text||'';
+}
+
 async function gerarAdaptacoes() {
   const texto=document.getElementById('material-texto').value.trim();
   const disciplina=document.getElementById('material-disciplina').value.trim()||'Geral';
@@ -1024,27 +1056,48 @@ async function gerarAdaptacoes() {
   progBar.classList.add('show');progFill.style.width='5%';
   state.adaptacoes={};
   const total=alunosParaAdaptar.length;let done=0;
+  const partes=dividirTexto(texto);
+  const textoLongo=partes.length>1;
+  if(textoLongo) showToast(`📄 Texto longo — dividido em ${partes.length} partes`);
+
   for(const aluno of alunosParaAdaptar){
     if(aluno.fragmentacao==='nao_alfabetizado'){
       try{
-        const r=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({messages:[{role:'user',content:buildPromptPictogramas(aluno,texto,disciplina,nomeAtiv)}]})});
-        const d=await r.json();
+        const texto_resumido=texto.substring(0,6000);
+        const result=await chamarAPI(buildPromptPictogramas(aluno,texto_resumido,disciplina,nomeAtiv));
         let conceitos=[];
-        try{conceitos=JSON.parse((d.content?.[0]?.text||'[]').replace(/```json|```/g,'').trim());}catch(e){}
+        try{conceitos=JSON.parse(result.replace(/```json|```/g,'').trim());}catch(e){}
         const pictogramas=await buscarPictogramas(conceitos);
         state.adaptacoes[aluno.id]={tipo:'pictograma',conceitos,pictogramas,nomeAtiv,disciplina};
       }catch(e){state.adaptacoes[aluno.id]={tipo:'pictograma',conceitos:[],pictogramas:[],nomeAtiv,disciplina};}
     }else{
       try{
-        const r=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({messages:[{role:'user',content:buildPrompt(aluno,texto,disciplina,nomeAtiv)}]})});
-        if(!r.ok){
-          const txt=await r.text().catch(()=>'');
-          state.adaptacoes[aluno.id]=`⚠️ Erro do servidor (${r.status}). ${txt.includes('rate')||txt.includes('Rate')?'Limite de requisições atingido — aguarde 30 segundos e tente novamente.':'Tente novamente em alguns segundos.'}`;
+        if(textoLongo){
+          // Adapta cada parte separadamente
+          const resultados=[];
+          for(let pi=0;pi<partes.length;pi++){
+            progFill.style.width=`${Math.round(((done+(pi+0.5)/partes.length)/total)*100)}%`;
+            const promptParte=buildPrompt(aluno,partes[pi],disciplina,pi===0?nomeAtiv:'');
+            const result=await chamarAPI(promptParte);
+            resultados.push(result);
+            if(pi<partes.length-1) await new Promise(r=>setTimeout(r,2500));
+          }
+          // Junta os resultados — mantém o registro pedagógico da primeira parte, concatena materiais
+          const blocos=resultados.map(r=>extrairBlocos(r));
+          const registroFinal=blocos[0].registro;
+          const materialFinal=blocos.map((b,i)=>
+            i===0 ? b.material : `\n---CONTINUAÇÃO ${i+1}---\n${b.material}`
+          ).join('\n\n');
+          state.adaptacoes[aluno.id]=`---REGISTRO PEDAGÓGICO---\n${registroFinal}\n---FIM REGISTRO---\n\n---MATERIAL DO ALUNO---\n${materialFinal}\n---FIM MATERIAL---`;
         } else {
-          const d=await r.json();
-          state.adaptacoes[aluno.id]=d.content?.[0]?.text||'Erro ao gerar.';
+          const result=await chamarAPI(buildPrompt(aluno,texto,disciplina,nomeAtiv));
+          if(!result) throw new Error('empty');
+          state.adaptacoes[aluno.id]=result;
         }
-      }catch(e){state.adaptacoes[aluno.id]=`⚠️ Erro de conexão. Tente novamente.`;}
+      }catch(e){
+        const msg=e.message==='rate_limit'?'⚠️ Limite de requisições — aguarde 30s e tente novamente.':'⚠️ Erro de conexão. Tente novamente.';
+        state.adaptacoes[aluno.id]=msg;
+      }
     }
     done++;
     progFill.style.width=`${Math.round((done/total)*100)}%`;
@@ -1113,14 +1166,34 @@ function renderPrancha(adapt,container) {
 function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 
 function markdownParaHtml(texto) {
+  const cores=['#1D4ED8','#7C3AED','#059669','#C2410C','#0369A1'];
+  const fundos=['#EFF6FF','#F5F3FF','#ECFDF5','#FFF7ED','#E0F2FE'];
+  let corIdx=0;
+
   return texto
     .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    // Seções ---TITULO---
+    .replace(/^---(.+?)---$/gm,(m,tit)=>{
+      const cor=cores[corIdx%cores.length];
+      const fundo=fundos[corIdx%fundos.length];
+      corIdx++;
+      return `<div style="margin:20px 0 8px;padding:10px 16px;background:${fundo};border-left:4px solid ${cor};border-radius:0 8px 8px 0">
+        <span style="font-family:'Syne',sans-serif;font-weight:800;font-size:15px;color:${cor}">${tit.trim()}</span>
+      </div>`;
+    })
+    // Negrito e itálico
     .replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>')
     .replace(/\*(.+?)\*/g,'<em>$1</em>')
-    .replace(/^---(.+?)---$/gm,'<h2 style="font-family:\'Syne\',sans-serif;font-weight:800;font-size:16px;margin:20px 0 8px;color:var(--accent2);border-bottom:2px solid var(--border);padding-bottom:6px">$1</h2>')
-    .replace(/^#{3}\s(.+)$/gm,'<h3 style="font-family:\'Syne\',sans-serif;font-weight:700;font-size:15px;margin:12px 0 4px">$1</h3>')
-    .replace(/^#{2}\s(.+)$/gm,'<h2 style="font-family:\'Syne\',sans-serif;font-weight:800;font-size:17px;margin:16px 0 6px;color:var(--accent2)">$1</h2>')
-    .replace(/^#{1}\s(.+)$/gm,'<h1 style="font-family:\'Syne\',sans-serif;font-weight:800;font-size:19px;margin:20px 0 8px;color:var(--accent)">$1</h1>')
+    // Listas com seta
+    .replace(/^[-•\*]\s+(.+)$/gm,'<div style="display:flex;gap:8px;margin:6px 0;padding-left:8px"><span style="color:#2563EB;font-weight:700;flex-shrink:0">▸</span><span>$1</span></div>')
+    // Numeração
+    .replace(/^(\d+)\.\s+(.+)$/gm,'<div style="display:flex;gap:8px;margin:8px 0;padding-left:8px"><span style="color:#7C3AED;font-weight:700;flex-shrink:0">$1.</span><span>$2</span></div>')
+    // Subtítulos em maiúsculo
+    .replace(/^([A-ZÁÉÍÓÚÂÊÎÔÛÃÕÀÇ\s]{5,})$/gm,(m)=>{
+      if(m.trim().length<4) return m;
+      return `<div style="font-weight:700;font-size:14px;color:#334155;margin:14px 0 6px;padding-bottom:4px;border-bottom:1px solid #E2E8F0">${m}</div>`;
+    })
+    // Quebras de linha normais
     .replace(/\n/g,'<br>');
 }
 
@@ -1645,6 +1718,29 @@ function showToast(msg,type) {
   const t=document.createElement('div');
   t.style.cssText=`position:fixed;bottom:24px;right:24px;padding:14px 20px;border-radius:12px;font-size:14px;font-weight:500;z-index:9999;animation:fadeUp 0.3s ease;background:${type==='warn'?'#fb923c22':'#34d39922'};border:1px solid ${type==='warn'?'#fb923c':'#34d399'};color:${type==='warn'?'#fb923c':'#34d399'};font-family:'DM Sans',sans-serif;backdrop-filter:blur(10px);`;
   t.textContent=msg;document.body.appendChild(t);setTimeout(()=>t.remove(),3000);
+}
+
+function togglePrevia() {
+  const div=document.getElementById('previa-docx');
+  const btn=document.getElementById('btn-previa');
+  if(div.style.display==='none'){
+    const txt=state.adaptacoes[state.alunoAdaptacaoAtual];
+    if(!txt||typeof txt!=='string') return showToast('⚠️ Selecione uma adaptação de texto','warn');
+    const{material}=extrairBlocos(txt);
+    const meta=state.user?.user_metadata||{};
+    const aluno=state.alunos.find(a=>a.id===state.alunoAdaptacaoAtual);
+    const cabecalho=`<div style="text-align:center;margin-bottom:24px;padding-bottom:16px;border-bottom:2px solid #E2E8F0">
+      <div style="font-size:22px;font-weight:800;color:#2563EB;margin-bottom:6px">${aluno?.nome?'Adaptação — '+aluno.nome:'Adaptação'}</div>
+      <div style="font-size:12px;color:#94A3B8">${[meta.escola,meta.name,new Date().toLocaleDateString('pt-BR')].filter(Boolean).join('  ·  ')}</div>
+    </div>`;
+    document.getElementById('previa-conteudo').innerHTML=cabecalho+markdownParaHtml(material);
+    div.style.display='block';
+    btn.textContent='✕ Fechar prévia';
+    div.scrollIntoView({behavior:'smooth',block:'nearest'});
+  } else {
+    div.style.display='none';
+    btn.textContent='👁 Prévia do DOCX';
+  }
 }
 
 function confirmarApagarAluno(id,nome) {
