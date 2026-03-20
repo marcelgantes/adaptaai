@@ -923,46 +923,133 @@ function loadAlunosPei() {
   container.innerHTML=alunos.map(a=>`<label style="display:flex;align-items:center;gap:8px;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:10px 14px;cursor:pointer;font-size:13px;font-weight:500"><input type="checkbox" value="${a.id}" style="accent-color:var(--accent2);width:16px;height:16px"> ${a.nome}</label>`).join('');
 }
 
-function buildPrompt(aluno,texto,disciplina,nomeAtiv) {
-  const fragMap={
-    baixa:'Texto corrido, parágrafos fluidos, sem divisões.',
-    media:'Parágrafos curtos. Máximo 3 frases por parágrafo.',
-    alta:'Blocos bem curtos. Um conceito por vez. Prefira listas numeradas.',
-  };
-  const abstMap={
-    alta:'Use analogias, exemplos do cotidiano e metáforas.',
-    media:'Explique com exemplos simples e diretos.',
-    baixa:'Linguagem concreta e direta. Evite abstrações.',
-    nao_abstrai:'Tudo literal. Zero metáforas. Apenas fatos concretos.',
-  };
-  const medMap={
-    autonomo:'Sem instruções extras.',
-    guiado:'Inclua uma instrução curta antes de cada parte.',
-    passo_a_passo:'Use "Primeiro...", "Depois...", "Por fim..." em cada etapa.',
-  };
-  const conds=[];
-  if(aluno.dislexia) conds.push('DISLEXIA: frases curtas (máx 15 palavras), uma ideia por frase.');
-  if(aluno.tdah) conds.push('TDAH: blocos minúsculos, destaque palavras-chave, elimine informações secundárias.');
-  if(aluno.tea) conds.push('TEA: linguagem 100% literal, sem metáforas nem linguagem figurada.');
-  if(aluno.baixa_visao) conds.push('BAIXA VISÃO: sem tabelas, descreva em palavras qualquer elemento visual.');
-  if(aluno.tipografia==='bastao') conds.push('TIPOGRAFIA BASTÃO: escreva TODO o texto em CAIXA ALTA.');
-  const meta=state.user?.user_metadata||{};
-  const estado=meta.estado||'BNCC';
-  const refCurr=estado==='RS'?'Referencial Curricular Gaúcho':estado==='SP'?'Currículo Paulista':estado==='RJ'?'Currículo Carioca':estado==='PR'?'CREP/Paraná':estado==='SC'?'DCSC/Santa Catarina':'BNCC';
-  const discProf=meta.disciplinas?.length?meta.disciplinas.join(', '):(disciplina||'Geral');
-  const altasH=aluno.altas_habilidades?'\nALTAS HABILIDADES: NÃO simplifique. Aprofunde além do nível da série. Inclua dados avançados, conexões interdisciplinares e ao menos uma questão desafiadora de raciocínio crítico.':'';
-  const interesses=aluno.interesses?`\nHIPERFOCO/INTERESSES: ${aluno.interesses} — use exemplos relacionados sempre que possível.`:'';
-  const obs=aluno.obs?`\nOBSERVAÇÕES: ${aluno.obs}`:'';
+function buildPrompt(aluno, texto, disciplina, nomeAtiv) {
+  const meta = state.user?.user_metadata || {};
+  const estado = meta.estado || 'BNCC';
+  const refCurr = estado === 'RS' ? 'Referencial Curricular Gaúcho'
+    : estado === 'SP' ? 'Currículo Paulista'
+    : estado === 'RJ' ? 'Currículo Carioca'
+    : estado === 'PR' ? 'CREP/Paraná'
+    : estado === 'SC' ? 'DCSC/Santa Catarina'
+    : 'BNCC';
+  const discProf = meta.disciplinas?.length ? meta.disciplinas.join(', ') : (disciplina || 'Geral');
 
-  return `Você é especialista em educação inclusiva. Reescreva o material abaixo para o perfil do aluno e responda SOMENTE com um JSON válido, sem markdown, sem explicações.
+  const fragMap = {
+    baixa: 'Escreva em texto corrido, parágrafos fluidos, sem divisões. Máximo 5 frases por parágrafo.',
+    media: 'Escreva em parágrafos curtos. Máximo 3 frases por parágrafo. Um conceito central por parágrafo.',
+    alta: 'Escreva em blocos bem curtos. Um único conceito por bloco. Use listas numeradas sempre que possível. Nunca agrupe dois conceitos no mesmo item.',
+  };
 
-PERFIL:
-- Estrutura: ${fragMap[aluno.fragmentacao]||'parágrafos curtos'}
-- Abstração: ${abstMap[aluno.abstracao]||'exemplos simples'}
-- Mediação: ${medMap[aluno.mediacao]||'guiado'}
-${conds.length?'- Condições: '+conds.join(' | '):''}${altasH}${interesses}${obs}
+  const abstMap = {
+    alta: 'Use analogias ricas, metáforas e exemplos do cotidiano para aprofundar a compreensão.',
+    media: 'Explique cada conceito com um exemplo simples e direto. Evite jargões sem explicação.',
+    baixa: 'Use linguagem concreta e direta. Prefira exemplos físicos e visíveis. Evite abstrações.',
+    nao_abstrai: 'Tudo literal e concreto. Zero metáforas, zero analogias, zero linguagem figurada. Apenas fatos observáveis.',
+  };
 
-CONTEXTO: Disciplina: ${discProf} | Referência: ${refCurr} | Escola: ${meta.escola||'—'}
+  const medMap = {
+    autonomo: 'Enunciados diretos, sem instruções de apoio. O aluno navega sozinho.',
+    guiado: 'Inclua uma instrução curta de apoio antes de cada seção. Ex: "Leia com atenção:" ou "Responda:".',
+    passo_a_passo: 'Use marcadores sequenciais explícitos em cada etapa: "Primeiro...", "Depois...", "Em seguida...", "Por fim...". Nunca pule etapas.',
+  };
+
+  const blocosDiagnostico = [];
+
+  if (aluno.tea) {
+    blocosDiagnostico.push(`
+TEA — TRANSTORNO DO ESPECTRO AUTISTA:
+- Use linguagem 100% literal. ZERO metáforas, expressões idiomáticas ou linguagem figurada. Exemplo do que EVITAR: "a célula é uma fábrica". Exemplo do que USAR: "a célula produz energia e proteínas".
+- Estruture com previsibilidade explícita: indique o que virá a seguir. Ex: "Agora você vai ler sobre...", "Depois, você vai responder...".
+- Aplique a técnica Dizer-Mostrar-Fazer: (1) explique o conceito em palavras simples, (2) dê um exemplo concreto e observável, (3) proponha que o aluno aplique ou responda.
+- Comandos curtos e diretos. Um comando por vez. Nunca junte dois comandos na mesma frase.
+- Evite ironia, sarcasmo, duplo sentido ou qualquer ambiguidade linguística.
+- Espaçamento entre linhas generoso. Não use tabelas complexas ou layouts densos.`);
+  }
+
+  if (aluno.tdah) {
+    blocosDiagnostico.push(`
+TDAH — TRANSTORNO DE DÉFICIT DE ATENÇÃO E HIPERATIVIDADE:
+- Divida o material em blocos pequenos e bem separados visualmente. Nunca dois conceitos no mesmo bloco.
+- Uma tarefa por vez. Nunca liste múltiplas instruções juntas.
+- Inicie cada instrução com um verbo de ação claro: "Leia", "Circule", "Escreva", "Observe", "Responda".
+- Destaque palavras-chave em negrito para ancorar a atenção.
+- Elimine completamente informações secundárias, curiosidades e detalhes dispensáveis — apenas o essencial.
+- Frases curtas. Máximo 15 palavras por frase. Uma ideia por frase.
+- Após 2 a 3 blocos de conteúdo, insira explicitamente: "⏸ Pausa — respire fundo antes de continuar."`);
+  }
+
+  if (aluno.dislexia) {
+    blocosDiagnostico.push(`
+DISLEXIA:
+- Frases curtas e diretas. Máximo 15 palavras por frase. Uma ideia por frase.
+- Use voz ativa sempre. Exemplo do que EVITAR: "A energia é produzida pela célula". Exemplo do que USAR: "A célula produz energia".
+- Evite dupla negação. Exemplo do que EVITAR: "não é incorreto". Exemplo do que USAR: "está correto".
+- Elimine palavras desnecessárias. Prefira frases simples e diretas.
+- Separe visualmente cada questão e cada seção com espaço generoso.
+- Use marcadores visuais claros (▸, números) para listas.
+- Não use itálico. Use negrito apenas para palavras-chave essenciais.`);
+  }
+
+  if (aluno.baixa_visao) {
+    blocosDiagnostico.push(`
+BAIXA VISÃO:
+- Sem tabelas, gráficos ou elementos visuais de qualquer tipo.
+- Descreva em palavras qualquer informação que normalmente seria apresentada visualmente.
+- Estrutura linear, sem colunas paralelas ou layouts complexos.
+- Frases descritivas e completas, sem depender de posição espacial.`);
+  }
+
+  let blocoAltasHabilidades = '';
+  if (aluno.altas_habilidades) {
+    blocoAltasHabilidades = `
+
+ALTAS HABILIDADES / SUPERDOTAÇÃO — ENRIQUECIMENTO CURRICULAR:
+- NÃO simplifique. NÃO reduza. Aprofunde além do nível da série.
+- Posicione o aluno como PRODUTOR de conhecimento, não consumidor: proponha que ele explique, crie, analise, questione ou aplique em novo contexto.
+- Inclua pelo menos uma conexão interdisciplinar (ex: relacione o conceito com outra área do conhecimento).
+- Inclua ao menos uma questão de raciocínio crítico ou investigativo aberta, sem resposta única óbvia.
+- O material deve provocar três dimensões: habilidade (conteúdo avançado) + envolvimento (desafio real) + criatividade (produção original).
+- Se o aluno tem interesses declarados, use-os como porta de entrada para o conteúdo avançado.`;
+  }
+
+  let blocoDuplaExcep = '';
+  const temDiagnostico = aluno.tea || aluno.tdah || aluno.dislexia;
+  if (aluno.altas_habilidades && temDiagnostico) {
+    blocoDuplaExcep = `
+
+DUPLA EXCEPCIONALIDADE (Altas Habilidades + diagnóstico):
+- NUNCA use remediação de déficit como foco principal. Use o talento como âncora pedagógica.
+- O interesse profundo do aluno é a porta de entrada para superar a barreira neurocognitiva.
+- Equilibre: desafie o intelecto respeitando os limites sensoriais ou executivos do diagnóstico.
+- Altas Habilidades e TEA não são excludentes: use linguagem literal E conteúdo aprofundado ao mesmo tempo.
+- Altas Habilidades e TDAH não são excludentes: use blocos curtos E conteúdo desafiador ao mesmo tempo.`;
+  }
+
+  const blocoInteresses = aluno.interesses
+    ? `\nINTERESSES / HIPERFOCO DO ALUNO: "${aluno.interesses}" — use exemplos, analogias e contextos relacionados a esses interesses sempre que possível.`
+    : '';
+  const blocoObs = aluno.obs
+    ? `\nOBSERVAÇÕES PEDAGÓGICAS: ${aluno.obs}`
+    : '';
+  const blocoTipografia = aluno.tipografia === 'bastao'
+    ? '\nTIPOGRAFIA BASTÃO: escreva TODO o texto em CAIXA ALTA.'
+    : '';
+
+  const instrucoesDiagnostico = blocosDiagnostico.length
+    ? '\n\nINSTRUÇÕES ESPECÍFICAS POR DIAGNÓSTICO (OBRIGATÓRIAS):\n' + blocosDiagnostico.join('\n')
+    : '';
+
+  return `Você é especialista em educação inclusiva com formação em Neuropsicologia Pedagógica. Reescreva o material abaixo respeitando RIGOROSAMENTE o perfil do aluno descrito. Responda SOMENTE com um JSON válido, sem markdown, sem explicações fora do JSON.
+
+PERFIL DO ALUNO:
+- Estrutura do texto: ${fragMap[aluno.fragmentacao] || fragMap['media']}
+- Nível de abstração: ${abstMap[aluno.abstracao] || abstMap['media']}
+- Mediação: ${medMap[aluno.mediacao] || medMap['guiado']}${instrucoesDiagnostico}${blocoAltasHabilidades}${blocoDuplaExcep}${blocoInteresses}${blocoObs}${blocoTipografia}
+
+CONTEXTO PEDAGÓGICO:
+- Disciplina: ${discProf}
+- Referência curricular: ${refCurr}
+- Escola: ${meta.escola || '—'}
 
 MATERIAL ORIGINAL:
 ${texto}
@@ -970,19 +1057,19 @@ ${texto}
 Responda APENAS com este JSON (sem markdown, sem \`\`\`):
 {
   "nomeAtividade": "título pedagógico curto",
-  "disciplina": "${disciplina||discProf}",
+  "disciplina": "${disciplina || discProf}",
   "objetivos": ["objetivo 1", "objetivo 2", "objetivo 3"],
   "habilidades": [{"codigo": "EF06CI01", "descricao": "descrição curta"}],
   "passos": [
-    {"numero": 1, "texto": "frase simples reescrita", "destaque": "palavra-chave"}
+    {"numero": 1, "texto": "frase reescrita respeitando o perfil", "destaque": "palavra-chave"}
   ],
   "resumo": [
-    {"titulo": "Conceito", "conteudo": "definição curta"}
+    {"titulo": "Conceito", "conteudo": "definição curta e adequada ao perfil"}
   ],
   "questoes": [
     {
       "tipo": "multipla",
-      "enunciado": "pergunta",
+      "enunciado": "pergunta adequada ao perfil",
       "opcoes": ["A) opção correta", "B) opção errada"],
       "gabarito": "A"
     },
@@ -992,17 +1079,17 @@ Responda APENAS com este JSON (sem markdown, sem \`\`\`):
       "gabarito": "V"
     }
   ],
-  "dicaPedagogica": "sugestão prática de apoio visual ou concreto para o professor",
+  "dicaPedagogica": "sugestão prática e concreta para o professor, específica para o diagnóstico deste aluno",
   "refCurr": "${refCurr}"
 }
 
-REGRAS:
-1. NÃO copie frases do original. REESCREVA com linguagem adequada ao perfil.
-2. Mantenha TODOS os conceitos e fatos científicos.
-3. passos: 4 a 8 itens, linguagem simples, um conceito por passo.
-4. resumo: exatamente 4 cards com conceitos-chave do conteúdo.
-5. questoes: 2 de múltipla escolha (2 opções) + 1 V/F. Gabarito correto.
-6. dicaPedagogica: sugestão concreta para materializar o conteúdo (massinha, desenho, etc).`;
+REGRAS CRÍTICAS:
+1. NÃO copie frases do original. REESCREVA completamente com linguagem adequada ao perfil.
+2. Mantenha TODOS os conceitos e fatos — só mude a forma, nunca o conteúdo científico.
+3. passos: 4 a 8 itens. Um conceito por passo. Linguagem do perfil.
+4. resumo: exatamente 4 cards com os conceitos-chave do conteúdo.
+5. questoes: 2 de múltipla escolha (2 opções cada) + 1 V/F. Gabarito sempre correto.
+6. dicaPedagogica: deve ser específica para o diagnóstico — nunca genérica.`;
 }
 function buildPromptPictogramas(aluno,texto,disciplina,nomeAtiv) {
   return `Você é especialista em CAA e ARASAAC. Extraia 8-14 conceitos do material para um aluno NÃO ALFABETIZADO.
