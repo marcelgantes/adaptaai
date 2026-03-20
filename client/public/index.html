@@ -1783,16 +1783,41 @@ async function baixarTodos() {
   for(const id of Object.keys(state.adaptacoes)){
     const aluno=state.alunos.find(x=>x.id===id);
     const txt=state.adaptacoes[id];
-    if(typeof txt!=='string') continue;
+    if(!txt) continue;
+    const nome=aluno?.nome||id;
     try{
-      const{material}=extrairBlocos(txt);
-      await criarDocx(`Adaptacao_${aluno?.nome||id}.docx`,`Adaptação — ${aluno?.nome||id}`,material);
-      baixados++;await new Promise(r=>setTimeout(r,600));
+      if(typeof txt==='object'&&txt.tipo==='json'){
+        const d=txt.data;
+        let textoParts=[`---${d.nomeAtividade||'Material Adaptado'}---`,''];
+        (d.passos||[]).forEach(p=>textoParts.push(`${p.numero}. ${p.texto}`));
+        textoParts.push('');
+        if(d.resumo?.length){textoParts.push('---Resumo Rápido---','');d.resumo.forEach(r=>textoParts.push(`**${r.titulo}:** ${r.conteudo}`));textoParts.push('');}
+        if(d.questoes?.length){
+          textoParts.push('---Atividade---','');
+          d.questoes.forEach((q,i)=>{
+            textoParts.push(`${i+1}. ${q.enunciado}`);
+            if(q.tipo==='multipla')(q.opcoes||[]).forEach(op=>textoParts.push(`   ${op}`));
+            if(q.tipo==='vf') textoParts.push(`   ( ) Verdadeiro  ( ) Falso`);
+            textoParts.push('');
+          });
+          textoParts.push('---Gabarito---','');
+          d.questoes.forEach((q,i)=>textoParts.push(`Questão ${i+1}: ${q.gabarito}`));
+        }
+        await criarDocx(`Adaptacao_${nome}.docx`,`Adaptação — ${nome}`,textoParts.join('\n'));
+        baixados++;
+      } else if(typeof txt==='object'&&txt.tipo==='pictograma'){
+        await criarDocxPrancha(`Prancha_${nome}.docx`,`Prancha — ${nome}`,txt);
+        baixados++;
+      } else if(typeof txt==='string'){
+        const{material}=extrairBlocos(txt);
+        await criarDocx(`Adaptacao_${nome}.docx`,`Adaptação — ${nome}`,material);
+        baixados++;
+      }
+      await new Promise(r=>setTimeout(r,600));
     }catch(e){console.error(e);}
   }
   showToast(`📦 ${baixados} DOCX baixados!`);
 }
-
 async function baixarPei() {
   if(!state.peiAtual?.alunoAtivo) return;
   const dado=state.peiAtual.alunos[state.peiAtual.alunoAtivo];
