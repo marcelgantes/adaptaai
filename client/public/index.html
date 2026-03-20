@@ -924,51 +924,86 @@ function loadAlunosPei() {
 }
 
 function buildPrompt(aluno,texto,disciplina,nomeAtiv) {
-  const fragMap={baixa:'Texto contínuo e fluido.',media:'Parágrafos curtos, conceitos separados.',alta:'Blocos curtos, um conceito por bloco. Use tópicos e listas.'};
-  const abstMap={alta:'Inclua inferências, analogias e exemplos.',media:'Explique com exemplos simples e diretos.',baixa:'Linguagem direta e concreta.',nao_abstrai:'Tudo literal. Sem inferências ou analogias.'};
-  const medMap={autonomo:'Enunciado direto, sem instruções extras.',guiado:'Inclua instruções curtas e exemplos de apoio.',passo_a_passo:'Cada etapa explicada detalhadamente.'};
-  const tipoMap={normal:'Fonte padrão.',bastao:'Escreva tudo em CAIXA ALTA.'};
+  const fragMap={
+    baixa:'Texto corrido, parágrafos fluidos, sem divisões.',
+    media:'Parágrafos curtos. Máximo 3 frases por parágrafo.',
+    alta:'Blocos bem curtos. Um conceito por vez. Prefira listas numeradas.',
+  };
+  const abstMap={
+    alta:'Use analogias, exemplos do cotidiano e metáforas.',
+    media:'Explique com exemplos simples e diretos.',
+    baixa:'Linguagem concreta e direta. Evite abstrações.',
+    nao_abstrai:'Tudo literal. Zero metáforas. Apenas fatos concretos.',
+  };
+  const medMap={
+    autonomo:'Sem instruções extras.',
+    guiado:'Inclua uma instrução curta antes de cada parte.',
+    passo_a_passo:'Use "Primeiro...", "Depois...", "Por fim..." em cada etapa.',
+  };
   const conds=[];
-  if(aluno.dislexia) conds.push('Dislexia: frases curtas, espaçamento claro.');
-  if(aluno.tdah) conds.push('TDAH: blocos muito curtos, um item por vez, elimine distrações.');
-  if(aluno.tea) conds.push('TEA: linguagem totalmente literal, sem metáforas ou expressões idiomáticas.');
-  if(aluno.baixa_visao) conds.push('Baixa visão: texto simples, sem tabelas complexas.');
+  if(aluno.dislexia) conds.push('DISLEXIA: frases curtas (máx 15 palavras), uma ideia por frase.');
+  if(aluno.tdah) conds.push('TDAH: blocos minúsculos, destaque palavras-chave, elimine informações secundárias.');
+  if(aluno.tea) conds.push('TEA: linguagem 100% literal, sem metáforas nem linguagem figurada.');
+  if(aluno.baixa_visao) conds.push('BAIXA VISÃO: sem tabelas, descreva em palavras qualquer elemento visual.');
+  if(aluno.tipografia==='bastao') conds.push('TIPOGRAFIA BASTÃO: escreva TODO o texto em CAIXA ALTA.');
   const meta=state.user?.user_metadata||{};
   const estado=meta.estado||'BNCC';
   const refCurr=estado==='RS'?'Referencial Curricular Gaúcho':estado==='SP'?'Currículo Paulista':estado==='RJ'?'Currículo Carioca':estado==='PR'?'CREP/Paraná':estado==='SC'?'DCSC/Santa Catarina':'BNCC';
   const discProf=meta.disciplinas?.length?meta.disciplinas.join(', '):(disciplina||'Geral');
-  const altasH=aluno.altas_habilidades?`\nATENÇÃO — ALTAS HABILIDADES/SUPERDOTAÇÃO:\nNÃO simplifique. Aprofunde, desafie e enriqueça:\n- Conecte com temas avançados e interdisciplinares\n- Proponha desafios e questões que estimulem o pensamento crítico\n- Sugira fontes para aprofundamento`:'';
-  const interesses=aluno.interesses?`\nINTERESSES DO ALUNO: ${aluno.interesses}\nUse esses interesses como exemplos e contexto ao longo do material.`:'';
-  return `Você é especialista em educação inclusiva. Adapte o material abaixo para este perfil de aluno.
+  const altasH=aluno.altas_habilidades?'\nALTAS HABILIDADES: NÃO simplifique. Aprofunde além do nível da série. Inclua dados avançados, conexões interdisciplinares e ao menos uma questão desafiadora de raciocínio crítico.':'';
+  const interesses=aluno.interesses?`\nHIPERFOCO/INTERESSES: ${aluno.interesses} — use exemplos relacionados sempre que possível.`:'';
+  const obs=aluno.obs?`\nOBSERVAÇÕES: ${aluno.obs}`:'';
 
-CONTEXTO DO PROFESSOR: Estado: ${estado} | Referência: ${refCurr} | Disciplina(s): ${discProf} | Escola: ${meta.escola||'Não informado'}
+  return `Você é especialista em educação inclusiva. Reescreva o material abaixo para o perfil do aluno e responda SOMENTE com um JSON válido, sem markdown, sem explicações.
 
-PERFIL DO ALUNO:
-- Fragmentação: ${fragMap[aluno.fragmentacao]||aluno.fragmentacao}
-- Abstração: ${abstMap[aluno.abstracao]||aluno.abstracao}
-- Mediação: ${medMap[aluno.mediacao]||medMap['guiado']}
-- Tipografia: ${tipoMap[aluno.tipografia]||'Padrão'}
-${conds.length?'- Condições:\n  • '+conds.join('\n  • '):''}
-${aluno.obs?'- Observações: '+aluno.obs:''}${altasH}${interesses}
+PERFIL:
+- Estrutura: ${fragMap[aluno.fragmentacao]||'parágrafos curtos'}
+- Abstração: ${abstMap[aluno.abstracao]||'exemplos simples'}
+- Mediação: ${medMap[aluno.mediacao]||'guiado'}
+${conds.length?'- Condições: '+conds.join(' | '):''}${altasH}${interesses}${obs}
 
-Fidelidade: mantenha TODAS as informações do original. Apenas adapte linguagem e estrutura.
-Não inclua introdução ou comentários. Apenas o material adaptado.
+CONTEXTO: Disciplina: ${discProf} | Referência: ${refCurr} | Escola: ${meta.escola||'—'}
 
-MATERIAL ORIGINAL (${disciplina}${nomeAtiv?', '+nomeAtiv:''}):
+MATERIAL ORIGINAL:
 ${texto}
 
-FORMATO OBRIGATÓRIO:
----REGISTRO PEDAGÓGICO---
-Nome da atividade: [Nome pedagógico]
-Objetivos: [2-3 objetivos de aprendizagem]
-Habilidades (${refCurr}): [2-3 habilidades com código]
----FIM REGISTRO---
-
----MATERIAL DO ALUNO---
-[Conteúdo adaptado completo — sem mencionar objetivos ou habilidades]
----FIM MATERIAL---`;
+Responda APENAS com este JSON (sem markdown, sem \`\`\`):
+{
+  "nomeAtividade": "título pedagógico curto",
+  "disciplina": "${disciplina||discProf}",
+  "objetivos": ["objetivo 1", "objetivo 2", "objetivo 3"],
+  "habilidades": [{"codigo": "EF06CI01", "descricao": "descrição curta"}],
+  "passos": [
+    {"numero": 1, "texto": "frase simples reescrita", "destaque": "palavra-chave"}
+  ],
+  "resumo": [
+    {"titulo": "Conceito", "conteudo": "definição curta"}
+  ],
+  "questoes": [
+    {
+      "tipo": "multipla",
+      "enunciado": "pergunta",
+      "opcoes": ["A) opção correta", "B) opção errada"],
+      "gabarito": "A"
+    },
+    {
+      "tipo": "vf",
+      "enunciado": "afirmação para julgar",
+      "gabarito": "V"
+    }
+  ],
+  "dicaPedagogica": "sugestão prática de apoio visual ou concreto para o professor",
+  "refCurr": "${refCurr}"
 }
 
+REGRAS:
+1. NÃO copie frases do original. REESCREVA com linguagem adequada ao perfil.
+2. Mantenha TODOS os conceitos e fatos científicos.
+3. passos: 4 a 8 itens, linguagem simples, um conceito por passo.
+4. resumo: exatamente 4 cards com conceitos-chave do conteúdo.
+5. questoes: 2 de múltipla escolha (2 opções) + 1 V/F. Gabarito correto.
+6. dicaPedagogica: sugestão concreta para materializar o conteúdo (massinha, desenho, etc).`;
+}
 function buildPromptPictogramas(aluno,texto,disciplina,nomeAtiv) {
   return `Você é especialista em CAA e ARASAAC. Extraia 8-14 conceitos do material para um aluno NÃO ALFABETIZADO.
 REGRAS IMPORTANTES:
@@ -1032,14 +1067,22 @@ function dividirTexto(texto, maxChars=6000) {
   return partes;
 }
 
-async function chamarAPI(prompt) {
-  const r=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({messages:[{role:'user',content:prompt}]})});
-  if(!r.ok){
+async function chamarAPI(prompt, tentativas=3) {
+  for(let t=0;t<tentativas;t++){
+    const r=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({messages:[{role:'user',content:prompt}]})});
+    if(r.ok){
+      const d=await r.json();
+      return d.content?.[0]?.text||'';
+    }
     const txt=await r.text().catch(()=>'');
-    throw new Error(txt.includes('rate')||txt.includes('Rate')?'rate_limit':'server_error');
+    const isRate=txt.includes('rate')||txt.includes('Rate')||r.status===429;
+    if(isRate && t<tentativas-1){
+      showToast(`⏳ Limite atingido — aguardando 35s (tentativa ${t+2}/${tentativas})...`,'warn');
+      await new Promise(r=>setTimeout(r,35000));
+    } else {
+      throw new Error(isRate?'rate_limit':'server_error');
+    }
   }
-  const d=await r.json();
-  return d.content?.[0]?.text||'';
 }
 
 async function gerarAdaptacoes() {
@@ -1086,13 +1129,14 @@ async function gerarAdaptacoes() {
           const blocos=resultados.map(r=>extrairBlocos(r));
           const registroFinal=blocos[0].registro;
           const materialFinal=blocos.map((b,i)=>
-            i===0 ? b.material : `\n---CONTINUAÇÃO ${i+1}---\n${b.material}`
+            i===0?b.material:`\n---CONTINUAÇÃO ${i+1}---\n${b.material}`
           ).join('\n\n');
-          state.adaptacoes[aluno.id]=`---REGISTRO PEDAGÓGICO---\n${registroFinal}\n---FIM REGISTRO---\n\n---MATERIAL DO ALUNO---\n${materialFinal}\n---FIM MATERIAL---`;
+          const textoFinal=`---REGISTRO PEDAGÓGICO---\n${registroFinal}\n---FIM REGISTRO---\n\n---MATERIAL DO ALUNO---\n${materialFinal}\n---FIM MATERIAL---`;
+          state.adaptacoes[aluno.id]=parseAdaptacao(textoFinal);
         } else {
           const result=await chamarAPI(buildPrompt(aluno,texto,disciplina,nomeAtiv));
           if(!result) throw new Error('empty');
-          state.adaptacoes[aluno.id]=result;
+          state.adaptacoes[aluno.id]=parseAdaptacao(result);
         }
       }catch(e){
         const msg=e.message==='rate_limit'?'⚠️ Limite de requisições — aguarde 30s e tente novamente.':'⚠️ Erro de conexão. Tente novamente.';
@@ -1112,16 +1156,147 @@ async function gerarAdaptacoes() {
   const primeiraAdapt=state.adaptacoes[alunosParaAdaptar[0]?.id];
   const box=document.getElementById('resultado-text');
   if(primeiraAdapt&&primeiraAdapt.tipo==='pictograma') renderPrancha(primeiraAdapt,box);
-  else if(primeiraAdapt){
-    const{registro,material}=extrairBlocos(primeiraAdapt);
-    box.innerHTML=
-      (registro?`<div style="background:rgba(37,99,235,0.06);border:1px solid rgba(37,99,235,0.2);border-radius:10px;padding:14px 16px;margin-bottom:16px;font-size:13px;">
-        <div style="font-weight:700;color:var(--accent);margin-bottom:6px;font-size:12px;text-transform:uppercase;letter-spacing:0.05em">📋 Registro Pedagógico (professor)</div>
-        ${markdownParaHtml(registro)}
-      </div>`:'')
-      +markdownParaHtml(material);
-  } else { box.innerHTML=''; }
+  else if(primeiraAdapt) box.innerHTML=renderAdaptacaoHtml(primeiraAdapt);
+  else box.innerHTML='';
   document.getElementById('resultado-area').style.display='block';
+}
+
+function parseAdaptacao(texto) {
+  try {
+    const clean=texto.replace(/```json|```/g,'').trim();
+    return {tipo:'json', data:JSON.parse(clean)};
+  } catch(e) {
+    // fallback: texto antigo
+    return {tipo:'texto', data:texto};
+  }
+}
+
+function renderAdaptacaoHtml(adaptacao) {
+  if(adaptacao.tipo==='texto') {
+    const{registro,material}=extrairBlocos(adaptacao.data);
+    return (registro?`<div style="background:rgba(37,99,235,0.06);border:1px solid rgba(37,99,235,0.2);border-radius:10px;padding:14px 16px;margin-bottom:16px;font-size:13px">
+      <div style="font-weight:700;color:var(--accent);margin-bottom:6px;font-size:12px;text-transform:uppercase;letter-spacing:0.05em">📋 Registro Pedagógico (professor)</div>
+      ${markdownParaHtml(registro)}</div>`:'')
+      +markdownParaHtml(material);
+  }
+  const d=adaptacao.data;
+  const cores=['#1D4ED8','#7C3AED','#059669','#C2410C','#0369A1'];
+  let html=`
+  <div style="font-family:'DM Sans',sans-serif;max-width:720px">
+    <!-- Header -->
+    <div style="text-align:center;padding:0 0 24px;border-bottom:1px solid var(--border);margin-bottom:24px">
+      <span style="display:inline-block;padding:4px 14px;background:rgba(37,99,235,0.1);color:var(--accent);border-radius:20px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:10px">${esc2(d.disciplina||'')}</span>
+      <h2 style="font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:var(--text);margin:0 0 10px">${esc2(d.nomeAtividade||'')}</h2>
+      <div style="width:48px;height:3px;background:var(--accent);border-radius:2px;margin:0 auto"></div>
+    </div>
+
+    <!-- Conteúdo passo a passo -->
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:24px;margin-bottom:20px">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px">
+        <div style="width:32px;height:32px;background:rgba(99,102,241,0.1);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px">📖</div>
+        <span style="font-family:'Syne',sans-serif;font-weight:800;font-size:15px;text-transform:uppercase;letter-spacing:0.05em">Aprenda Passo a Passo</span>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        ${(d.passos||[]).map(p=>`
+        <div style="display:flex;align-items:flex-start;gap:12px;padding:12px 16px;background:#F8FAFC;border-radius:10px;border-left:4px solid var(--accent)">
+          <span style="display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;min-width:26px;background:var(--accent);color:white;border-radius:50%;font-weight:700;font-size:12px">${p.numero}</span>
+          <p style="margin:0;font-size:14px;line-height:1.7">${esc2(p.texto).replace(new RegExp(esc2(p.destaque||'XXXXX'),'gi'),m=>`<span style="background:#DBEAFE;padding:1px 5px;border-radius:4px;font-weight:600">${m}</span>`)}</p>
+        </div>`).join('')}
+      </div>
+    </div>
+
+    <!-- Resumo Rápido -->
+    <div style="background:var(--accent);border-radius:16px;padding:24px;margin-bottom:20px;color:white">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px">
+        <span style="font-size:18px">⚡</span>
+        <span style="font-family:'Syne',sans-serif;font-weight:800;font-size:15px;text-transform:uppercase;letter-spacing:0.05em">Resumo Rápido</span>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        ${(d.resumo||[]).map(r=>`
+        <div style="background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.2);border-radius:10px;padding:12px">
+          <div style="font-weight:700;font-size:13px;margin-bottom:4px">${esc2(r.titulo)}</div>
+          <div style="font-size:12px;opacity:0.9">${esc2(r.conteudo)}</div>
+        </div>`).join('')}
+      </div>
+    </div>
+
+    <!-- Atividade -->
+    <div style="margin-bottom:20px">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
+        <div style="width:32px;height:32px;background:rgba(5,150,105,0.1);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px">✏️</div>
+        <span style="font-family:'Syne',sans-serif;font-weight:800;font-size:15px;text-transform:uppercase;letter-spacing:0.05em">Atividade</span>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:12px">
+        ${(d.questoes||[]).map((q,qi)=>{
+          if(q.tipo==='multipla') return `
+          <div style="background:var(--surface);border:2px solid var(--border);border-radius:14px;padding:20px" class="questao-card">
+            <p style="font-weight:700;font-size:14px;margin:0 0 14px">QUESTÃO ${qi+1}. ${esc2(q.enunciado)}</p>
+            <div style="display:flex;flex-direction:column;gap:8px">
+              ${(q.opcoes||[]).map((op,oi)=>`
+              <div onclick="selecionarOpcao(this,'q${qi}')" data-idx="${oi}" style="display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:10px;border:1px solid var(--border);cursor:pointer;transition:all 0.2s" onmouseover="this.style.background='rgba(37,99,235,0.04)'" onmouseout="if(!this.classList.contains('selecionado')) this.style.background='transparent'">
+                <span style="width:20px;height:20px;border-radius:50%;border:2px solid var(--border);flex-shrink:0;display:inline-block" class="radio-circle"></span>
+                <span style="font-size:14px">${esc2(op)}</span>
+              </div>`).join('')}
+            </div>
+          </div>`;
+          if(q.tipo==='vf') return `
+          <div style="background:var(--surface);border:2px solid var(--border);border-radius:14px;padding:20px">
+            <p style="font-weight:700;font-size:14px;margin:0 0 14px">QUESTÃO ${qi+1}. Escreva V para VERDADEIRO ou F para FALSO:</p>
+            <div style="display:flex;align-items:center;gap:16px">
+              <span style="font-size:14px;flex:1">${esc2(q.enunciado)}</span>
+              <div style="width:52px;height:52px;border:3px dashed rgba(37,99,235,0.3);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:800;color:rgba(37,99,235,0.3)">( )</div>
+            </div>
+          </div>`;
+          return '';
+        }).join('')}
+      </div>
+    </div>
+
+    <!-- Gabarito -->
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:20px;margin-bottom:20px">
+      <button onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display==='none'?'block':'none';this.querySelector('.seta').style.transform=this.nextElementSibling.style.display==='block'?'rotate(180deg)':'rotate(0deg)'"
+        style="width:100%;display:flex;align-items:center;justify-content:space-between;background:none;border:none;cursor:pointer;padding:0">
+        <div style="display:flex;align-items:center;gap:10px">
+          <div style="width:32px;height:32px;background:var(--surface2);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px">📝</div>
+          <span style="font-family:'Syne',sans-serif;font-weight:800;font-size:14px;text-transform:uppercase;letter-spacing:0.05em">Ver Gabarito</span>
+        </div>
+        <span class="seta" style="font-size:18px;color:var(--muted);transition:transform 0.2s">▾</span>
+      </button>
+      <div style="display:none;margin-top:16px;padding-top:16px;border-top:1px solid var(--border)">
+        ${(d.questoes||[]).map((q,qi)=>`
+        <p style="font-size:14px;margin:0 0 8px"><span style="font-weight:700;color:var(--accent)">QUESTÃO ${qi+1}:</span> ${esc2(q.gabarito)}</p>`).join('')}
+      </div>
+    </div>
+
+    <!-- Dica Pedagógica -->
+    ${d.dicaPedagogica?`
+    <div style="background:#FFFBEB;border:2px dashed #FDE68A;border-radius:14px;padding:20px">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+        <span style="color:#D97706;font-size:18px">💡</span>
+        <span style="font-family:'Syne',sans-serif;font-weight:800;font-size:12px;color:#92400E;text-transform:uppercase;letter-spacing:0.08em">Dica Pedagógica</span>
+      </div>
+      <p style="font-size:13px;color:#78350F;margin:0;line-height:1.7;font-style:italic">${esc2(d.dicaPedagogica)}</p>
+    </div>`:''}
+  </div>`;
+  return html;
+}
+
+function esc2(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+
+function selecionarOpcao(el, grupo) {
+  const card=el.closest('.questao-card')||el.parentElement.parentElement;
+  card.querySelectorAll('[data-idx]').forEach(opt=>{
+    opt.classList.remove('selecionado');
+    opt.style.background='transparent';
+    opt.style.borderColor='var(--border)';
+    const circle=opt.querySelector('.radio-circle');
+    if(circle){circle.style.background='transparent';circle.style.borderColor='var(--border)';}
+  });
+  el.classList.add('selecionado');
+  el.style.background='rgba(37,99,235,0.06)';
+  el.style.borderColor='var(--accent)';
+  const circle=el.querySelector('.radio-circle');
+  if(circle){circle.style.background='var(--accent)';circle.style.borderColor='var(--accent)';}
 }
 
 function extrairBlocos(texto) {
@@ -1136,19 +1311,11 @@ function extrairBlocos(texto) {
 function mostrarAdaptacao(alunoId,el) {
   document.querySelectorAll('.rtab').forEach(t=>t.classList.remove('active'));
   el.classList.add('active');state.alunoAdaptacaoAtual=alunoId;
-  const adapt=state.adaptacoes[alunoId];const box=document.getElementById('resultado-text');
-  if(adapt&&adapt.tipo==='pictograma') renderPrancha(adapt,box);
-  else if(adapt){
-    const{registro,material}=extrairBlocos(adapt);
-    box.innerHTML=
-      (registro?`<div style="background:rgba(37,99,235,0.06);border:1px solid rgba(37,99,235,0.2);border-radius:10px;padding:14px 16px;margin-bottom:16px;font-size:13px;">
-        <div style="font-weight:700;color:var(--accent);margin-bottom:6px;font-size:12px;text-transform:uppercase;letter-spacing:0.05em">📋 Registro Pedagógico (professor)</div>
-        ${markdownParaHtml(registro)}
-      </div>`:'')
-      +markdownParaHtml(material);
-  } else {
-    box.innerHTML='Aguardando...';
-  }
+  const adapt=state.adaptacoes[alunoId];
+  const box=document.getElementById('resultado-text');
+  if(!adapt){box.innerHTML='Aguardando...';return;}
+  if(adapt.tipo==='pictograma') renderPrancha(adapt,box);
+  else box.innerHTML=renderAdaptacaoHtml(adapt);
 }
 
 function renderPrancha(adapt,container) {
@@ -1341,6 +1508,29 @@ async function baixarDocx() {
   if(!txt) return showToast('⚠️ Nenhuma adaptação selecionada','warn');
   const aluno=state.alunos.find(a=>a.id===state.alunoAdaptacaoAtual);
   const nome=aluno?.nome||'aluno';
+  if(typeof txt==='object'&&txt.tipo==='json'){
+    const d=txt.data;
+    // Monta texto estruturado a partir do JSON
+    let textoParts=[`---${d.nomeAtividade||'Material Adaptado'}---`,''];
+    (d.passos||[]).forEach(p=>textoParts.push(`${p.numero}. ${p.texto}`));
+    textoParts.push('');
+    if(d.resumo?.length){textoParts.push('---Resumo Rápido---','');d.resumo.forEach(r=>textoParts.push(`**${r.titulo}:** ${r.conteudo}`));textoParts.push('');}
+    if(d.questoes?.length){
+      textoParts.push('---Atividade---','');
+      d.questoes.forEach((q,i)=>{
+        textoParts.push(`${i+1}. ${q.enunciado}`);
+        if(q.tipo==='multipla')(q.opcoes||[]).forEach(op=>textoParts.push(`   ${op}`));
+        if(q.tipo==='vf') textoParts.push(`   ( ) Verdadeiro  ( ) Falso`);
+        textoParts.push('');
+      });
+      textoParts.push('---Gabarito---','');
+      d.questoes.forEach((q,i)=>textoParts.push(`Questão ${i+1}: ${q.gabarito}`));
+    }
+    const textoFinal=textoParts.join('\n');
+    try{await criarDocx(`Adaptacao_${nome}.docx`,`Adaptação — ${nome}`,textoFinal);showToast('📥 DOCX baixado!');}
+    catch(e){showToast('❌ Erro ao gerar DOCX','warn');}
+    return;
+  }
   if(typeof txt!=='string'){
     // PRANCHA COM IMAGENS
     showToast('⏳ Gerando DOCX com imagens...','');
@@ -1724,16 +1914,9 @@ function togglePrevia() {
   const div=document.getElementById('previa-docx');
   const btn=document.getElementById('btn-previa');
   if(div.style.display==='none'){
-    const txt=state.adaptacoes[state.alunoAdaptacaoAtual];
-    if(!txt||typeof txt!=='string') return showToast('⚠️ Selecione uma adaptação de texto','warn');
-    const{material}=extrairBlocos(txt);
-    const meta=state.user?.user_metadata||{};
-    const aluno=state.alunos.find(a=>a.id===state.alunoAdaptacaoAtual);
-    const cabecalho=`<div style="text-align:center;margin-bottom:24px;padding-bottom:16px;border-bottom:2px solid #E2E8F0">
-      <div style="font-size:22px;font-weight:800;color:#2563EB;margin-bottom:6px">${aluno?.nome?'Adaptação — '+aluno.nome:'Adaptação'}</div>
-      <div style="font-size:12px;color:#94A3B8">${[meta.escola,meta.name,new Date().toLocaleDateString('pt-BR')].filter(Boolean).join('  ·  ')}</div>
-    </div>`;
-    document.getElementById('previa-conteudo').innerHTML=cabecalho+markdownParaHtml(material);
+    const adapt=state.adaptacoes[state.alunoAdaptacaoAtual];
+    if(!adapt||adapt.tipo==='pictograma') return showToast('⚠️ Selecione uma adaptação de texto','warn');
+    document.getElementById('previa-conteudo').innerHTML=renderAdaptacaoHtml(adapt);
     div.style.display='block';
     btn.textContent='✕ Fechar prévia';
     div.scrollIntoView({behavior:'smooth',block:'nearest'});
