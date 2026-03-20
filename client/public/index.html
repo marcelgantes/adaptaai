@@ -163,12 +163,10 @@ h1,h2,h3,h4{font-family:'Syne',sans-serif;}
 .empty-state p{font-size:14px;}
 .back-btn{display:inline-flex;align-items:center;gap:6px;color:var(--muted);font-size:13px;cursor:pointer;margin-bottom:20px;transition:color 0.2s;background:none;border:none;}
 .back-btn:hover{color:var(--text);}
-/* Perfil */
 .perfil-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;}
 .perfil-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:24px;}
 .perfil-card h4{font-size:14px;font-weight:700;margin-bottom:16px;display:flex;align-items:center;gap:8px;}
 .etapa-checks{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px;}
-/* Mobile */
 .mobile-topbar{display:none;align-items:center;justify-content:space-between;padding:14px 16px;background:var(--surface);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:50;flex-shrink:0;}
 .hamburger{background:none;border:1px solid var(--border);border-radius:8px;width:36px;height:36px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;cursor:pointer;padding:0;}
 .hamburger span{display:block;width:16px;height:2px;background:var(--text);border-radius:2px;}
@@ -716,7 +714,6 @@ function carregarDadosPerfil() {
   document.querySelectorAll('#perfil-disciplinas-list input').forEach(cb=>{cb.checked=discs.includes(cb.value);});
   const etapas=meta.etapas||[];
   ['ei','ef1','ef2','em','eja','superior'].forEach(e=>{const el=document.getElementById('etapa-'+e);if(el) el.checked=etapas.includes(e);});
-  // Preenche campos PEI com dados do perfil
   const profEl=document.getElementById('pei-professor');
   if(profEl&&!profEl.value) profEl.value=meta.name||'';
 }
@@ -798,8 +795,6 @@ function renderAlunosList(turmaId) {
   const list=document.getElementById('alunos-list');
   if(!alunos.length){list.innerHTML='<div class="empty-state"><div class="empty-icon">👥</div><p>Nenhum aluno incluso cadastrado ainda.</p></div>';return;}
   const fragLabel={baixa:'Frag. Baixa',media:'Frag. Média',alta:'Frag. Alta',nao_alfabetizado:'🖼️ Não alfab.'};
-  const abstLabel={alta:'Abstr. Alta',media:'Abstr. Média',baixa:'Abstr. Baixa',nao_abstrai:'Não abstrai'};
-  const medLabel={autonomo:'Autônomo',guiado:'Guiado',passo_a_passo:'Passo a passo'};
   list.innerHTML=alunos.map((a,i)=>{
     const tags=[];
     if(a.dislexia) tags.push('<span class="tag tag-orange">Dislexia</span>');
@@ -854,7 +849,7 @@ function renderParamGrid(a) {
       <div class="check-group">
         <label class="check-item"><input type="checkbox" id="p-dislexia" ${a.dislexia?'checked':''}> <span><strong>Dislexia</strong> — frases curtas, espaçamento maior</span></label>
         <label class="check-item"><input type="checkbox" id="p-tdah" ${a.tdah?'checked':''}> <span><strong>TDAH</strong> — blocos curtos, um item por vez</span></label>
-        <label class="check-item"><input type="checkbox" id="p-tea" ${a.tea?'checked':''}> <span><strong>TEA</strong> — linguagem literal, sem metáforas</span></label>
+        <label class="check-item"><input type="checkbox" id="p-tea" ${a.tea?'checked':''} onchange="if(this.checked){var sel=document.getElementById('p-abstracao');if(sel){sel.value='nao_abstrai';updateParamDesc('p-abstracao');}showToast('⚠️ TEA ativo: abstração ajustada para literal automaticamente','warn')}"> <span><strong>TEA</strong> — linguagem literal, sem metáforas</span></label>
         <label class="check-item"><input type="checkbox" id="p-baixa-visao" ${a.baixa_visao?'checked':''}> <span><strong>Baixa visão</strong> — texto simples, sem tabelas complexas</span></label>
         <label class="check-item" style="margin-top:8px;padding-top:8px;border-top:1px solid var(--border)">
           <input type="checkbox" id="p-altas-habilidades" ${a.altas_habilidades?'checked':''}>
@@ -923,6 +918,10 @@ function loadAlunosPei() {
   container.innerHTML=alunos.map(a=>`<label style="display:flex;align-items:center;gap:8px;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:10px 14px;cursor:pointer;font-size:13px;font-weight:500"><input type="checkbox" value="${a.id}" style="accent-color:var(--accent2);width:16px;height:16px"> ${a.nome}</label>`).join('');
 }
 
+// ═══════════════════════════════════════════════════════════════
+// BUILD PROMPT — versão com blocos por diagnóstico (v2.0)
+// Baseado em diretrizes de Neuropsicologia Pedagógica
+// ═══════════════════════════════════════════════════════════════
 function buildPrompt(aluno, texto, disciplina, nomeAtiv) {
   const meta = state.user?.user_metadata || {};
   const estado = meta.estado || 'BNCC';
@@ -934,25 +933,31 @@ function buildPrompt(aluno, texto, disciplina, nomeAtiv) {
     : 'BNCC';
   const discProf = meta.disciplinas?.length ? meta.disciplinas.join(', ') : (disciplina || 'Geral');
 
+  // ── BLOCO 1: ESTRUTURA DO TEXTO ──────────────────────────────
   const fragMap = {
     baixa: 'Escreva em texto corrido, parágrafos fluidos, sem divisões. Máximo 5 frases por parágrafo.',
     media: 'Escreva em parágrafos curtos. Máximo 3 frases por parágrafo. Um conceito central por parágrafo.',
     alta: 'Escreva em blocos bem curtos. Um único conceito por bloco. Use listas numeradas sempre que possível. Nunca agrupe dois conceitos no mesmo item.',
   };
 
+  // ── BLOCO 2: ABSTRAÇÃO ───────────────────────────────────────
+  // TEA sempre sobrescreve abstração — linguagem figurada é contraindicada
+  const abstracaoEfetiva = aluno.tea ? 'nao_abstrai' : (aluno.abstracao || 'media');
   const abstMap = {
     alta: 'Use analogias ricas, metáforas e exemplos do cotidiano para aprofundar a compreensão.',
     media: 'Explique cada conceito com um exemplo simples e direto. Evite jargões sem explicação.',
     baixa: 'Use linguagem concreta e direta. Prefira exemplos físicos e visíveis. Evite abstrações.',
-    nao_abstrai: 'Tudo literal e concreto. Zero metáforas, zero analogias, zero linguagem figurada. Apenas fatos observáveis.',
+    nao_abstrai: 'Tudo literal e concreto. Zero metáforas, zero analogias, zero linguagem figurada. Apenas fatos observáveis e verificáveis.',
   };
 
+  // ── BLOCO 3: MEDIAÇÃO ────────────────────────────────────────
   const medMap = {
     autonomo: 'Enunciados diretos, sem instruções de apoio. O aluno navega sozinho.',
     guiado: 'Inclua uma instrução curta de apoio antes de cada seção. Ex: "Leia com atenção:" ou "Responda:".',
     passo_a_passo: 'Use marcadores sequenciais explícitos em cada etapa: "Primeiro...", "Depois...", "Em seguida...", "Por fim...". Nunca pule etapas.',
   };
 
+  // ── BLOCO 4: CONDIÇÕES ESPECÍFICAS POR DIAGNÓSTICO ──────────
   const blocosDiagnostico = [];
 
   if (aluno.tea) {
@@ -999,6 +1004,7 @@ BAIXA VISÃO:
 - Frases descritivas e completas, sem depender de posição espacial.`);
   }
 
+  // ── BLOCO 5: ALTAS HABILIDADES ───────────────────────────────
   let blocoAltasHabilidades = '';
   if (aluno.altas_habilidades) {
     blocoAltasHabilidades = `
@@ -1006,12 +1012,13 @@ BAIXA VISÃO:
 ALTAS HABILIDADES / SUPERDOTAÇÃO — ENRIQUECIMENTO CURRICULAR:
 - NÃO simplifique. NÃO reduza. Aprofunde além do nível da série.
 - Posicione o aluno como PRODUTOR de conhecimento, não consumidor: proponha que ele explique, crie, analise, questione ou aplique em novo contexto.
-- Inclua pelo menos uma conexão interdisciplinar (ex: relacione o conceito com outra área do conhecimento).
+- Inclua pelo menos uma conexão interdisciplinar (ex: relacione o conceito com outra área do conhecimento — Física, Filosofia, Matemática, Arte, etc.).
 - Inclua ao menos uma questão de raciocínio crítico ou investigativo aberta, sem resposta única óbvia.
 - O material deve provocar três dimensões: habilidade (conteúdo avançado) + envolvimento (desafio real) + criatividade (produção original).
 - Se o aluno tem interesses declarados, use-os como porta de entrada para o conteúdo avançado.`;
   }
 
+  // ── BLOCO 6: DUPLA EXCEPCIONALIDADE ─────────────────────────
   let blocoDuplaExcep = '';
   const temDiagnostico = aluno.tea || aluno.tdah || aluno.dislexia;
   if (aluno.altas_habilidades && temDiagnostico) {
@@ -1025,16 +1032,20 @@ DUPLA EXCEPCIONALIDADE (Altas Habilidades + diagnóstico):
 - Altas Habilidades e TDAH não são excludentes: use blocos curtos E conteúdo desafiador ao mesmo tempo.`;
   }
 
+  // ── BLOCO 7: INTERESSES E OBSERVAÇÕES ───────────────────────
   const blocoInteresses = aluno.interesses
-    ? `\nINTERESSES / HIPERFOCO DO ALUNO: "${aluno.interesses}" — use exemplos, analogias e contextos relacionados a esses interesses sempre que possível.`
+    ? `\nINTERESSES / HIPERFOCO DO ALUNO: "${aluno.interesses}" — use exemplos, analogias e contextos relacionados a esses interesses sempre que possível. Isso aumenta significativamente o engajamento e a retenção.`
     : '';
   const blocoObs = aluno.obs
     ? `\nOBSERVAÇÕES PEDAGÓGICAS: ${aluno.obs}`
     : '';
+
+  // ── BLOCO 8: TIPOGRAFIA ──────────────────────────────────────
   const blocoTipografia = aluno.tipografia === 'bastao'
     ? '\nTIPOGRAFIA BASTÃO: escreva TODO o texto em CAIXA ALTA.'
     : '';
 
+  // ── MONTAGEM FINAL ───────────────────────────────────────────
   const instrucoesDiagnostico = blocosDiagnostico.length
     ? '\n\nINSTRUÇÕES ESPECÍFICAS POR DIAGNÓSTICO (OBRIGATÓRIAS):\n' + blocosDiagnostico.join('\n')
     : '';
@@ -1043,7 +1054,7 @@ DUPLA EXCEPCIONALIDADE (Altas Habilidades + diagnóstico):
 
 PERFIL DO ALUNO:
 - Estrutura do texto: ${fragMap[aluno.fragmentacao] || fragMap['media']}
-- Nível de abstração: ${abstMap[aluno.abstracao] || abstMap['media']}
+- Nível de abstração: ${abstMap[abstracaoEfetiva] || abstMap['media']}${aluno.tea && aluno.abstracao === 'alta' ? ' [TEA ativo: abstração forçada para literal — linguagem figurada é contraindicada para este perfil]' : ''}
 - Mediação: ${medMap[aluno.mediacao] || medMap['guiado']}${instrucoesDiagnostico}${blocoAltasHabilidades}${blocoDuplaExcep}${blocoInteresses}${blocoObs}${blocoTipografia}
 
 CONTEXTO PEDAGÓGICO:
@@ -1085,12 +1096,14 @@ Responda APENAS com este JSON (sem markdown, sem \`\`\`):
 
 REGRAS CRÍTICAS:
 1. NÃO copie frases do original. REESCREVA completamente com linguagem adequada ao perfil.
-2. Mantenha TODOS os conceitos e fatos — só mude a forma, nunca o conteúdo científico.
-3. passos: 4 a 8 itens. Um conceito por passo. Linguagem do perfil.
-4. resumo: exatamente 4 cards com os conceitos-chave do conteúdo.
-5. questoes: 2 de múltipla escolha (2 opções cada) + 1 V/F. Gabarito sempre correto.
-6. dicaPedagogica: deve ser específica para o diagnóstico — nunca genérica.`;
+2. PRESERVAÇÃO DE FATOS — OBRIGATÓRIO: mantenha todos os dados específicos do original: nomes próprios, datas, números, nomes de lugares e pessoas. Se o original cita "Umbu, Vieira e Tupi-Guarani", esses três nomes DEVEM aparecer na adaptação. Se cita "1737", esse ano DEVE aparecer. NUNCA substitua um dado concreto por uma generalização vaga como "povos indígenas" no lugar de "povos Umbu, Vieira e Tupi-Guarani".
+3. Só mude a forma de apresentar — nunca o conteúdo factual.
+4. passos: 4 a 8 itens. Um conceito por passo. Linguagem do perfil.
+5. resumo: exatamente 4 cards com os conceitos-chave do conteúdo.
+6. questoes: 2 de múltipla escolha (2 opções cada) + 1 V/F. Gabarito sempre correto. Português correto e formal.
+7. dicaPedagogica: deve ser específica para o diagnóstico — ex: "Para aluno com TEA, use um objeto real para demonstrar..." — nunca genérica.`;
 }
+
 function buildPromptPictogramas(aluno,texto,disciplina,nomeAtiv) {
   return `Você é especialista em CAA e ARASAAC. Extraia 8-14 conceitos do material para um aluno NÃO ALFABETIZADO.
 REGRAS IMPORTANTES:
@@ -1110,21 +1123,17 @@ async function buscarPictogramas(conceitos) {
   const resultados=[];
   for(const c of conceitos){
     try{
-      // Tenta português primeiro
       let resp=await fetch(`https://api.arasaac.org/api/pictograms/pt/search/${encodeURIComponent(c.palavra)}`);
       let data=await resp.json();
-      // Se não encontrou em PT, tenta inglês com busca_en
       if(!data||!data.length){
         resp=await fetch(`https://api.arasaac.org/api/pictograms/en/search/${encodeURIComponent(c.busca_en||c.palavra)}`);
         data=await resp.json();
       }
-      // Se ainda não encontrou, tenta palavra simplificada em PT (remove acentos)
       if(!data||!data.length){
         const semAcento=c.palavra.normalize('NFD').replace(/[\u0300-\u036f]/g,'');
         resp=await fetch(`https://api.arasaac.org/api/pictograms/pt/search/${encodeURIComponent(semAcento)}`);
         data=await resp.json();
       }
-      // Escolhe o pictograma com maior schematic (mais simples e claro)
       if(data&&data.length){
         const melhor=data.find(p=>p.schematic)||data[0];
         resultados.push(melhor);
@@ -1136,7 +1145,6 @@ async function buscarPictogramas(conceitos) {
   return resultados;
 }
 
-// Divide texto longo em partes respeitando parágrafos
 function dividirTexto(texto, maxChars=6000) {
   if(texto.length <= maxChars) return [texto];
   const partes=[];
@@ -1203,7 +1211,6 @@ async function gerarAdaptacoes() {
     }else{
       try{
         if(textoLongo){
-          // Adapta cada parte separadamente
           const resultados=[];
           for(let pi=0;pi<partes.length;pi++){
             progFill.style.width=`${Math.round(((done+(pi+0.5)/partes.length)/total)*100)}%`;
@@ -1212,7 +1219,6 @@ async function gerarAdaptacoes() {
             resultados.push(result);
             if(pi<partes.length-1) await new Promise(r=>setTimeout(r,2500));
           }
-          // Junta os resultados — mantém o registro pedagógico da primeira parte, concatena materiais
           const blocos=resultados.map(r=>extrairBlocos(r));
           const registroFinal=blocos[0].registro;
           const materialFinal=blocos.map((b,i)=>
@@ -1253,7 +1259,6 @@ function parseAdaptacao(texto) {
     const clean=texto.replace(/```json|```/g,'').trim();
     return {tipo:'json', data:JSON.parse(clean)};
   } catch(e) {
-    // fallback: texto antigo
     return {tipo:'texto', data:texto};
   }
 }
@@ -1267,17 +1272,13 @@ function renderAdaptacaoHtml(adaptacao) {
       +markdownParaHtml(material);
   }
   const d=adaptacao.data;
-  const cores=['#1D4ED8','#7C3AED','#059669','#C2410C','#0369A1'];
   let html=`
   <div style="font-family:'DM Sans',sans-serif;max-width:720px">
-    <!-- Header -->
     <div style="text-align:center;padding:0 0 24px;border-bottom:1px solid var(--border);margin-bottom:24px">
       <span style="display:inline-block;padding:4px 14px;background:rgba(37,99,235,0.1);color:var(--accent);border-radius:20px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:10px">${esc2(d.disciplina||'')}</span>
       <h2 style="font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:var(--text);margin:0 0 10px">${esc2(d.nomeAtividade||'')}</h2>
       <div style="width:48px;height:3px;background:var(--accent);border-radius:2px;margin:0 auto"></div>
     </div>
-
-    <!-- Conteúdo passo a passo -->
     <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:24px;margin-bottom:20px">
       <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px">
         <div style="width:32px;height:32px;background:rgba(99,102,241,0.1);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px">📖</div>
@@ -1291,8 +1292,6 @@ function renderAdaptacaoHtml(adaptacao) {
         </div>`).join('')}
       </div>
     </div>
-
-    <!-- Resumo Rápido -->
     <div style="background:var(--accent);border-radius:16px;padding:24px;margin-bottom:20px;color:white">
       <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px">
         <span style="font-size:18px">⚡</span>
@@ -1306,8 +1305,6 @@ function renderAdaptacaoHtml(adaptacao) {
         </div>`).join('')}
       </div>
     </div>
-
-    <!-- Atividade -->
     <div style="margin-bottom:20px">
       <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
         <div style="width:32px;height:32px;background:rgba(5,150,105,0.1);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px">✏️</div>
@@ -1338,8 +1335,6 @@ function renderAdaptacaoHtml(adaptacao) {
         }).join('')}
       </div>
     </div>
-
-    <!-- Gabarito -->
     <div style="background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:20px;margin-bottom:20px">
       <button onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display==='none'?'block':'none';this.querySelector('.seta').style.transform=this.nextElementSibling.style.display==='block'?'rotate(180deg)':'rotate(0deg)'"
         style="width:100%;display:flex;align-items:center;justify-content:space-between;background:none;border:none;cursor:pointer;padding:0">
@@ -1354,8 +1349,6 @@ function renderAdaptacaoHtml(adaptacao) {
         <p style="font-size:14px;margin:0 0 8px"><span style="font-weight:700;color:var(--accent)">QUESTÃO ${qi+1}:</span> ${esc2(q.gabarito)}</p>`).join('')}
       </div>
     </div>
-
-    <!-- Dica Pedagógica -->
     ${d.dicaPedagogica?`
     <div style="background:#FFFBEB;border:2px dashed #FDE68A;border-radius:14px;padding:20px">
       <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
@@ -1416,17 +1409,14 @@ function renderPrancha(adapt,container) {
   container.innerHTML=html+'</div>';
 }
 
-// ======================== DOCX ========================
 function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 
 function markdownParaHtml(texto) {
   const cores=['#1D4ED8','#7C3AED','#059669','#C2410C','#0369A1'];
   const fundos=['#EFF6FF','#F5F3FF','#ECFDF5','#FFF7ED','#E0F2FE'];
   let corIdx=0;
-
   return texto
     .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
-    // Seções ---TITULO---
     .replace(/^---(.+?)---$/gm,(m,tit)=>{
       const cor=cores[corIdx%cores.length];
       const fundo=fundos[corIdx%fundos.length];
@@ -1435,19 +1425,14 @@ function markdownParaHtml(texto) {
         <span style="font-family:'Syne',sans-serif;font-weight:800;font-size:15px;color:${cor}">${tit.trim()}</span>
       </div>`;
     })
-    // Negrito e itálico
     .replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>')
     .replace(/\*(.+?)\*/g,'<em>$1</em>')
-    // Listas com seta
     .replace(/^[-•\*]\s+(.+)$/gm,'<div style="display:flex;gap:8px;margin:6px 0;padding-left:8px"><span style="color:#2563EB;font-weight:700;flex-shrink:0">▸</span><span>$1</span></div>')
-    // Numeração
     .replace(/^(\d+)\.\s+(.+)$/gm,'<div style="display:flex;gap:8px;margin:8px 0;padding-left:8px"><span style="color:#7C3AED;font-weight:700;flex-shrink:0">$1.</span><span>$2</span></div>')
-    // Subtítulos em maiúsculo
     .replace(/^([A-ZÁÉÍÓÚÂÊÎÔÛÃÕÀÇ\s]{5,})$/gm,(m)=>{
       if(m.trim().length<4) return m;
       return `<div style="font-weight:700;font-size:14px;color:#334155;margin:14px 0 6px;padding-bottom:4px;border-bottom:1px solid #E2E8F0">${m}</div>`;
     })
-    // Quebras de linha normais
     .replace(/\n/g,'<br>');
 }
 
@@ -1467,39 +1452,27 @@ function gerarXmlDocx(titulo, texto) {
   const data=new Date().toLocaleDateString('pt-BR');
   const escola=meta.escola||'';
   const prof=meta.name||state.user?.email||'';
-
-  // Cabeçalho do documento
   let p=`
   <w:p><w:pPr><w:jc w:val="center"/><w:spacing w:before="0" w:after="80"/></w:pPr>
     <w:r><w:rPr><w:b/><w:sz w:val="40"/><w:szCs w:val="40"/><w:color w:val="2563EB"/></w:rPr>
       <w:t>${esc(titulo)}</w:t></w:r>
   </w:p>`;
-
   if(escola||prof){
     p+=`<w:p><w:pPr><w:jc w:val="center"/><w:spacing w:before="0" w:after="200"/></w:pPr>
       <w:r><w:rPr><w:sz w:val="18"/><w:color w:val="94A3B8"/></w:rPr>
         <w:t>${esc([escola,prof,data].filter(Boolean).join('  ·  '))}</w:t></w:r>
     </w:p>`;
   }
-
-  // Paleta de cores para seções
   const coresTitulo=['1D4ED8','7C3AED','059669','C2410C','0369A1'];
   const coresFundo=['EFF6FF','F5F3FF','ECFDF5','FFF7ED','E0F2FE'];
   let corIdx=0;
-
   const linhas=texto
-    // Converte **TITULO** sozinho numa linha em ---TITULO---
     .replace(/^\*\*([^*\n]+)\*\*$/gm, '---$1---')
-    // Converte * item e - item de lista
     .replace(/^\* /gm, '- ')
     .split('\n');
-  let dentroBloco=false;
-
   for(let i=0;i<linhas.length;i++){
     const linha=linhas[i].trim();
     if(!linha){p+='<w:p><w:pPr><w:spacing w:before="0" w:after="60"/></w:pPr></w:p>';continue;}
-
-    // Detecta título de seção ---TITULO---
     const secaoMatch=linha.match(/^---(.+)---$/);
     if(secaoMatch){
       const tit=secaoMatch[1].trim();
@@ -1518,8 +1491,6 @@ function gerarXmlDocx(titulo, texto) {
       <w:p><w:pPr><w:spacing w:before="0" w:after="40"/></w:pPr></w:p>`;
       continue;
     }
-
-    // Detecta linha toda maiúscula como subtítulo
     const ehSubtitulo=linha===linha.toUpperCase()&&linha.length>4&&linha.replace(/[^a-zA-ZÀ-ÿ]/g,'').length>3&&!linha.includes('.');
     if(ehSubtitulo){
       p+=`<w:p><w:pPr><w:spacing w:before="160" w:after="60"/>
@@ -1530,8 +1501,6 @@ function gerarXmlDocx(titulo, texto) {
       </w:p>`;
       continue;
     }
-
-    // Detecta item de lista (começa com - ou •)
     const listaMatch=linha.match(/^[-•]\s+(.+)$/);
     if(listaMatch){
       p+=`<w:p><w:pPr><w:spacing w:before="60" w:after="60"/><w:ind w:left="400" w:hanging="200"/></w:pPr>
@@ -1541,8 +1510,6 @@ function gerarXmlDocx(titulo, texto) {
       </w:p>`;
       continue;
     }
-
-    // Detecta numeração (1. 2. etc)
     const numMatch=linha.match(/^(\d+)\.\s+(.+)$/);
     if(numMatch){
       p+=`<w:p><w:pPr><w:spacing w:before="80" w:after="60"/><w:ind w:left="400" w:hanging="280"/></w:pPr>
@@ -1551,13 +1518,10 @@ function gerarXmlDocx(titulo, texto) {
       </w:p>`;
       continue;
     }
-
-    // Texto normal com negrito markdown
     p+=`<w:p><w:pPr><w:spacing w:before="60" w:after="80"/></w:pPr>
       ${linhaParaRuns(linha)}
     </w:p>`;
   }
-
   const xmlStyles=`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:styles xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
     <w:docDefaults><w:rPrDefault><w:rPr>
       <w:rFonts w:ascii="Calibri" w:hAnsi="Calibri" w:cs="Calibri"/>
@@ -1567,7 +1531,6 @@ function gerarXmlDocx(titulo, texto) {
       <w:pPr><w:spacing w:line="360" w:lineRule="auto"/></w:pPr>
     </w:style>
   </w:styles>`;
-
   return {
     xmlDoc: `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:body>${p}<w:sectPr><w:pgSz w:w="12240" w:h="15840"/><w:pgMar w:top="1440" w:right="1440" w:bottom="1440" w:left="1440"/></w:sectPr></w:body></w:document>`,
     xmlStyles,
@@ -1597,7 +1560,6 @@ async function baixarDocx() {
   const nome=aluno?.nome||'aluno';
   if(typeof txt==='object'&&txt.tipo==='json'){
     const d=txt.data;
-    // Monta texto estruturado a partir do JSON
     let textoParts=[`---${d.nomeAtividade||'Material Adaptado'}---`,''];
     (d.passos||[]).forEach(p=>textoParts.push(`${p.numero}. ${p.texto}`));
     textoParts.push('');
@@ -1619,7 +1581,6 @@ async function baixarDocx() {
     return;
   }
   if(typeof txt!=='string'){
-    // PRANCHA COM IMAGENS
     showToast('⏳ Gerando DOCX com imagens...','');
     try{ await criarDocxPrancha(`Prancha_${nome}.docx`, `Prancha — ${nome}`, txt); showToast('📥 DOCX baixado!'); }
     catch(e){ showToast('❌ Erro ao gerar DOCX','warn'); console.error(e); }
@@ -1648,8 +1609,6 @@ async function imgParaBase64(url) {
 
 async function criarDocxPrancha(nomeArquivo, titulo, adapt) {
   const { conceitos, pictogramas, nomeAtiv, disciplina } = adapt;
-
-  // Baixa imagens como base64
   const imagens = [];
   for(let i=0;i<conceitos.length;i++){
     const pic = pictogramas[i];
@@ -1661,23 +1620,17 @@ async function criarDocxPrancha(nomeArquivo, titulo, adapt) {
       imagens.push(null);
     }
   }
-
   const zip = new JSZip();
-  const rels = [];
   const wordRels = [];
   let imgXml = '';
   let rIdCounter = 1;
-
-  // Adiciona imagens ao zip e gera XML
   conceitos.forEach((c, i) => {
     const b64 = imagens[i];
     const rId = `rId${rIdCounter++}`;
     const imgName = `img${i}.png`;
-
     if(b64){
       zip.file(`word/media/${imgName}`, b64, {base64:true});
       wordRels.push(`<Relationship Id="${rId}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/${imgName}"/>`);
-
       imgXml += `
         <w:tc><w:tcPr><w:tcW w:w="1800" w:type="dxa"/><w:vAlign w:val="center"/></w:tcPr>
           <w:p><w:pPr><w:jc w:val="center"/></w:pPr>
@@ -1718,21 +1671,16 @@ async function criarDocxPrancha(nomeArquivo, titulo, adapt) {
           </w:p>
         </w:tc>`;
     }
-
-    // Quebra de linha a cada 4 pictogramas
     if((i+1) % 4 === 0 && i < conceitos.length-1){
       imgXml += '</w:tr><w:tr>';
     }
   });
-
-  // Preenche células vazias para completar última linha
   const resto = conceitos.length % 4;
   if(resto > 0){
     for(let k=resto;k<4;k++){
       imgXml += '<w:tc><w:tcPr><w:tcW w:w="1800" w:type="dxa"/></w:tcPr><w:p/></w:tc>';
     }
   }
-
   const xmlDoc = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"
   xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"
@@ -1761,18 +1709,15 @@ async function criarDocxPrancha(nomeArquivo, titulo, adapt) {
   </w:tbl>
   <w:sectPr><w:pgSz w:w="12240" w:h="15840"/><w:pgMar w:top="720" w:right="720" w:bottom="720" w:left="720"/></w:sectPr>
 </w:body></w:document>`;
-
   const xmlStyles = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:styles xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:style w:type="paragraph" w:styleId="Normal"><w:name w:val="Normal"/><w:rPr><w:sz w:val="24"/></w:rPr></w:style></w:styles>`;
   const xmlCT = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Default Extension="png" ContentType="image/png"/><Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/><Override PartName="/word/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.styles+xml"/></Types>`;
   const xmlRelsMain = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/></Relationships>`;
   const xmlRelsWord = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/>${wordRels.join('')}</Relationships>`;
-
   zip.file('[Content_Types].xml', xmlCT);
   zip.file('_rels/.rels', xmlRelsMain);
   zip.file('word/document.xml', xmlDoc);
   zip.file('word/styles.xml', xmlStyles);
   zip.file('word/_rels/document.xml.rels', xmlRelsWord);
-
   const blob = await zip.generateAsync({type:'blob', mimeType:'application/vnd.openxmlformats-officedocument.wordprocessingml.document'});
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a'); a.href=url; a.download=nomeArquivo; a.click(); URL.revokeObjectURL(url);
@@ -1783,41 +1728,16 @@ async function baixarTodos() {
   for(const id of Object.keys(state.adaptacoes)){
     const aluno=state.alunos.find(x=>x.id===id);
     const txt=state.adaptacoes[id];
-    if(!txt) continue;
-    const nome=aluno?.nome||id;
+    if(typeof txt!=='string') continue;
     try{
-      if(typeof txt==='object'&&txt.tipo==='json'){
-        const d=txt.data;
-        let textoParts=[`---${d.nomeAtividade||'Material Adaptado'}---`,''];
-        (d.passos||[]).forEach(p=>textoParts.push(`${p.numero}. ${p.texto}`));
-        textoParts.push('');
-        if(d.resumo?.length){textoParts.push('---Resumo Rápido---','');d.resumo.forEach(r=>textoParts.push(`**${r.titulo}:** ${r.conteudo}`));textoParts.push('');}
-        if(d.questoes?.length){
-          textoParts.push('---Atividade---','');
-          d.questoes.forEach((q,i)=>{
-            textoParts.push(`${i+1}. ${q.enunciado}`);
-            if(q.tipo==='multipla')(q.opcoes||[]).forEach(op=>textoParts.push(`   ${op}`));
-            if(q.tipo==='vf') textoParts.push(`   ( ) Verdadeiro  ( ) Falso`);
-            textoParts.push('');
-          });
-          textoParts.push('---Gabarito---','');
-          d.questoes.forEach((q,i)=>textoParts.push(`Questão ${i+1}: ${q.gabarito}`));
-        }
-        await criarDocx(`Adaptacao_${nome}.docx`,`Adaptação — ${nome}`,textoParts.join('\n'));
-        baixados++;
-      } else if(typeof txt==='object'&&txt.tipo==='pictograma'){
-        await criarDocxPrancha(`Prancha_${nome}.docx`,`Prancha — ${nome}`,txt);
-        baixados++;
-      } else if(typeof txt==='string'){
-        const{material}=extrairBlocos(txt);
-        await criarDocx(`Adaptacao_${nome}.docx`,`Adaptação — ${nome}`,material);
-        baixados++;
-      }
-      await new Promise(r=>setTimeout(r,600));
+      const{material}=extrairBlocos(txt);
+      await criarDocx(`Adaptacao_${aluno?.nome||id}.docx`,`Adaptação — ${aluno?.nome||id}`,material);
+      baixados++;await new Promise(r=>setTimeout(r,600));
     }catch(e){console.error(e);}
   }
   showToast(`📦 ${baixados} DOCX baixados!`);
 }
+
 async function baixarPei() {
   if(!state.peiAtual?.alunoAtivo) return;
   const dado=state.peiAtual.alunos[state.peiAtual.alunoAtivo];
@@ -1951,7 +1871,6 @@ function renderHistorico() {
   list.innerHTML=html;
 }
 
-// UPLOAD
 function setUploadState(s){['idle','loading','success','error'].forEach(x=>document.getElementById('upload-'+x).style.display=s===x?'block':'none');}
 function handleDrop(e){e.preventDefault();document.getElementById('upload-zone').classList.remove('dragover');const file=e.dataTransfer.files[0];if(file) handleFileSelect(file);}
 
@@ -1999,7 +1918,6 @@ async function handlePeiFileSelect(file) {
   }catch(err){setPeiUploadState('error');document.getElementById('pei-upload-errmsg').textContent='Erro: '+err.message;}
 }
 
-// NAVIGATION
 function showPanel(id) {
   closeSidebar();
   document.querySelectorAll('.content-panel').forEach(p=>p.classList.remove('active'));
