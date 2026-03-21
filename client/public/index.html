@@ -2319,6 +2319,7 @@ function baixarPdf() {
 }
 
 
+function setUploadState(s){['idle','loading','success','error'].forEach(x=>document.getElementById('upload-'+x).style.display=s===x?'block':'none');}
 function handleDrop(e){e.preventDefault();document.getElementById('upload-zone').classList.remove('dragover');const file=e.dataTransfer.files[0];if(file) handleFileSelect(file);}
 
 async function lerArquivo(file) {
