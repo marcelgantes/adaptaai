@@ -1,10 +1,9 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-  <head>
+<head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Adapta Aí — Inclusão que funciona</title>
-    <script defer src="/_vercel/insights/script.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
@@ -313,7 +312,10 @@ h1,h2,h3,h4{font-family:'Syne',sans-serif;}
         <button class="back-btn" onclick="showPanel('turmas')">← Voltar para turmas</button>
         <div class="page-header" style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:12px">
           <div><h2 id="detalhe-nome">Turma</h2><p id="detalhe-meta" style="color:var(--muted);font-size:14px"></p></div>
-          <button class="btn btn-accent2" style="width:auto" onclick="openModalNovoAluno()">+ Novo aluno incluso</button>
+          <div style="display:flex;gap:10px;flex-wrap:wrap">
+            <button class="btn btn-accent2" style="width:auto" onclick="openModalNovoAluno()">+ Novo aluno incluso</button>
+            <button class="btn btn-primary" style="width:auto" onclick="adaptarEstaTurma()">✨ Adaptar material para esta turma →</button>
+          </div>
         </div>
         <div class="aluno-list" id="alunos-list"></div>
       </div>
@@ -787,6 +789,20 @@ function openTurma(id) {
   document.getElementById('detalhe-meta').innerHTML=`<span class="tc-badge ${et.cls}" style="margin-right:8px">${et.label}</span>${t.disciplina} · ${t.ano}`;
   renderAlunosList(id);showPanel('turma-detalhe');
   document.getElementById('nav-turmas').classList.add('active');
+}
+
+function adaptarEstaTurma() {
+  // Navega para adaptação com a turma atual já selecionada
+  showPanel('adaptar');
+  const sel=document.getElementById('adaptar-turma');
+  if(sel&&state.turmaSelecionada){
+    sel.value=state.turmaSelecionada;
+    loadAlunosParaAdaptar();
+  }
+  // Preenche disciplina da turma automaticamente se campo vazio
+  const turma=state.turmas.find(t=>t.id===state.turmaSelecionada);
+  const discInput=document.getElementById('material-disciplina');
+  if(turma&&discInput&&!discInput.value) discInput.value=turma.disciplina;
 }
 
 const alunoColors=['#4f9cf9','#a78bfa','#34d399','#fb923c','#f87171','#fbbf24','#60a5fa','#c084fc'];
