@@ -1243,23 +1243,28 @@ Responda APENAS com este JSON (sem markdown, sem \`\`\`):
       "gabarito": "V"
     }
   ],
-  "dicaPedagogica": "sugestão prática e concreta para o professor, específica para o diagnóstico deste aluno",
   "registroPedagogico": {
     "objetivos": ["objetivo de aprendizagem 1", "objetivo 2", "objetivo 3"],
-    "habilidades": [{"codigo": "EF06CI01", "descricao": "descrição da habilidade conforme ${refCurr}"}],
+    "habilidadesBNCC": [{"codigo": "EF06CI01", "descricao": "descrição da habilidade conforme BNCC"}],
+    "habilidadesEstadual": [{"codigo": "código estadual ou BNCC", "descricao": "descrição conforme ${refCurr}"}],
     "refCurr": "${refCurr}",
-    "orientacoes": "orientações metodológicas para o professor sobre como trabalhar este conteúdo com este perfil específico de aluno"
+    "orientacoes": "orientações metodológicas específicas para trabalhar este conteúdo com este perfil de aluno",
+    "dicaPedagogica": "sugestão prática e concreta específica para o diagnóstico deste aluno"
   }
 }
 
 REGRAS CRÍTICAS:
 1. NÃO copie frases do original. REESCREVA completamente com linguagem adequada ao perfil.
-2. PRESERVAÇÃO DE FATOS — OBRIGATÓRIO: mantenha todos os dados específicos do original: nomes próprios, datas, números, nomes de lugares e pessoas. Se o original cita "Umbu, Vieira e Tupi-Guarani", esses três nomes DEVEM aparecer na adaptação. Se cita "1737", esse ano DEVE aparecer. NUNCA substitua um dado concreto por uma generalização vaga como "povos indígenas" no lugar de "povos Umbu, Vieira e Tupi-Guarani".
+2. PRESERVAÇÃO DE FATOS — OBRIGATÓRIO: mantenha todos os dados específicos do original: nomes próprios, datas, números, nomes de lugares e pessoas. Se o original cita "Umbu, Vieira e Tupi-Guarani", esses três nomes DEVEM aparecer na adaptação. Se cita "1737", esse ano DEVE aparecer. NUNCA substitua um dado concreto por uma generalização vaga.
 3. Só mude a forma de apresentar — nunca o conteúdo factual.
 4. passos: 4 a 8 itens. Um conceito por passo. Linguagem do perfil.
 5. resumo: exatamente 4 cards com os conceitos-chave do conteúdo.
 6. questoes: 2 de múltipla escolha (2 opções cada) + 1 V/F. Gabarito sempre correto. Português correto e formal.
-7. dicaPedagogica: deve ser específica para o diagnóstico — ex: "Para aluno com TEA, use um objeto real para demonstrar..." — nunca genérica.`;
+7. habilidadesBNCC: 2 a 4 habilidades reais da BNCC com códigos corretos (ex: EF06CI01, EM13CNT101).
+8. habilidadesEstadual: habilidades equivalentes do ${refCurr}. Se o estado tiver numeração própria use-a; senão referencie a BNCC com nota de contextualização estadual.
+9. orientacoes: 3 a 5 linhas com estratégias metodológicas para o diagnóstico específico.
+10. dicaPedagogica vai APENAS no registroPedagogico — NÃO aparece no material do aluno.`;
+
 }
 
 function buildPromptPictogramas(aluno,texto,disciplina,nomeAtiv) {
@@ -1661,12 +1666,23 @@ function renderRegistroPedagogicoHtml(adaptacao) {
     </div>
 
     <div style="background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:20px;margin-bottom:16px">
-      <div style="font-weight:700;font-size:14px;margin-bottom:12px;color:var(--accent2)">📚 Habilidades — BNCC / ${rp.refCurr||'BNCC'}</div>
-      ${(rp.habilidades||[]).length ? (rp.habilidades||[]).map(h=>`<div style="display:flex;gap:10px;margin-bottom:8px;font-size:13px;align-items:flex-start"><span style="background:rgba(124,58,237,0.1);color:var(--accent2);padding:2px 8px;border-radius:6px;font-size:11px;font-weight:700;flex-shrink:0;white-space:nowrap">${h.codigo}</span><span>${h.descricao}</span></div>`).join('') : '<p style="font-size:13px;color:var(--muted)">Nenhuma habilidade identificada para este conteúdo.</p>'}
+      <div style="font-weight:700;font-size:14px;margin-bottom:12px;color:var(--accent2)">📚 Habilidades BNCC</div>
+      ${(rp.habilidadesBNCC||rp.habilidades||[]).length
+        ? (rp.habilidadesBNCC||rp.habilidades||[]).map(h=>`<div style="display:flex;gap:10px;margin-bottom:8px;font-size:13px;align-items:flex-start"><span style="background:rgba(124,58,237,0.1);color:var(--accent2);padding:2px 8px;border-radius:6px;font-size:11px;font-weight:700;flex-shrink:0;white-space:nowrap">${h.codigo}</span><span>${h.descricao}</span></div>`).join('')
+        : '<p style="font-size:13px;color:var(--muted)">Nenhuma habilidade BNCC identificada.</p>'}
       <div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--border);font-size:11px;color:var(--muted)">
-        Os códigos acima seguem a <strong>Base Nacional Comum Curricular (BNCC)</strong>${rp.refCurr&&rp.refCurr!=='BNCC'?` e o <strong>${rp.refCurr}</strong>`:''}. Consulte o documento oficial para detalhes completos de cada habilidade.
+        Códigos conforme a <strong>Base Nacional Comum Curricular (BNCC)</strong>.
       </div>
     </div>
+
+    ${(rp.habilidadesEstadual||[]).length ? `
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:20px;margin-bottom:16px">
+      <div style="font-weight:700;font-size:14px;margin-bottom:12px;color:var(--accent3)">🌿 Habilidades — ${rp.refCurr||meta.estado||'Referencial Estadual'}</div>
+      ${(rp.habilidadesEstadual||[]).map(h=>`<div style="display:flex;gap:10px;margin-bottom:8px;font-size:13px;align-items:flex-start"><span style="background:rgba(5,150,105,0.1);color:var(--accent3);padding:2px 8px;border-radius:6px;font-size:11px;font-weight:700;flex-shrink:0;white-space:nowrap">${h.codigo}</span><span>${h.descricao}</span></div>`).join('')}
+      <div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--border);font-size:11px;color:var(--muted)">
+        Códigos conforme o <strong>${rp.refCurr||'Referencial Curricular Estadual'}</strong>.
+      </div>
+    </div>` : ''}
 
     <div style="background:#FFFBEB;border:2px dashed #FDE68A;border-radius:14px;padding:20px;margin-bottom:16px">
       <div style="font-weight:700;font-size:13px;color:#92400E;margin-bottom:8px">💡 Dica Pedagógica</div>
@@ -2322,8 +2338,12 @@ async function baixarRegistroProfessor() {
     '',
   ];
   (rp.objetivos||[]).forEach((o,i)=>textoParts.push(`${i+1}. ${o}`));
-  textoParts.push('','---Habilidades---','');
-  (rp.habilidades||[]).forEach(h=>textoParts.push(`${h.codigo} — ${h.descricao}`));
+  textoParts.push('','---Habilidades BNCC---','');
+  (rp.habilidadesBNCC||rp.habilidades||[]).forEach(h=>textoParts.push(`${h.codigo} — ${h.descricao}`));
+  if((rp.habilidadesEstadual||[]).length){
+    textoParts.push('',`---Habilidades ${rp.refCurr||'Referencial Estadual'}---`,'');
+    rp.habilidadesEstadual.forEach(h=>textoParts.push(`${h.codigo} — ${h.descricao}`));
+  }
   textoParts.push('','---Dica Pedagógica---','',d.dicaPedagogica||'—');
   if(rp.orientacoes) textoParts.push('','---Orientações Metodológicas---','',rp.orientacoes);
   try{
@@ -2341,54 +2361,116 @@ async function baixarPdf() {
 
   showToast('⏳ Gerando PDF...','');
 
-  // Cria div temporário oculto com o conteúdo renderizado
+  // Cria container oculto com largura A4
   const container=document.createElement('div');
-  container.style.cssText='position:fixed;left:-9999px;top:0;width:760px;padding:32px;background:white;font-family:Arial,sans-serif;font-size:13px;line-height:1.7;color:#1e293b;';
-
-  // CSS inline para garantir que as cores funcionem
-  container.innerHTML=`
-    <style>
-      :root{--accent:#2563eb;--accent2:#7c3aed;--accent3:#059669;--border:#d0dae6;--surface:#fff;--surface2:#e8eef5;--bg:#f0f4f8;--text:#1e293b;--muted:#64748b;--warn:#ea580c;--card:#fff;}
-      *{box-sizing:border-box;}
-    </style>
-    <div style="text-align:center;margin-bottom:20px;padding-bottom:14px;border-bottom:2px solid #2563eb">
-      <div style="font-size:11px;color:#64748b;margin-bottom:4px">${[meta.escola,meta.name,new Date().toLocaleDateString('pt-BR')].filter(Boolean).join('  ·  ')}</div>
-      <h1 style="font-family:Arial,sans-serif;font-size:20px;font-weight:800;color:#2563eb;margin:0">Adaptação — ${nome}</h1>
-    </div>
-    ${renderAdaptacaoHtml(adapt)}`;
-
+  container.style.cssText='position:fixed;left:-9999px;top:0;width:740px;background:white;font-family:Arial,sans-serif;font-size:13px;line-height:1.7;color:#1e293b;';
+  container.innerHTML=`<style>
+    :root{--accent:#2563eb;--accent2:#7c3aed;--accent3:#059669;--border:#d0dae6;--surface:#fff;--surface2:#e8eef5;--bg:#f0f4f8;--text:#1e293b;--muted:#64748b;--warn:#ea580c;--card:#fff;}
+    *{box-sizing:border-box;}
+  </style>`;
   document.body.appendChild(container);
 
-  try {
-    const canvas=await html2canvas(container,{
-      scale:1.5,
-      useCORS:true,
-      backgroundColor:'#ffffff',
-      logging:false,
-    });
+  const {jsPDF}=window.jspdf;
+  const pdf=new jsPDF({orientation:'portrait',unit:'mm',format:'a4'});
+  const pageW=pdf.internal.pageSize.getWidth(); // 210mm
+  const pageH=pdf.internal.pageSize.getHeight(); // 297mm
+  const margin=12;
+  const usableH=pageH-(margin*2); // altura útil por página em mm
+  const usableW=pageW-(margin*2);
 
+  let curY=margin;
+
+  async function renderSecao(html, padding='16px') {
+    const div=document.createElement('div');
+    div.style.cssText=`width:740px;padding:${padding};background:white;`;
+    div.innerHTML=html;
+    container.appendChild(div);
+    const canvas=await html2canvas(div,{scale:1.5,useCORS:true,backgroundColor:'#ffffff',logging:false});
+    container.removeChild(div);
     const imgData=canvas.toDataURL('image/jpeg',0.92);
-    const {jsPDF}=window.jspdf;
-    const pdf=new jsPDF({orientation:'portrait',unit:'mm',format:'a4'});
-
-    const pageW=pdf.internal.pageSize.getWidth();
-    const pageH=pdf.internal.pageSize.getHeight();
-    const margin=10;
-    const imgW=pageW-(margin*2);
-    const imgH=(canvas.height*imgW)/canvas.width;
-
-    let y=margin;
-    let heightLeft=imgH;
-
-    // Adiciona imagem página a página
-    pdf.addImage(imgData,'JPEG',margin,y,imgW,imgH);
-    heightLeft-=(pageH-(margin*2));
-
-    while(heightLeft>0){
-      y=heightLeft-imgH+margin;
+    const imgH=(canvas.height*usableW)/canvas.width; // altura em mm
+    // Se não cabe na página atual, pula para próxima
+    if(curY+imgH > pageH-margin && curY > margin+10) {
       pdf.addPage();
-      pdf.addImage(imgData,'JPEG',margin,y,imgW,imgH);
-      heightLeft-=(pageH-(margin*2));
+      curY=margin;
+    }
+    pdf.addImage(imgData,'JPEG',margin,curY,usableW,imgH);
+    curY+=imgH+4;
+  }
+
+  try {
+    if(adapt.tipo!=='json'||!adapt.data){
+      showToast('❌ Formato não suportado para PDF','warn');
+      document.body.removeChild(container);
+      return;
+    }
+    const d=adapt.data;
+
+    // Cabeçalho
+    await renderSecao(`
+      <div style="text-align:center;padding-bottom:14px;border-bottom:2px solid #2563eb">
+        <div style="font-size:11px;color:#64748b;margin-bottom:4px">${[meta.escola,meta.name,new Date().toLocaleDateString('pt-BR')].filter(Boolean).join('  ·  ')}</div>
+        <h1 style="font-family:Arial,sans-serif;font-size:20px;font-weight:800;color:#2563eb;margin:0">Adaptação — ${nome}</h1>
+        <span style="display:inline-block;margin-top:8px;padding:3px 12px;background:rgba(37,99,235,0.1);color:#2563eb;border-radius:20px;font-size:11px;font-weight:700">${esc2(d.disciplina||'')}</span>
+      </div>`, '0');
+
+    // Cada passo individualmente — nunca corta no meio
+    if((d.passos||[]).length){
+      await renderSecao(`<div style="font-weight:800;font-size:14px;margin-bottom:8px;color:#1e293b">📖 Aprenda Passo a Passo</div>`,'8px 0');
+      for(const p of d.passos){
+        await renderSecao(`
+          <div style="display:flex;align-items:flex-start;gap:10px;padding:10px 14px;background:#F8FAFC;border-radius:8px;border-left:4px solid #2563eb">
+            <span style="display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;min-width:24px;background:#2563eb;color:white;border-radius:50%;font-weight:700;font-size:11px">${p.numero}</span>
+            <p style="margin:0;font-size:13px;line-height:1.6">${esc2(p.texto)}</p>
+          </div>`,'4px 0');
+      }
+    }
+
+    // Resumo — cada card individualmente
+    if((d.resumo||[]).length){
+      await renderSecao(`<div style="font-weight:800;font-size:14px;margin:8px 0 4px;color:#1e293b">⚡ Resumo Rápido</div>`,'8px 0');
+      for(const r of d.resumo){
+        await renderSecao(`
+          <div style="background:#2563eb;border-radius:8px;padding:12px 14px;color:white;margin-bottom:4px">
+            <div style="font-weight:700;font-size:12px;margin-bottom:3px">${esc2(r.titulo)}</div>
+            <div style="font-size:12px;opacity:0.92">${esc2(r.conteudo)}</div>
+          </div>`,'4px 0');
+      }
+    }
+
+    // Questões — cada uma individualmente
+    if((d.questoes||[]).length){
+      await renderSecao(`<div style="font-weight:800;font-size:14px;margin:8px 0 4px;color:#1e293b">✏️ Atividade</div>`,'8px 0');
+      d.questoes.forEach(async(q,qi)=>{});
+      for(let qi=0;qi<d.questoes.length;qi++){
+        const q=d.questoes[qi];
+        let qHtml=`<div style="background:white;border:2px solid #d0dae6;border-radius:10px;padding:14px">
+          <p style="font-weight:700;font-size:13px;margin:0 0 10px">QUESTÃO ${qi+1}. ${esc2(q.enunciado)}</p>`;
+        if(q.tipo==='multipla'){
+          (q.opcoes||[]).forEach(op=>{
+            qHtml+=`<div style="display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:7px;border:1px solid #d0dae6;margin-bottom:6px;font-size:13px">
+              <span style="width:16px;height:16px;border-radius:50%;border:2px solid #d0dae6;flex-shrink:0;display:inline-block"></span>
+              ${esc2(op)}</div>`;
+          });
+        }
+        if(q.tipo==='vf'){
+          qHtml+=`<div style="display:flex;align-items:center;gap:12px;font-size:13px">
+            <span style="flex:1">${esc2(q.enunciado)}</span>
+            <div style="width:44px;height:44px;border:2px dashed #93c5fd;border-radius:8px;display:flex;align-items:center;justify-content:center;color:#93c5fd;font-size:16px">( )</div>
+          </div>`;
+        }
+        qHtml+='</div>';
+        await renderSecao(qHtml,'4px 0');
+      }
+    }
+
+    // Gabarito
+    if((d.questoes||[]).length){
+      const gabHtml=`<div style="background:#f8fafc;border:1px solid #d0dae6;border-radius:8px;padding:12px 14px">
+        <div style="font-weight:700;font-size:12px;margin-bottom:8px;color:#1e293b">📝 GABARITO</div>
+        ${d.questoes.map((q,qi)=>`<p style="font-size:12px;margin:0 0 4px"><strong style="color:#2563eb">Q${qi+1}:</strong> ${esc2(q.gabarito)}</p>`).join('')}
+      </div>`;
+      await renderSecao(gabHtml,'4px 0');
     }
 
     pdf.save(`Adaptacao_${nome.replace(/\s/g,'_')}.pdf`);
@@ -2397,7 +2479,7 @@ async function baixarPdf() {
     console.error(e);
     showToast('❌ Erro ao gerar PDF','warn');
   } finally {
-    document.body.removeChild(container);
+    if(document.body.contains(container)) document.body.removeChild(container);
   }
 }
 
