@@ -9,6 +9,8 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <style>
 :root {
   --bg:#f0f4f8;--surface:#fff;--surface2:#e8eef5;--border:#d0dae6;
@@ -1394,18 +1396,51 @@ async function gerarAdaptacoes() {
           const resultados=[];
           for(let pi=0;pi<partes.length;pi++){
             progFill.style.width=`${Math.round(((done+(pi+0.5)/partes.length)/total)*100)}%`;
-            const promptParte=buildPrompt(aluno,partes[pi],disciplina,pi===0?nomeAtiv:'');
-            const result=await chamarAPI(promptParte, pi===0?imagem:null);
+            const promptParte=buildPrompt(aluno,partes[pi],disciplina,pi===0?nomeAtiv:`${nomeAtiv} — parte ${pi+1}`);
+            let result='';
+            try{result=await chamarAPI(promptParte, pi===0?imagem:null);}
+            catch(e){result='';}
             resultados.push(result);
             if(pi<partes.length-1) await new Promise(r=>setTimeout(r,1000));
           }
-          const blocos=resultados.map(r=>extrairBlocos(r));
-          const registroFinal=blocos[0].registro;
-          const materialFinal=blocos.map((b,i)=>
-            i===0?b.material:`\n---CONTINUAÇÃO ${i+1}---\n${b.material}`
-          ).join('\n\n');
-          const textoFinal=`---REGISTRO PEDAGÓGICO---\n${registroFinal}\n---FIM REGISTRO---\n\n---MATERIAL DO ALUNO---\n${materialFinal}\n---FIM MATERIAL---`;
-          state.adaptacoes[aluno.id]=parseAdaptacao(textoFinal);
+
+          // Parseia cada parte como JSON — ignora partes inválidas
+          const jsons=resultados.map(r=>{
+            if(!r) return null;
+            try{
+              const clean=r.replace(/```json|```/g,'').trim();
+              // Tenta parsear direto
+              return JSON.parse(clean);
+            }catch(e){
+              // Tenta extrair JSON do meio do texto
+              const match=r.match(/\{[\s\S]*\}/);
+              if(match){try{return JSON.parse(match[0]);}catch(e2){return null;}}
+              return null;
+            }
+          }).filter(Boolean);
+
+          if(jsons.length>0){
+            const base=jsons[0];
+            // Renumera passos das partes extras para continuar a numeração
+            let numOffset=(base.passos||[]).length;
+            const passosExtras=jsons.slice(1).flatMap(j=>{
+              return (j.passos||[]).map(p=>({...p,numero:p.numero+numOffset}));
+            });
+            const resumoTodos=jsons.flatMap(j=>j.resumo||[]).slice(0,4);
+            const jsonFinal={
+              ...base,
+              nomeAtividade:nomeAtiv||base.nomeAtividade,
+              passos:[...(base.passos||[]),...passosExtras],
+              resumo:resumoTodos.length>0?resumoTodos:(base.resumo||[]),
+              // Questões e registro pedagógico sempre da primeira parte (mais completa)
+              questoes:base.questoes||[],
+              dicaPedagogica:base.dicaPedagogica||'',
+              registroPedagogico:base.registroPedagogico||{},
+            };
+            state.adaptacoes[aluno.id]={tipo:'json',data:jsonFinal};
+          } else {
+            state.adaptacoes[aluno.id]={tipo:'erro',msg:'⚠️ Não foi possível processar o material. Tente com um texto mais curto.'};
+          }
         } else {
           const result=await chamarAPI(buildPrompt(aluno,texto,disciplina,nomeAtiv), imagem);
           if(!result) throw new Error('empty');
@@ -2297,25 +2332,73 @@ async function baixarRegistroProfessor() {
   }catch(e){showToast('❌ Erro ao gerar DOCX','warn');}
 }
 
-function baixarPdf() {
+async function baixarPdf() {
   const adapt=state.adaptacoes[state.alunoAdaptacaoAtual];
   if(!adapt||adapt.tipo==='pictograma') return showToast('⚠️ Selecione uma adaptação de texto','warn');
   const aluno=state.alunos.find(a=>a.id===state.alunoAdaptacaoAtual);
   const nome=aluno?.nome||'aluno';
-  // Cria div oculto com conteúdo formatado para impressão
-  let printDiv=document.getElementById('print-area');
-  if(!printDiv){printDiv=document.createElement('div');printDiv.id='print-area';document.body.appendChild(printDiv);}
   const meta=state.user?.user_metadata||{};
-  const escola=meta.escola||'';
-  const prof=meta.name||'';
-  const data=new Date().toLocaleDateString('pt-BR');
-  printDiv.innerHTML=`
-    <div style="text-align:center;margin-bottom:20px;padding-bottom:16px;border-bottom:2px solid #2563eb">
-      <div style="font-size:11px;color:#64748b;margin-bottom:4px">${[escola,prof,data].filter(Boolean).join('  ·  ')}</div>
-      <h1 style="font-size:22px;color:#2563eb;margin:0">Adaptação — ${nome}</h1>
+
+  showToast('⏳ Gerando PDF...','');
+
+  // Cria div temporário oculto com o conteúdo renderizado
+  const container=document.createElement('div');
+  container.style.cssText='position:fixed;left:-9999px;top:0;width:760px;padding:32px;background:white;font-family:Arial,sans-serif;font-size:13px;line-height:1.7;color:#1e293b;';
+
+  // CSS inline para garantir que as cores funcionem
+  container.innerHTML=`
+    <style>
+      :root{--accent:#2563eb;--accent2:#7c3aed;--accent3:#059669;--border:#d0dae6;--surface:#fff;--surface2:#e8eef5;--bg:#f0f4f8;--text:#1e293b;--muted:#64748b;--warn:#ea580c;--card:#fff;}
+      *{box-sizing:border-box;}
+    </style>
+    <div style="text-align:center;margin-bottom:20px;padding-bottom:14px;border-bottom:2px solid #2563eb">
+      <div style="font-size:11px;color:#64748b;margin-bottom:4px">${[meta.escola,meta.name,new Date().toLocaleDateString('pt-BR')].filter(Boolean).join('  ·  ')}</div>
+      <h1 style="font-family:Arial,sans-serif;font-size:20px;font-weight:800;color:#2563eb;margin:0">Adaptação — ${nome}</h1>
     </div>
     ${renderAdaptacaoHtml(adapt)}`;
-  window.print();
+
+  document.body.appendChild(container);
+
+  try {
+    const canvas=await html2canvas(container,{
+      scale:1.5,
+      useCORS:true,
+      backgroundColor:'#ffffff',
+      logging:false,
+    });
+
+    const imgData=canvas.toDataURL('image/jpeg',0.92);
+    const {jsPDF}=window.jspdf;
+    const pdf=new jsPDF({orientation:'portrait',unit:'mm',format:'a4'});
+
+    const pageW=pdf.internal.pageSize.getWidth();
+    const pageH=pdf.internal.pageSize.getHeight();
+    const margin=10;
+    const imgW=pageW-(margin*2);
+    const imgH=(canvas.height*imgW)/canvas.width;
+
+    let y=margin;
+    let heightLeft=imgH;
+
+    // Adiciona imagem página a página
+    pdf.addImage(imgData,'JPEG',margin,y,imgW,imgH);
+    heightLeft-=(pageH-(margin*2));
+
+    while(heightLeft>0){
+      y=heightLeft-imgH+margin;
+      pdf.addPage();
+      pdf.addImage(imgData,'JPEG',margin,y,imgW,imgH);
+      heightLeft-=(pageH-(margin*2));
+    }
+
+    pdf.save(`Adaptacao_${nome.replace(/\s/g,'_')}.pdf`);
+    showToast('📄 PDF baixado!');
+  } catch(e) {
+    console.error(e);
+    showToast('❌ Erro ao gerar PDF','warn');
+  } finally {
+    document.body.removeChild(container);
+  }
 }
 
 
