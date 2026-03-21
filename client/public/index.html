@@ -450,11 +450,20 @@ h1,h2,h3,h4{font-family:'Syne',sans-serif;}
           </div>
           <div class="alert alert-success">✅ Adaptações prontas!</div>
           <div class="resultado-tabs" id="resultado-tabs"></div>
-          <div class="resultado-box"><div class="resultado-content" id="resultado-text"></div></div>
+          <!-- Abas material aluno / registro pedagógico -->
+          <div style="display:flex;gap:8px;margin-bottom:16px">
+            <button id="aba-aluno" onclick="mostrarAba('aluno')" style="padding:8px 16px;border-radius:8px;border:none;background:var(--accent);color:white;font-family:'Syne',sans-serif;font-weight:700;font-size:13px;cursor:pointer">📄 Material do aluno</button>
+            <button id="aba-professor" onclick="mostrarAba('professor')" style="padding:8px 16px;border-radius:8px;border:1px solid var(--border);background:var(--bg);color:var(--muted);font-family:'Syne',sans-serif;font-weight:700;font-size:13px;cursor:pointer">📋 Registro pedagógico</button>
+          </div>
+          <div class="resultado-box">
+            <div class="resultado-content" id="resultado-text"></div>
+            <div id="resultado-registro" style="display:none;font-size:14px;line-height:1.8"></div>
+          </div>
           <div style="display:flex;gap:10px;margin-top:16px;flex-wrap:wrap;align-items:center">
-            <button class="btn btn-success" style="width:auto" onclick="baixarDocx()">📥 Baixar DOCX do aluno selecionado</button>
+            <button class="btn btn-success" style="width:auto" onclick="baixarDocx()">📥 Baixar DOCX do aluno</button>
             <button class="btn btn-primary" style="width:auto" onclick="baixarTodos()">📦 Baixar todos em DOCX</button>
-            <button class="btn btn-secondary" style="width:auto" onclick="togglePrevia()" id="btn-previa">👁 Prévia do DOCX</button>
+            <button class="btn btn-accent2" style="width:auto" onclick="baixarRegistroProfessor()">📋 Baixar registro do professor</button>
+            <button class="btn btn-secondary" style="width:auto" onclick="togglePrevia()" id="btn-previa">👁 Prévia</button>
           </div>
           <div id="previa-docx" style="display:none;margin-top:16px;background:white;border:2px solid var(--border);border-radius:14px;padding:32px 40px;font-family:'Calibri',sans-serif;font-size:14px;line-height:1.8;color:#1E293B;box-shadow:0 4px 20px rgba(0,0,0,0.08)">
             <div id="previa-conteudo"></div>
@@ -696,6 +705,12 @@ async function salvarAluno() {
 
 async function salvarHistorico(item) {
   const{data}=await sb.from('historico').insert({...item,user_id:state.user.id}).select().single();
+  if(data) state.historico.unshift(data);
+  renderHistorico();
+}
+
+async function salvarHistoricoComConteudo(item, conteudo) {
+  const{data}=await sb.from('historico').insert({...item, conteudo, user_id:state.user.id}).select().single();
   if(data) state.historico.unshift(data);
   renderHistorico();
 }
@@ -1200,8 +1215,6 @@ Responda APENAS com este JSON (sem markdown, sem \`\`\`):
 {
   "nomeAtividade": "título pedagógico curto",
   "disciplina": "${disciplina || discProf}",
-  "objetivos": ["objetivo 1", "objetivo 2", "objetivo 3"],
-  "habilidades": [{"codigo": "EF06CI01", "descricao": "descrição curta"}],
   "passos": [
     {"numero": 1, "texto": "frase reescrita respeitando o perfil", "destaque": "palavra-chave"}
   ],
@@ -1222,7 +1235,12 @@ Responda APENAS com este JSON (sem markdown, sem \`\`\`):
     }
   ],
   "dicaPedagogica": "sugestão prática e concreta para o professor, específica para o diagnóstico deste aluno",
-  "refCurr": "${refCurr}"
+  "registroPedagogico": {
+    "objetivos": ["objetivo de aprendizagem 1", "objetivo 2", "objetivo 3"],
+    "habilidades": [{"codigo": "EF06CI01", "descricao": "descrição da habilidade conforme ${refCurr}"}],
+    "refCurr": "${refCurr}",
+    "orientacoes": "orientações metodológicas para o professor sobre como trabalhar este conteúdo com este perfil específico de aluno"
+  }
 }
 
 REGRAS CRÍTICAS:
@@ -1388,7 +1406,10 @@ async function gerarAdaptacoes() {
     done++;
     progFill.style.width=`${Math.round((done/total)*100)}%`;
     const turma=state.turmas.find(t=>t.id===aluno.turma_id);
-    await salvarHistorico({aluno_id:aluno.id,aluno_nome:aluno.nome,titulo:nomeAtiv||disciplina,disciplina,turma_nome:turma?.nome||''});
+    await salvarHistoricoComConteudo(
+      {aluno_id:aluno.id,aluno_nome:aluno.nome,titulo:nomeAtiv||disciplina,disciplina,turma_nome:turma?.nome||''},
+      state.adaptacoes[aluno.id]
+    );
     if(done<total) await new Promise(r=>setTimeout(r,2000));
   }
   progBar.classList.remove('show');progFill.style.width='0%';
@@ -1538,6 +1559,71 @@ function extrairBlocos(texto) {
   };
 }
 
+function mostrarAba(aba) {
+  const abaAluno=document.getElementById('aba-aluno');
+  const abaProfessor=document.getElementById('aba-professor');
+  const textoAluno=document.getElementById('resultado-text');
+  const textoRegistro=document.getElementById('resultado-registro');
+  if(aba==='aluno'){
+    abaAluno.style.background='var(--accent)';abaAluno.style.color='white';abaAluno.style.border='none';
+    abaProfessor.style.background='var(--bg)';abaProfessor.style.color='var(--muted)';abaProfessor.style.border='1px solid var(--border)';
+    textoAluno.style.display='block';textoRegistro.style.display='none';
+  } else {
+    abaProfessor.style.background='var(--accent2)';abaProfessor.style.color='white';abaProfessor.style.border='none';
+    abaAluno.style.background='var(--bg)';abaAluno.style.color='var(--muted)';abaAluno.style.border='1px solid var(--border)';
+    textoAluno.style.display='none';textoRegistro.style.display='block';
+    // Renderiza registro do aluno atual
+    const adapt=state.adaptacoes[state.alunoAdaptacaoAtual];
+    textoRegistro.innerHTML=renderRegistroPedagogicoHtml(adapt);
+  }
+}
+
+function renderRegistroPedagogicoHtml(adaptacao) {
+  if(!adaptacao||adaptacao.tipo!=='json'||!adaptacao.data) return '<div style="padding:20px;color:var(--muted)">Nenhum registro disponível.</div>';
+  const d=adaptacao.data;
+  const rp=d.registroPedagogico||{};
+  const meta=state.user?.user_metadata||{};
+  const aluno=state.alunos.find(a=>a.id===state.alunoAdaptacaoAtual);
+  const conds=[];
+  if(aluno?.tea) conds.push('TEA');
+  if(aluno?.tdah) conds.push('TDAH');
+  if(aluno?.dislexia) conds.push('Dislexia');
+  if(aluno?.baixa_visao) conds.push('Baixa visão');
+  if(aluno?.altas_habilidades) conds.push('Altas habilidades');
+
+  return `<div style="font-family:'DM Sans',sans-serif;max-width:720px">
+    <div style="background:rgba(124,58,237,0.06);border:1px solid rgba(124,58,237,0.2);border-radius:14px;padding:20px;margin-bottom:16px">
+      <div style="font-size:11px;font-weight:700;color:var(--accent2);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:12px">📋 Registro Pedagógico — Exclusivo do Professor</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:13px;margin-bottom:12px">
+        <div><span style="color:var(--muted)">Aluno:</span> <strong>${aluno?.nome||'—'}</strong></div>
+        <div><span style="color:var(--muted)">Disciplina:</span> <strong>${d.disciplina||'—'}</strong></div>
+        <div><span style="color:var(--muted)">Referencial:</span> <strong>${rp.refCurr||meta.estado||'BNCC'}</strong></div>
+        <div><span style="color:var(--muted)">Diagnóstico:</span> <strong>${conds.length?conds.join(', '):'Não especificado'}</strong></div>
+      </div>
+    </div>
+
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:20px;margin-bottom:16px">
+      <div style="font-weight:700;font-size:14px;margin-bottom:12px;color:var(--accent)">🎯 Objetivos de Aprendizagem</div>
+      ${(rp.objetivos||[]).map((o,i)=>`<div style="display:flex;gap:10px;margin-bottom:8px;font-size:13px"><span style="color:var(--accent);font-weight:700;flex-shrink:0">${i+1}.</span><span>${o}</span></div>`).join('')}
+    </div>
+
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:20px;margin-bottom:16px">
+      <div style="font-weight:700;font-size:14px;margin-bottom:12px;color:var(--accent2)">📚 Habilidades — ${rp.refCurr||'BNCC'}</div>
+      ${(rp.habilidades||[]).map(h=>`<div style="display:flex;gap:10px;margin-bottom:8px;font-size:13px;align-items:flex-start"><span style="background:rgba(124,58,237,0.1);color:var(--accent2);padding:2px 8px;border-radius:6px;font-size:11px;font-weight:700;flex-shrink:0;white-space:nowrap">${h.codigo}</span><span>${h.descricao}</span></div>`).join('')}
+    </div>
+
+    <div style="background:#FFFBEB;border:2px dashed #FDE68A;border-radius:14px;padding:20px;margin-bottom:16px">
+      <div style="font-weight:700;font-size:13px;color:#92400E;margin-bottom:8px">💡 Dica Pedagógica</div>
+      <p style="font-size:13px;color:#78350F;margin:0;line-height:1.7">${d.dicaPedagogica||'—'}</p>
+    </div>
+
+    ${rp.orientacoes?`<div style="background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:20px">
+      <div style="font-weight:700;font-size:14px;margin-bottom:10px;color:var(--accent3)">📝 Orientações Metodológicas</div>
+      <p style="font-size:13px;line-height:1.8;margin:0">${rp.orientacoes}</p>
+    </div>`:''}
+  </div>`;
+}
+
 function mostrarAdaptacao(alunoId,el) {
   document.querySelectorAll('.rtab').forEach(t=>t.classList.remove('active'));
   el.classList.add('active');state.alunoAdaptacaoAtual=alunoId;
@@ -1546,6 +1632,11 @@ function mostrarAdaptacao(alunoId,el) {
   if(!adapt){box.innerHTML='Aguardando...';return;}
   if(adapt.tipo==='pictograma') renderPrancha(adapt,box);
   else box.innerHTML=renderAdaptacaoHtml(adapt);
+  // Volta para aba do aluno ao trocar
+  mostrarAba('aluno');
+  // Atualiza registro se aba do professor estiver ativa
+  const registroEl=document.getElementById('resultado-registro');
+  if(registroEl&&registroEl.style.display!=='none') registroEl.innerHTML=renderRegistroPedagogicoHtml(adapt);
 }
 
 function renderPrancha(adapt,container) {
@@ -2087,10 +2178,102 @@ function renderHistorico() {
   Object.keys(porTurma).forEach(turmaK=>{
     html+=`<div class="section-title" style="margin-top:20px;font-size:14px">🏫 ${turmaK}</div>`;
     porTurma[turmaK].forEach(h=>{
-      html+=`<div class="historico-item"><div class="hist-icon">📄</div><div class="hist-info"><div class="hist-title">${h.titulo}</div><div class="hist-meta">${h.aluno_nome||'Aluno'} · ${h.created_at?new Date(h.created_at).toLocaleDateString('pt-BR'):''}</div><div style="margin-top:4px"><span class="tag tag-blue">${h.disciplina}</span></div></div></div>`;
+      const temConteudo=!!(h.conteudo);
+      html+=`<div class="historico-item">
+        <div class="hist-icon">📄</div>
+        <div class="hist-info">
+          <div class="hist-title">${h.titulo}</div>
+          <div class="hist-meta">${h.aluno_nome||'Aluno'} · ${h.created_at?new Date(h.created_at).toLocaleDateString('pt-BR'):''}</div>
+          <div style="margin-top:4px"><span class="tag tag-blue">${h.disciplina}</span></div>
+        </div>
+        ${temConteudo?`<div style="display:flex;flex-direction:column;gap:6px;flex-shrink:0">
+          <button class="btn btn-secondary btn-sm" onclick="reabrirAdaptacao('${h.id}')">📂 Reabrir</button>
+          <button class="btn btn-sm" onclick="baixarHistoricoDocx('${h.id}')" style="background:rgba(5,150,105,0.1);color:var(--accent3);border:1px solid rgba(5,150,105,0.2)">📥 DOCX</button>
+        </div>`:''}
+      </div>`;
     });
   });
   list.innerHTML=html;
+}
+
+function reabrirAdaptacao(historicoId) {
+  const h=state.historico.find(x=>x.id===historicoId);
+  if(!h||!h.conteudo) return showToast('⚠️ Conteúdo não disponível para este registro','warn');
+  // Restaura adaptação no state
+  state.adaptacoes={};
+  state.adaptacoes[h.aluno_id]=h.conteudo;
+  state.alunoAdaptacaoAtual=h.aluno_id;
+  state.imagemMaterial=null;
+  // Navega para tela de adaptação
+  showPanel('adaptar');
+  // Mostra resultado
+  document.getElementById('resultado-area').style.display='block';
+  document.getElementById('resultado-tabs').innerHTML=`<div class="rtab active" onclick="mostrarAdaptacao('${h.aluno_id}',this)">${h.aluno_nome}</div>`;
+  const box=document.getElementById('resultado-text');
+  const adapt=h.conteudo;
+  if(adapt&&adapt.tipo==='pictograma') renderPrancha(adapt,box);
+  else if(adapt) box.innerHTML=renderAdaptacaoHtml(adapt);
+  mostrarAba('aluno');
+  showToast(`📂 Adaptação de ${h.aluno_nome} reaberta!`);
+}
+
+async function baixarHistoricoDocx(historicoId) {
+  const h=state.historico.find(x=>x.id===historicoId);
+  if(!h||!h.conteudo) return showToast('⚠️ Conteúdo não disponível','warn');
+  const adapt=h.conteudo;
+  const nome=h.aluno_nome||'aluno';
+  if(adapt.tipo==='json'){
+    const d=adapt.data;
+    let textoParts=[`---${d.nomeAtividade||'Material Adaptado'}---`,''];
+    (d.passos||[]).forEach(p=>textoParts.push(`${p.numero}. ${p.texto}`));
+    textoParts.push('');
+    if(d.resumo?.length){textoParts.push('---Resumo Rápido---','');d.resumo.forEach(r=>textoParts.push(`**${r.titulo}:** ${r.conteudo}`));textoParts.push('');}
+    if(d.questoes?.length){
+      textoParts.push('---Atividade---','');
+      d.questoes.forEach((q,i)=>{
+        textoParts.push(`${i+1}. ${q.enunciado}`);
+        if(q.tipo==='multipla')(q.opcoes||[]).forEach(op=>textoParts.push(`   ${op}`));
+        if(q.tipo==='vf') textoParts.push(`   ( ) Verdadeiro  ( ) Falso`);
+        textoParts.push('');
+      });
+      textoParts.push('---Gabarito---','');
+      d.questoes.forEach((q,i)=>textoParts.push(`Questão ${i+1}: ${q.gabarito}`));
+    }
+    try{await criarDocx(`Adaptacao_${nome}.docx`,`Adaptação — ${nome}`,textoParts.join('\n'));showToast('📥 DOCX baixado!');}
+    catch(e){showToast('❌ Erro ao gerar DOCX','warn');}
+  }
+}
+
+async function baixarRegistroProfessor() {
+  const adapt=state.adaptacoes[state.alunoAdaptacaoAtual];
+  if(!adapt||adapt.tipo!=='json'||!adapt.data) return showToast('⚠️ Nenhum registro disponível','warn');
+  const d=adapt.data;
+  const rp=d.registroPedagogico||{};
+  const aluno=state.alunos.find(a=>a.id===state.alunoAdaptacaoAtual);
+  const nome=aluno?.nome||'aluno';
+  const conds=[];
+  if(aluno?.tea) conds.push('TEA');if(aluno?.tdah) conds.push('TDAH');
+  if(aluno?.dislexia) conds.push('Dislexia');if(aluno?.baixa_visao) conds.push('Baixa visão');
+  if(aluno?.altas_habilidades) conds.push('Altas habilidades');
+  let textoParts=[
+    `---Registro Pedagógico — ${nome}---`,
+    '',
+    `Disciplina: ${d.disciplina||'—'}`,
+    `Referencial: ${rp.refCurr||'BNCC'}`,
+    `Diagnóstico: ${conds.length?conds.join(', '):'Não especificado'}`,
+    '',
+    '---Objetivos de Aprendizagem---',
+    '',
+  ];
+  (rp.objetivos||[]).forEach((o,i)=>textoParts.push(`${i+1}. ${o}`));
+  textoParts.push('','---Habilidades---','');
+  (rp.habilidades||[]).forEach(h=>textoParts.push(`${h.codigo} — ${h.descricao}`));
+  textoParts.push('','---Dica Pedagógica---','',d.dicaPedagogica||'—');
+  if(rp.orientacoes) textoParts.push('','---Orientações Metodológicas---','',rp.orientacoes);
+  try{
+    await criarDocx(`Registro_${nome}.docx`,`Registro Pedagógico — ${nome}`,textoParts.join('\n'));
+    showToast('📋 Registro do professor baixado!');
+  }catch(e){showToast('❌ Erro ao gerar DOCX','warn');}
 }
 
 function setUploadState(s){['idle','loading','success','error'].forEach(x=>document.getElementById('upload-'+x).style.display=s===x?'block':'none');}
