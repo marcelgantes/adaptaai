@@ -199,6 +199,12 @@ h1,h2,h3,h4{font-family:'Syne',sans-serif;}
 @keyframes fadeUp{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);}}
 @keyframes fadeIn{from{opacity:0;}to{opacity:1;}}
 @keyframes bounce{0%,100%{transform:translateY(0);}50%{transform:translateY(-10px);}}
+@media print{
+  body *{visibility:hidden;}
+  #print-area,#print-area *{visibility:visible;}
+  #print-area{position:fixed;top:0;left:0;width:100%;padding:24px;font-family:'Calibri',sans-serif;font-size:13px;line-height:1.8;}
+  @page{margin:1.5cm;}
+}
 </style>
 </head>
 <body>
@@ -460,9 +466,10 @@ h1,h2,h3,h4{font-family:'Syne',sans-serif;}
             <div id="resultado-registro" style="display:none;font-size:14px;line-height:1.8"></div>
           </div>
           <div style="display:flex;gap:10px;margin-top:16px;flex-wrap:wrap;align-items:center">
-            <button class="btn btn-success" style="width:auto" onclick="baixarDocx()">📥 Baixar DOCX do aluno</button>
-            <button class="btn btn-primary" style="width:auto" onclick="baixarTodos()">📦 Baixar todos em DOCX</button>
-            <button class="btn btn-accent2" style="width:auto" onclick="baixarRegistroProfessor()">📋 Baixar registro do professor</button>
+            <button class="btn btn-success" style="width:auto" onclick="baixarDocx()">📥 DOCX do aluno</button>
+            <button class="btn btn-primary" style="width:auto" onclick="baixarTodos()">📦 Todos em DOCX</button>
+            <button class="btn btn-secondary" style="width:auto" onclick="baixarPdf()">🖨️ Baixar PDF</button>
+            <button class="btn btn-accent2" style="width:auto" onclick="baixarRegistroProfessor()">📋 Registro do professor</button>
             <button class="btn btn-secondary" style="width:auto" onclick="togglePrevia()" id="btn-previa">👁 Prévia</button>
           </div>
           <div id="previa-docx" style="display:none;margin-top:16px;background:white;border:2px solid var(--border);border-radius:14px;padding:32px 40px;font-family:'Calibri',sans-serif;font-size:14px;line-height:1.8;color:#1E293B;box-shadow:0 4px 20px rgba(0,0,0,0.08)">
@@ -1365,6 +1372,12 @@ async function gerarAdaptacoes() {
 
   const total=alunosParaAdaptar.length;let done=0;
 
+  // Mostra área de resultado imediatamente com tabs — resultado vai aparecendo progressivamente
+  document.getElementById('resultado-area').style.display='block';
+  document.getElementById('resultado-tabs').innerHTML=alunosParaAdaptar.map((a,i)=>`<div class="rtab ${i===0?'active':''}" onclick="mostrarAdaptacao('${a.id}',this)">${a.nome}</div>`).join('');
+  state.alunoAdaptacaoAtual=alunosParaAdaptar[0]?.id;
+  document.getElementById('resultado-text').innerHTML=`<div class="loading-dots" style="height:120px"><span></span><span></span><span></span></div>`;
+
   for(const aluno of alunosParaAdaptar){
     if(aluno.fragmentacao==='nao_alfabetizado'){
       try{
@@ -1384,7 +1397,7 @@ async function gerarAdaptacoes() {
             const promptParte=buildPrompt(aluno,partes[pi],disciplina,pi===0?nomeAtiv:'');
             const result=await chamarAPI(promptParte, pi===0?imagem:null);
             resultados.push(result);
-            if(pi<partes.length-1) await new Promise(r=>setTimeout(r,2500));
+            if(pi<partes.length-1) await new Promise(r=>setTimeout(r,1000));
           }
           const blocos=resultados.map(r=>extrairBlocos(r));
           const registroFinal=blocos[0].registro;
@@ -1400,28 +1413,33 @@ async function gerarAdaptacoes() {
         }
       }catch(e){
         const msg=e.message==='rate_limit'?'⚠️ Limite de requisições — aguarde 30s e tente novamente.':'⚠️ Erro de conexão. Tente novamente.';
-        state.adaptacoes[aluno.id]=msg;
+        state.adaptacoes[aluno.id]={tipo:'erro',msg};
       }
     }
+
     done++;
     progFill.style.width=`${Math.round((done/total)*100)}%`;
+
+    // Mostra resultado do primeiro aluno assim que ficar pronto — não espera os outros
+    if(done===1){
+      const adapt=state.adaptacoes[aluno.id];
+      const box=document.getElementById('resultado-text');
+      if(adapt&&adapt.tipo==='pictograma') renderPrancha(adapt,box);
+      else if(adapt&&adapt.tipo==='erro') box.innerHTML=`<div style="padding:20px;color:var(--warn)">${adapt.msg}</div>`;
+      else if(adapt) box.innerHTML=renderAdaptacaoHtml(adapt);
+      mostrarAba('aluno');
+    }
+
     const turma=state.turmas.find(t=>t.id===aluno.turma_id);
     await salvarHistoricoComConteudo(
       {aluno_id:aluno.id,aluno_nome:aluno.nome,titulo:nomeAtiv||disciplina,disciplina,turma_nome:turma?.nome||''},
       state.adaptacoes[aluno.id]
     );
-    if(done<total) await new Promise(r=>setTimeout(r,2000));
+    if(done<total) await new Promise(r=>setTimeout(r,800));
   }
   progBar.classList.remove('show');progFill.style.width='0%';
   document.getElementById('btn-gerar').disabled=false;
-  document.getElementById('resultado-tabs').innerHTML=alunosParaAdaptar.map((a,i)=>`<div class="rtab ${i===0?'active':''}" onclick="mostrarAdaptacao('${a.id}',this)">${a.nome}</div>`).join('');
-  state.alunoAdaptacaoAtual=alunosParaAdaptar[0]?.id;
-  const primeiraAdapt=state.adaptacoes[alunosParaAdaptar[0]?.id];
-  const box=document.getElementById('resultado-text');
-  if(primeiraAdapt&&primeiraAdapt.tipo==='pictograma') renderPrancha(primeiraAdapt,box);
-  else if(primeiraAdapt) box.innerHTML=renderAdaptacaoHtml(primeiraAdapt);
-  else box.innerHTML='';
-  document.getElementById('resultado-area').style.display='block';
+  showToast(`✅ ${total} adaptação${total>1?'ões':''} pronta${total>1?'s':''}!`);
 }
 
 function parseAdaptacao(texto) {
@@ -1608,8 +1626,11 @@ function renderRegistroPedagogicoHtml(adaptacao) {
     </div>
 
     <div style="background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:20px;margin-bottom:16px">
-      <div style="font-weight:700;font-size:14px;margin-bottom:12px;color:var(--accent2)">📚 Habilidades — ${rp.refCurr||'BNCC'}</div>
-      ${(rp.habilidades||[]).map(h=>`<div style="display:flex;gap:10px;margin-bottom:8px;font-size:13px;align-items:flex-start"><span style="background:rgba(124,58,237,0.1);color:var(--accent2);padding:2px 8px;border-radius:6px;font-size:11px;font-weight:700;flex-shrink:0;white-space:nowrap">${h.codigo}</span><span>${h.descricao}</span></div>`).join('')}
+      <div style="font-weight:700;font-size:14px;margin-bottom:12px;color:var(--accent2)">📚 Habilidades — BNCC / ${rp.refCurr||'BNCC'}</div>
+      ${(rp.habilidades||[]).length ? (rp.habilidades||[]).map(h=>`<div style="display:flex;gap:10px;margin-bottom:8px;font-size:13px;align-items:flex-start"><span style="background:rgba(124,58,237,0.1);color:var(--accent2);padding:2px 8px;border-radius:6px;font-size:11px;font-weight:700;flex-shrink:0;white-space:nowrap">${h.codigo}</span><span>${h.descricao}</span></div>`).join('') : '<p style="font-size:13px;color:var(--muted)">Nenhuma habilidade identificada para este conteúdo.</p>'}
+      <div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--border);font-size:11px;color:var(--muted)">
+        Os códigos acima seguem a <strong>Base Nacional Comum Curricular (BNCC)</strong>${rp.refCurr&&rp.refCurr!=='BNCC'?` e o <strong>${rp.refCurr}</strong>`:''}. Consulte o documento oficial para detalhes completos de cada habilidade.
+      </div>
     </div>
 
     <div style="background:#FFFBEB;border:2px dashed #FDE68A;border-radius:14px;padding:20px;margin-bottom:16px">
@@ -2276,7 +2297,28 @@ async function baixarRegistroProfessor() {
   }catch(e){showToast('❌ Erro ao gerar DOCX','warn');}
 }
 
-function setUploadState(s){['idle','loading','success','error'].forEach(x=>document.getElementById('upload-'+x).style.display=s===x?'block':'none');}
+function baixarPdf() {
+  const adapt=state.adaptacoes[state.alunoAdaptacaoAtual];
+  if(!adapt||adapt.tipo==='pictograma') return showToast('⚠️ Selecione uma adaptação de texto','warn');
+  const aluno=state.alunos.find(a=>a.id===state.alunoAdaptacaoAtual);
+  const nome=aluno?.nome||'aluno';
+  // Cria div oculto com conteúdo formatado para impressão
+  let printDiv=document.getElementById('print-area');
+  if(!printDiv){printDiv=document.createElement('div');printDiv.id='print-area';document.body.appendChild(printDiv);}
+  const meta=state.user?.user_metadata||{};
+  const escola=meta.escola||'';
+  const prof=meta.name||'';
+  const data=new Date().toLocaleDateString('pt-BR');
+  printDiv.innerHTML=`
+    <div style="text-align:center;margin-bottom:20px;padding-bottom:16px;border-bottom:2px solid #2563eb">
+      <div style="font-size:11px;color:#64748b;margin-bottom:4px">${[escola,prof,data].filter(Boolean).join('  ·  ')}</div>
+      <h1 style="font-size:22px;color:#2563eb;margin:0">Adaptação — ${nome}</h1>
+    </div>
+    ${renderAdaptacaoHtml(adapt)}`;
+  window.print();
+}
+
+
 function handleDrop(e){e.preventDefault();document.getElementById('upload-zone').classList.remove('dragover');const file=e.dataTransfer.files[0];if(file) handleFileSelect(file);}
 
 async function lerArquivo(file) {
