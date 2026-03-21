@@ -416,8 +416,8 @@ h1,h2,h3,h4{font-family:'Syne',sans-serif;}
           <div>
             <div class="section-title">1. Conteúdo a adaptar</div>
             <label for="file-input" class="upload-zone" id="upload-zone" ondragover="event.preventDefault();this.classList.add('dragover')" ondragleave="this.classList.remove('dragover')" ondrop="handleDrop(event)">
-              <input type="file" id="file-input" accept=".pdf,.docx,.doc,.txt" style="display:none;position:absolute" onchange="handleFileSelect(this.files[0])">
-              <div id="upload-idle"><div class="upload-icon">📎</div><p><strong>Arraste o arquivo aqui</strong> ou clique para selecionar</p><p style="margin-top:6px;font-size:12px">PDF · DOCX · TXT — até 10MB</p></div>
+              <input type="file" id="file-input" accept=".pdf,.docx,.doc,.txt,.png,.jpg,.jpeg,.webp" style="display:none;position:absolute" onchange="handleFileSelect(this.files[0])">
+              <div id="upload-idle"><div class="upload-icon">📎</div><p><strong>Arraste o arquivo aqui</strong> ou clique para selecionar</p><p style="margin-top:6px;font-size:12px">PDF · DOCX · TXT · PNG · JPG — até 10MB</p></div>
               <div id="upload-loading" style="display:none"><div class="loading-dots" style="height:60px"><span></span><span></span><span></span></div></div>
               <div id="upload-success" style="display:none"><div style="font-size:28px;margin-bottom:8px">✅</div><p id="upload-filename" style="font-weight:600;font-size:14px"></p><p id="upload-charcount" style="font-size:12px;color:var(--accent3);margin-top:4px"></p><p style="font-size:11px;color:var(--muted);margin-top:6px">Clique para trocar</p></div>
               <div id="upload-error" style="display:none"><div style="font-size:28px;margin-bottom:8px">⚠️</div><p id="upload-errmsg" style="font-size:13px;color:var(--warn)"></p></div>
@@ -1162,9 +1162,19 @@ function dividirTexto(texto, maxChars=6000) {
   return partes;
 }
 
-async function chamarAPI(prompt, tentativas=3) {
+async function chamarAPI(prompt, imagem=null, tentativas=3) {
   for(let t=0;t<tentativas;t++){
-    const r=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({messages:[{role:'user',content:prompt}]})});
+    // Monta conteúdo: texto puro ou multimodal (texto + imagem)
+    let content;
+    if(imagem){
+      content=[
+        {type:'image_url', image_url:{url: imagem.base64}},
+        {type:'text', text: prompt}
+      ];
+    } else {
+      content=prompt;
+    }
+    const r=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({messages:[{role:'user',content}]})});
     if(r.ok){
       const d=await r.json();
       return d.content?.[0]?.text||'';
@@ -1181,10 +1191,14 @@ async function chamarAPI(prompt, tentativas=3) {
 }
 
 async function gerarAdaptacoes() {
-  const texto=document.getElementById('material-texto').value.trim();
+  const textoDigitado=document.getElementById('material-texto').value.trim();
+  const imagem=state.imagemMaterial||null;
   const disciplina=document.getElementById('material-disciplina').value.trim()||'Geral';
   const nomeAtiv=document.getElementById('material-nome').value.trim();
-  if(!texto) return showToast('⚠️ Cole o texto do material primeiro','warn');
+
+  // Precisa de texto OU imagem
+  if(!textoDigitado && !imagem) return showToast('⚠️ Envie um arquivo ou cole o texto do material','warn');
+
   const checkboxes=document.querySelectorAll('#aluno-select-list input[type=checkbox]:checked');
   if(!checkboxes.length) return showToast('⚠️ Selecione pelo menos um aluno','warn');
   const alunosParaAdaptar=state.alunos.filter(a=>Array.from(checkboxes).map(c=>c.value).includes(a.id));
@@ -1193,16 +1207,20 @@ async function gerarAdaptacoes() {
   const progBar=document.getElementById('prog-bar');const progFill=document.getElementById('prog-fill');
   progBar.classList.add('show');progFill.style.width='5%';
   state.adaptacoes={};
-  const total=alunosParaAdaptar.length;let done=0;
-  const partes=dividirTexto(texto);
+
+  // Se for imagem, usa texto vazio — a IA vai ler a imagem diretamente
+  const texto = textoDigitado || '[MATERIAL ENVIADO COMO IMAGEM — leia a imagem para extrair o conteúdo e adaptar]';
+  const partes = imagem ? [texto] : dividirTexto(texto);
   const textoLongo=partes.length>1;
   if(textoLongo) showToast(`📄 Texto longo — dividido em ${partes.length} partes`);
+
+  const total=alunosParaAdaptar.length;let done=0;
 
   for(const aluno of alunosParaAdaptar){
     if(aluno.fragmentacao==='nao_alfabetizado'){
       try{
-        const texto_resumido=texto.substring(0,6000);
-        const result=await chamarAPI(buildPromptPictogramas(aluno,texto_resumido,disciplina,nomeAtiv));
+        const texto_resumido=imagem?'[veja a imagem]':texto.substring(0,6000);
+        const result=await chamarAPI(buildPromptPictogramas(aluno,texto_resumido,disciplina,nomeAtiv), imagem);
         let conceitos=[];
         try{conceitos=JSON.parse(result.replace(/```json|```/g,'').trim());}catch(e){}
         const pictogramas=await buscarPictogramas(conceitos);
@@ -1215,7 +1233,7 @@ async function gerarAdaptacoes() {
           for(let pi=0;pi<partes.length;pi++){
             progFill.style.width=`${Math.round(((done+(pi+0.5)/partes.length)/total)*100)}%`;
             const promptParte=buildPrompt(aluno,partes[pi],disciplina,pi===0?nomeAtiv:'');
-            const result=await chamarAPI(promptParte);
+            const result=await chamarAPI(promptParte, pi===0?imagem:null);
             resultados.push(result);
             if(pi<partes.length-1) await new Promise(r=>setTimeout(r,2500));
           }
@@ -1227,7 +1245,7 @@ async function gerarAdaptacoes() {
           const textoFinal=`---REGISTRO PEDAGÓGICO---\n${registroFinal}\n---FIM REGISTRO---\n\n---MATERIAL DO ALUNO---\n${materialFinal}\n---FIM MATERIAL---`;
           state.adaptacoes[aluno.id]=parseAdaptacao(textoFinal);
         } else {
-          const result=await chamarAPI(buildPrompt(aluno,texto,disciplina,nomeAtiv));
+          const result=await chamarAPI(buildPrompt(aluno,texto,disciplina,nomeAtiv), imagem);
           if(!result) throw new Error('empty');
           state.adaptacoes[aluno.id]=parseAdaptacao(result);
         }
@@ -1910,15 +1928,64 @@ function handleDrop(e){e.preventDefault();document.getElementById('upload-zone')
 
 async function lerArquivo(file) {
   const ext=file.name.split('.').pop().toLowerCase();
-  if(!['pdf','docx','doc','txt'].includes(ext)) throw new Error(`Formato .${ext} não suportado.`);
-  let texto='';
-  if(ext==='txt') texto=await new Promise((res,rej)=>{const r=new FileReader();r.onload=e=>res(e.target.result);r.onerror=()=>rej(new Error('Falha'));r.readAsText(file,'UTF-8');});
-  else if(ext==='docx'||ext==='doc'){const ab=await file.arrayBuffer();const result=await mammoth.extractRawText({arrayBuffer:ab});texto=result.value||'';}
-  else if(ext==='pdf'){
-    const ab=await file.arrayBuffer();const pdf=await pdfjsLib.getDocument({data:ab}).promise;
-    for(let i=1;i<=pdf.numPages;i++){const p=await pdf.getPage(i);const c=await p.getTextContent();texto+=c.items.map(x=>x.str).join(' ')+'\n\n';}
+  if(!['pdf','docx','doc','txt','png','jpg','jpeg','webp'].includes(ext))
+    throw new Error(`Formato .${ext} não suportado.`);
+
+  // IMAGEM DIRETA (foto do celular, PNG, JPG, WEBP)
+  if(['png','jpg','jpeg','webp'].includes(ext)){
+    return new Promise((res,rej)=>{
+      const r=new FileReader();
+      r.onload=e=>res({tipo:'imagem', base64:e.target.result, mimeType:file.type, nome:file.name});
+      r.onerror=()=>rej(new Error('Falha ao ler imagem'));
+      r.readAsDataURL(file);
+    });
   }
-  return texto.trim();
+
+  // TXT
+  if(ext==='txt'){
+    const texto=await new Promise((res,rej)=>{
+      const r=new FileReader();
+      r.onload=e=>res(e.target.result);
+      r.onerror=()=>rej(new Error('Falha'));
+      r.readAsText(file,'UTF-8');
+    });
+    return {tipo:'texto', conteudo:texto.trim()};
+  }
+
+  // DOCX / DOC
+  if(ext==='docx'||ext==='doc'){
+    const ab=await file.arrayBuffer();
+    const result=await mammoth.extractRawText({arrayBuffer:ab});
+    return {tipo:'texto', conteudo:(result.value||'').trim()};
+  }
+
+  // PDF — tenta extrair texto primeiro
+  if(ext==='pdf'){
+    const ab=await file.arrayBuffer();
+    const pdf=await pdfjsLib.getDocument({data:ab}).promise;
+    let texto='';
+    for(let i=1;i<=pdf.numPages;i++){
+      const p=await pdf.getPage(i);
+      const c=await p.getTextContent();
+      texto+=c.items.map(x=>x.str).join(' ')+'\n\n';
+    }
+    // Se extraiu texto suficiente, usa texto
+    if(texto.trim().length>=80){
+      return {tipo:'texto', conteudo:texto.trim()};
+    }
+    // PDF com pouco texto = provavelmente atividade com imagem
+    // Renderiza primeira página como imagem e manda para visão da IA
+    showToast('🖼️ PDF com imagem detectado — usando visão da IA...','');
+    const page=await pdf.getPage(1);
+    const viewport=page.getViewport({scale:2});
+    const canvas=document.createElement('canvas');
+    canvas.width=viewport.width;
+    canvas.height=viewport.height;
+    await page.render({canvasContext:canvas.getContext('2d'),viewport}).promise;
+    return {tipo:'imagem', base64:canvas.toDataURL('image/png'), mimeType:'image/png', nome:file.name};
+  }
+
+  throw new Error('Formato não suportado.');
 }
 
 async function handleFileSelect(file) {
@@ -1926,13 +1993,31 @@ async function handleFileSelect(file) {
   if(file.size>10*1024*1024){setUploadState('error');document.getElementById('upload-errmsg').textContent='Arquivo muito grande. Máximo: 10MB.';return;}
   setUploadState('loading');
   try{
-    const texto=await lerArquivo(file);
-    if(!texto||texto.length<10){setUploadState('error');document.getElementById('upload-errmsg').textContent='Não foi possível extrair texto. Cole manualmente.';return;}
-    document.getElementById('material-texto').value=texto;
-    document.getElementById('upload-filename').textContent='📄 '+file.name;
-    document.getElementById('upload-charcount').textContent=`✅ ${texto.length.toLocaleString('pt-BR')} caracteres extraídos`;
-    setUploadState('success');
-    const nomeInput=document.getElementById('material-nome');if(!nomeInput.value) nomeInput.value=file.name.replace(/\.[^/.]+$/,'');
+    const resultado=await lerArquivo(file);
+    const nomeInput=document.getElementById('material-nome');
+    if(!nomeInput.value) nomeInput.value=file.name.replace(/\.[^/.]+$/,'');
+
+    if(resultado.tipo==='imagem'){
+      // Guarda imagem no state para usar na geração
+      state.imagemMaterial=resultado;
+      // Limpa textarea — o texto virá da IA quando gerar
+      document.getElementById('material-texto').value='';
+      document.getElementById('upload-filename').textContent='🖼️ '+file.name;
+      document.getElementById('upload-charcount').textContent='✅ Imagem carregada — a IA vai ler o conteúdo';
+      setUploadState('success');
+    } else {
+      // Texto normal
+      state.imagemMaterial=null;
+      if(!resultado.conteudo||resultado.conteudo.length<10){
+        setUploadState('error');
+        document.getElementById('upload-errmsg').textContent='Não foi possível extrair texto. Cole manualmente.';
+        return;
+      }
+      document.getElementById('material-texto').value=resultado.conteudo;
+      document.getElementById('upload-filename').textContent='📄 '+file.name;
+      document.getElementById('upload-charcount').textContent=`✅ ${resultado.conteudo.length.toLocaleString('pt-BR')} caracteres extraídos`;
+      setUploadState('success');
+    }
   }catch(err){setUploadState('error');document.getElementById('upload-errmsg').textContent='Erro: '+err.message;}
 }
 
