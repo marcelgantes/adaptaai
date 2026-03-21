@@ -792,6 +792,12 @@ function openTurma(id) {
 }
 
 function adaptarEstaTurma() {
+  // Verifica se a turma tem alunos cadastrados
+  const alunosDaTurma=state.alunos.filter(a=>a.turma_id===state.turmaSelecionada);
+  if(!alunosDaTurma.length){
+    showToast('👤 Ops! Precisamos cadastrar um aluno primeiro.','warn');
+    return;
+  }
   // Navega para adaptação com a turma atual já selecionada
   showPanel('adaptar');
   const sel=document.getElementById('adaptar-turma');
