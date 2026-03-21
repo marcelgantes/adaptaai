@@ -666,14 +666,19 @@ async function criarAluno() {
 async function salvarAluno() {
   const a=state.alunos.find(x=>x.id===state.alunoSelecionado);
   if(!a) return;
+  // Lê do select se visível, senão do hidden input com default calculado
+  const getVal=(id)=>document.getElementById(id)?.value||document.getElementById(id+'-hidden')?.value||null;
+  const tea=document.getElementById('p-tea')?.checked||false;
+  const tdah=document.getElementById('p-tdah')?.checked||false;
+  const dislexia=document.getElementById('p-dislexia')?.checked||false;
   const updates={
-    fragmentacao:document.getElementById('p-fragmentacao')?.value||a.fragmentacao,
-    abstracao:document.getElementById('p-abstracao')?.value||a.abstracao,
-    mediacao:document.getElementById('p-mediacao')?.value||a.mediacao,
-    tipografia:document.getElementById('p-tipografia')?.value||a.tipografia,
-    dislexia:document.getElementById('p-dislexia')?.checked||false,
-    tdah:document.getElementById('p-tdah')?.checked||false,
-    tea:document.getElementById('p-tea')?.checked||false,
+    fragmentacao:getVal('p-fragmentacao')||(tea||tdah||dislexia?'alta':a.fragmentacao),
+    abstracao:getVal('p-abstracao')||(tea?'nao_abstrai':a.abstracao),
+    mediacao:getVal('p-mediacao')||(tea||tdah?'passo_a_passo':a.mediacao),
+    tipografia:getVal('p-tipografia')||a.tipografia||'normal',
+    dislexia,
+    tdah,
+    tea,
     baixa_visao:document.getElementById('p-baixa-visao')?.checked||false,
     altas_habilidades:document.getElementById('p-altas-habilidades')?.checked||false,
     interesses:document.getElementById('p-interesses')?.value||'',
@@ -862,37 +867,137 @@ function updateParamDesc(id) {
 
 function renderParamGrid(a) {
   const isNaoAlf=a.fragmentacao==='nao_alfabetizado';
-  document.getElementById('param-grid-content').innerHTML=
-    paramSelect('p-fragmentacao','Nível de leitura / Fragmentação','📝','Define o formato do material.',fragOpts,a.fragmentacao)+
-    (!isNaoAlf?paramSelect('p-abstracao','Nível de abstração','🧩','Define se usa analogias ou mantém tudo literal.',abstOpts,a.abstracao):'')+
-    (!isNaoAlf?paramSelect('p-mediacao','Mediação / Autonomia','🧭','Define se o aluno precisa de instruções detalhadas.',medOpts,a.mediacao||'guiado'):'')+
-    (!isNaoAlf?paramSelect('p-tipografia','Tipo de letra','🔤','Define o formato de texto.',tipoOpts,a.tipografia):'')+
-    `<div class="param-card" ${isNaoAlf?'style="grid-column:1/-1"':''}>
-      <h4>📚 Condições adicionais</h4>
-      <div class="check-group">
-        <label class="check-item"><input type="checkbox" id="p-dislexia" ${a.dislexia?'checked':''}> <span><strong>Dislexia</strong> — frases curtas, espaçamento maior</span></label>
-        <label class="check-item"><input type="checkbox" id="p-tdah" ${a.tdah?'checked':''}> <span><strong>TDAH</strong> — blocos curtos, um item por vez</span></label>
-        <label class="check-item"><input type="checkbox" id="p-tea" ${a.tea?'checked':''} onchange="if(this.checked){var sel=document.getElementById('p-abstracao');if(sel){sel.value='nao_abstrai';updateParamDesc('p-abstracao');}showToast('⚠️ TEA ativo: abstração ajustada para literal automaticamente','warn')}"> <span><strong>TEA</strong> — linguagem literal, sem metáforas</span></label>
-        <label class="check-item"><input type="checkbox" id="p-baixa-visao" ${a.baixa_visao?'checked':''}> <span><strong>Baixa visão</strong> — texto simples, sem tabelas complexas</span></label>
-        <label class="check-item" style="margin-top:8px;padding-top:8px;border-top:1px solid var(--border)">
-          <input type="checkbox" id="p-altas-habilidades" ${a.altas_habilidades?'checked':''}>
-          <span><strong>⭐ Altas habilidades / Superdotação</strong> — aprofundar, desafiar e enriquecer o conteúdo</span>
+
+  // Defaults automáticos por diagnóstico
+  const fragDefault = isNaoAlf ? 'nao_alfabetizado' : (a.tea ? 'alta' : a.tdah ? 'alta' : a.dislexia ? 'alta' : a.fragmentacao||'media');
+  const abstDefault = a.tea ? 'nao_abstrai' : (a.abstracao||'media');
+  const medDefault  = a.tea ? 'passo_a_passo' : a.tdah ? 'passo_a_passo' : (a.mediacao||'guiado');
+  const tipoDefault = a.tipografia||'normal';
+
+  document.getElementById('param-grid-content').innerHTML=`
+
+    <!-- BLOCO 1: DIAGNÓSTICO — vem primeiro -->
+    <div class="param-card" style="grid-column:1/-1;border:2px solid rgba(37,99,235,0.2);background:rgba(37,99,235,0.03)">
+      <h4 style="font-size:15px;color:var(--text)">🩺 Diagnóstico do aluno</h4>
+      <p style="font-size:12px;color:var(--muted);margin-bottom:16px">Marque o(s) diagnóstico(s) do aluno. Os parâmetros serão ajustados automaticamente.</p>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <label class="check-item" style="padding:10px 14px;background:var(--bg);border:1px solid var(--border);border-radius:10px;cursor:pointer;transition:all 0.2s" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border)'">
+          <input type="checkbox" id="p-dislexia" ${a.dislexia?'checked':''} onchange="atualizarDefaultsDiagnostico()">
+          <span><strong>Dislexia</strong><br><span style="font-size:11px;color:var(--muted);font-weight:400">Frases curtas, espaçamento maior</span></span>
+        </label>
+        <label class="check-item" style="padding:10px 14px;background:var(--bg);border:1px solid var(--border);border-radius:10px;cursor:pointer;transition:all 0.2s" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border)'">
+          <input type="checkbox" id="p-tdah" ${a.tdah?'checked':''} onchange="atualizarDefaultsDiagnostico()">
+          <span><strong>TDAH</strong><br><span style="font-size:11px;color:var(--muted);font-weight:400">Blocos curtos, um item por vez</span></span>
+        </label>
+        <label class="check-item" style="padding:10px 14px;background:var(--bg);border:1px solid var(--border);border-radius:10px;cursor:pointer;transition:all 0.2s" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border)'">
+          <input type="checkbox" id="p-tea" ${a.tea?'checked':''} onchange="atualizarDefaultsDiagnostico()">
+          <span><strong>TEA</strong><br><span style="font-size:11px;color:var(--muted);font-weight:400">Linguagem literal, sem metáforas</span></span>
+        </label>
+        <label class="check-item" style="padding:10px 14px;background:var(--bg);border:1px solid var(--border);border-radius:10px;cursor:pointer;transition:all 0.2s" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border)'">
+          <input type="checkbox" id="p-baixa-visao" ${a.baixa_visao?'checked':''} onchange="atualizarDefaultsDiagnostico()">
+          <span><strong>Baixa visão</strong><br><span style="font-size:11px;color:var(--muted);font-weight:400">Sem tabelas ou layouts complexos</span></span>
+        </label>
+        <label class="check-item" style="padding:10px 14px;background:rgba(251,191,36,0.08);border:1px solid rgba(251,191,36,0.3);border-radius:10px;cursor:pointer;grid-column:1/-1;transition:all 0.2s" onmouseover="this.style.borderColor='#f59e0b'" onmouseout="this.style.borderColor='rgba(251,191,36,0.3)'">
+          <input type="checkbox" id="p-altas-habilidades" ${a.altas_habilidades?'checked':''} onchange="atualizarDefaultsDiagnostico()">
+          <span><strong>⭐ Altas habilidades / Superdotação</strong><br><span style="font-size:11px;color:var(--muted);font-weight:400">Aprofundar, desafiar e enriquecer o conteúdo</span></span>
         </label>
       </div>
     </div>
+
+    <!-- BLOCO 2: PERSONALIZAÇÃO — expansível -->
+    <div class="param-card" style="grid-column:1/-1">
+      <button onclick="togglePersonalizacao()" style="width:100%;display:flex;align-items:center;justify-content:space-between;background:none;border:none;cursor:pointer;padding:0;font-family:'DM Sans',sans-serif">
+        <h4 style="font-size:14px;margin:0;display:flex;align-items:center;gap:8px">⚙️ Personalizar parâmetros <span style="font-size:11px;color:var(--muted);font-weight:400">(opcional)</span></h4>
+        <span id="personalizacao-seta" style="font-size:16px;color:var(--muted);transition:transform 0.2s">▾</span>
+      </button>
+      <p style="font-size:12px;color:var(--muted);margin-top:6px;margin-bottom:0">Os parâmetros já foram ajustados pelo diagnóstico. Clique para refinar manualmente.</p>
+      <div id="personalizacao-conteudo" style="display:none;margin-top:16px">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+          ${!isNaoAlf ? `
+          <div>
+            ${paramSelect('p-fragmentacao','Nível de leitura','📝','Define o formato do material.',fragOpts,fragDefault)}
+          </div>
+          <div>
+            ${paramSelect('p-abstracao','Nível de abstração','🧩','Define se usa analogias ou mantém tudo literal.',abstOpts,abstDefault)}
+          </div>
+          <div>
+            ${paramSelect('p-mediacao','Mediação / Autonomia','🧭','Define se o aluno precisa de instruções detalhadas.',medOpts,medDefault)}
+          </div>
+          <div>
+            ${paramSelect('p-tipografia','Tipo de letra','🔤','Define o formato de texto.',tipoOpts,tipoDefault)}
+          </div>
+          ` : `
+          <div style="grid-column:1/-1">
+            ${paramSelect('p-fragmentacao','Nível de leitura','📝','Define o formato do material.',fragOpts,fragDefault)}
+          </div>
+          `}
+        </div>
+      </div>
+      ${isNaoAlf ? '' : `
+      <!-- Campos ocultos com valores default para garantir que buildPrompt sempre tenha os valores -->
+      <input type="hidden" id="p-fragmentacao-hidden" value="${fragDefault}">
+      <input type="hidden" id="p-abstracao-hidden" value="${abstDefault}">
+      <input type="hidden" id="p-mediacao-hidden" value="${medDefault}">
+      <input type="hidden" id="p-tipografia-hidden" value="${tipoDefault}">
+      `}
+    </div>
+
+    <!-- BLOCO 3: INTERESSES E OBSERVAÇÕES -->
     <div class="param-card" style="grid-column:1/-1">
       <h4>🎯 Interesses e hiperfoco</h4>
-      <p style="font-size:12px;color:var(--muted);margin-bottom:10px">A IA vai usar esses interesses como contexto para tornar o conteúdo mais relevante para o aluno.</p>
-      <textarea id="p-interesses" rows="4" placeholder="Ex: adora dinossauros e jogos de estratégia, tem hiperfoco em astronomia..." style="width:100%;min-height:100px">${a.interesses||''}</textarea>
+      <p style="font-size:12px;color:var(--muted);margin-bottom:10px">A IA usará esses interesses para tornar o conteúdo mais relevante para o aluno.</p>
+      <textarea id="p-interesses" rows="3" placeholder="Ex: adora dinossauros, tem hiperfoco em astronomia, gosta de Minecraft..." style="width:100%;min-height:80px">${a.interesses||''}</textarea>
     </div>
     <div class="param-card" style="grid-column:1/-1">
       <h4>📌 Observações pedagógicas</h4>
-      <p style="font-size:12px;color:var(--muted);margin-bottom:10px">Contexto adicional sobre o aluno que a IA deve considerar na adaptação.</p>
-      <textarea id="p-obs" rows="5" placeholder="Ex: aprende melhor com exemplos do cotidiano, responde bem a desafios..." style="width:100%;min-height:120px">${a.obs||''}</textarea>
+      <p style="font-size:12px;color:var(--muted);margin-bottom:10px">Contexto adicional que a IA deve considerar na adaptação.</p>
+      <textarea id="p-obs" rows="4" placeholder="Ex: aprende melhor com exemplos do cotidiano, responde bem a desafios..." style="width:100%;min-height:100px">${a.obs||''}</textarea>
     </div>`;
-  document.getElementById('p-fragmentacao').addEventListener('change',function(){
-    renderParamGrid({...state.alunos.find(x=>x.id===state.alunoSelecionado),fragmentacao:this.value});
-  });
+
+  // Listener para o select de fragmentação quando aberto
+  const fragSel=document.getElementById('p-fragmentacao');
+  if(fragSel){
+    fragSel.addEventListener('change',function(){
+      renderParamGrid({...state.alunos.find(x=>x.id===state.alunoSelecionado),fragmentacao:this.value});
+    });
+  }
+}
+
+function togglePersonalizacao() {
+  const conteudo=document.getElementById('personalizacao-conteudo');
+  const seta=document.getElementById('personalizacao-seta');
+  if(!conteudo||!seta) return;
+  const aberto=conteudo.style.display!=='none';
+  conteudo.style.display=aberto?'none':'block';
+  seta.style.transform=aberto?'rotate(0deg)':'rotate(180deg)';
+}
+
+function atualizarDefaultsDiagnostico() {
+  const tea=document.getElementById('p-tea')?.checked||false;
+  const tdah=document.getElementById('p-tdah')?.checked||false;
+  const dislexia=document.getElementById('p-dislexia')?.checked||false;
+
+  // Só atualiza se o painel de personalização estiver fechado
+  const conteudo=document.getElementById('personalizacao-conteudo');
+  const painelAberto=conteudo&&conteudo.style.display!=='none';
+  if(painelAberto) return; // professor está personalizando manualmente, não sobrescreve
+
+  // Ajusta defaults baseado em diagnóstico
+  const fragSel=document.getElementById('p-fragmentacao');
+  const abstSel=document.getElementById('p-abstracao');
+  const medSel=document.getElementById('p-mediacao');
+
+  if(tea){
+    if(abstSel){abstSel.value='nao_abstrai';updateParamDesc('p-abstracao');}
+    if(medSel){medSel.value='passo_a_passo';updateParamDesc('p-mediacao');}
+    if(fragSel){fragSel.value='alta';updateParamDesc('p-fragmentacao');}
+    showToast('⚠️ TEA ativo: parâmetros ajustados automaticamente','warn');
+  } else if(tdah){
+    if(fragSel){fragSel.value='alta';updateParamDesc('p-fragmentacao');}
+    if(medSel){medSel.value='passo_a_passo';updateParamDesc('p-mediacao');}
+  } else if(dislexia){
+    if(fragSel){fragSel.value='alta';updateParamDesc('p-fragmentacao');}
+  }
 }
 
 function openModalNovoAluno() {
