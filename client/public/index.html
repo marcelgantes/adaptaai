@@ -444,7 +444,10 @@ h1,h2,h3,h4{font-family:'Syne',sans-serif;}
         <div class="progress-bar" id="prog-bar"><div class="progress-fill" id="prog-fill" style="width:0%"></div></div>
         <div id="resultado-area" style="display:none;margin-top:28px">
           <div class="divider"></div>
-          <div class="section-title">3. Adaptações geradas</div>
+          <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:16px">
+            <div class="section-title" style="margin-bottom:0">3. Adaptações geradas</div>
+            <button class="btn btn-secondary" style="width:auto" onclick="novaAdaptacao()">🔄 Nova adaptação</button>
+          </div>
           <div class="alert alert-success">✅ Adaptações prontas!</div>
           <div class="resultado-tabs" id="resultado-tabs"></div>
           <div class="resultado-box"><div class="resultado-content" id="resultado-text"></div></div>
@@ -2224,6 +2227,32 @@ function showToast(msg,type) {
   const t=document.createElement('div');
   t.style.cssText=`position:fixed;bottom:24px;right:24px;padding:14px 20px;border-radius:12px;font-size:14px;font-weight:500;z-index:9999;animation:fadeUp 0.3s ease;background:${type==='warn'?'#fb923c22':'#34d39922'};border:1px solid ${type==='warn'?'#fb923c':'#34d399'};color:${type==='warn'?'#fb923c':'#34d399'};font-family:'DM Sans',sans-serif;backdrop-filter:blur(10px);`;
   t.textContent=msg;document.body.appendChild(t);setTimeout(()=>t.remove(),3000);
+}
+
+function novaAdaptacao() {
+  // Limpa tudo da adaptação atual
+  state.adaptacoes={};
+  state.alunoAdaptacaoAtual=null;
+  state.imagemMaterial=null;
+  // Limpa campos de texto
+  document.getElementById('material-texto').value='';
+  document.getElementById('material-disciplina').value='';
+  document.getElementById('material-nome').value='';
+  // Reseta upload zone
+  setUploadState('idle');
+  // Limpa seleção de turma e alunos
+  document.getElementById('adaptar-turma').value='';
+  document.getElementById('aluno-select-list').innerHTML='<div class="empty-state"><div class="empty-icon">👆</div><p>Selecione uma turma acima</p></div>';
+  // Esconde resultado
+  document.getElementById('resultado-area').style.display='none';
+  document.getElementById('resultado-tabs').innerHTML='';
+  document.getElementById('resultado-text').innerHTML='';
+  // Fecha prévia se aberta
+  document.getElementById('previa-docx').style.display='none';
+  document.getElementById('btn-previa').textContent='👁 Prévia do DOCX';
+  // Scroll para o topo
+  document.querySelector('.main-content').scrollTop=0;
+  showToast('✅ Pronto para nova adaptação!');
 }
 
 function togglePrevia() {
