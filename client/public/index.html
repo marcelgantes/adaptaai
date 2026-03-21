@@ -1282,6 +1282,7 @@ function parseAdaptacao(texto) {
 }
 
 function renderAdaptacaoHtml(adaptacao) {
+  if(!adaptacao||!adaptacao.tipo) return '<div style="padding:20px;color:var(--danger)">⚠️ Não foi possível gerar a adaptação. Verifique sua conexão e tente novamente.</div>';
   if(adaptacao.tipo==='texto') {
     const{registro,material}=extrairBlocos(adaptacao.data);
     return (registro?`<div style="background:rgba(37,99,235,0.06);border:1px solid rgba(37,99,235,0.2);border-radius:10px;padding:14px 16px;margin-bottom:16px;font-size:13px">
@@ -1290,8 +1291,8 @@ function renderAdaptacaoHtml(adaptacao) {
       +markdownParaHtml(material);
   }
   const d=adaptacao.data;
+  if(!d) return '<div style="padding:20px;color:var(--danger)">⚠️ Resposta inválida da IA. Tente novamente.</div>';
   let html=`
-  <div style="font-family:'DM Sans',sans-serif;max-width:720px">
     <div style="text-align:center;padding:0 0 24px;border-bottom:1px solid var(--border);margin-bottom:24px">
       <span style="display:inline-block;padding:4px 14px;background:rgba(37,99,235,0.1);color:var(--accent);border-radius:20px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:10px">${esc2(d.disciplina||'')}</span>
       <h2 style="font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:var(--text);margin:0 0 10px">${esc2(d.nomeAtividade||'')}</h2>
