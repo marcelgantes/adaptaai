@@ -357,7 +357,8 @@ h1,h2,h3,h4{font-family:'Syne',sans-serif;}
             <div class="field"><label>Estado de atuação</label>
               <select id="perfil-estado">
                 <option value="BNCC">Nacional (BNCC)</option>
-                <option value="RS">Rio Grande do Sul — Currículo Gaúcho</option>
+                <option value="RS">Rio Grande do Sul — Referencial Curricular Gaúcho</option>
+                <option value="RS_RG">Rio Grande/RS — Documento Orientador Rio-grandino</option>
                 <option value="SP">São Paulo — Currículo Paulista</option>
                 <option value="RJ">Rio de Janeiro — Currículo Carioca</option>
                 <option value="MG">Minas Gerais — CBC/BNCC</option>
@@ -1080,12 +1081,20 @@ function loadAlunosPei() {
 function buildPrompt(aluno, texto, disciplina, nomeAtiv) {
   const meta = state.user?.user_metadata || {};
   const estado = meta.estado || 'BNCC';
-  const refCurr = estado === 'RS' ? 'Referencial Curricular Gaúcho'
+  const refCurr = estado === 'RS_RG' ? 'Documento Orientador Curricular do Território Rio-grandino (SMEd/Rio Grande-RS)'
+    : estado === 'RS' ? 'Referencial Curricular Gaúcho'
     : estado === 'SP' ? 'Currículo Paulista'
     : estado === 'RJ' ? 'Currículo Carioca'
     : estado === 'PR' ? 'CREP/Paraná'
     : estado === 'SC' ? 'DCSC/Santa Catarina'
     : 'BNCC';
+
+  // Instrução adicional para Rio Grande município
+  const instrucaoMunicipal = estado === 'RS_RG' ? `
+REFERENCIAL MUNICIPAL — Rio Grande/RS:
+O professor atua no município de Rio Grande/RS. O documento orientador curricular local é o "Documento Orientador Curricular do Território Rio-grandino", publicado pela SMEd em 2020, disponível em https://www.riogrande.rs.gov.br/smed/?page_id=38648.
+Este documento é alinhado à BNCC e obrigatório para todas as redes de ensino do município.
+Nas habilidadesEstadual, use o Documento Rio-grandino como referência. Se não houver código municipal específico para o conteúdo, referencie a habilidade BNCC com a nota: "Alinhado ao Documento Orientador Curricular do Território Rio-grandino — SMEd Rio Grande/RS".` : '';
   const discProf = meta.disciplinas?.length ? meta.disciplinas.join(', ') : (disciplina || 'Geral');
 
   // ── BLOCO 1: ESTRUTURA DO TEXTO ──────────────────────────────
@@ -1215,7 +1224,7 @@ PERFIL DO ALUNO:
 CONTEXTO PEDAGÓGICO:
 - Disciplina: ${discProf}
 - Referência curricular: ${refCurr}
-- Escola: ${meta.escola || '—'}
+- Escola: ${meta.escola || '—'}${instrucaoMunicipal}
 
 MATERIAL ORIGINAL:
 ${texto}
@@ -2202,7 +2211,7 @@ function buildPromptPei(aluno,turma,planejamento,periodo,professor,disciplina) {
   const medMap={autonomo:'Autônomo',guiado:'Guiado',passo_a_passo:'Passo a passo'};
   const conds=[];if(aluno.dislexia) conds.push('Dislexia');if(aluno.tdah) conds.push('TDAH');if(aluno.tea) conds.push('TEA');if(aluno.baixa_visao) conds.push('Baixa visão');if(aluno.altas_habilidades) conds.push('Altas habilidades/Superdotação');
   const meta=state.user?.user_metadata||{};
-  const refCurr=meta.estado==='RS'?'Referencial Curricular Gaúcho':meta.estado==='SP'?'Currículo Paulista':'BNCC';
+  const refCurr=meta.estado==='RS_RG'?'Documento Orientador Curricular do Território Rio-grandino (SMEd/Rio Grande-RS)':meta.estado==='RS'?'Referencial Curricular Gaúcho':meta.estado==='SP'?'Currículo Paulista':'BNCC';
   return `Você é especialista em educação inclusiva e legislação brasileira. Gere um PEI completo.
 DADOS: Aluno: ${aluno.nome} | Turma: ${turma.nome} | Etapa: ${turma.etapa.toUpperCase()} | Disciplina: ${disciplina||turma.disciplina} | Professor(a): ${professor||meta.name||'—'} | Período: ${periodo||'—'} | Escola: ${meta.escola||'—'} | Ref. Curr.: ${refCurr}
 PERFIL: Leitura: ${fragMap[aluno.fragmentacao]||aluno.fragmentacao} | Abstração: ${abstMap[aluno.abstracao]||aluno.abstracao} | Mediação: ${medMap[aluno.mediacao]||aluno.mediacao} | Condições: ${conds.length?conds.join(', '):'Não especificadas'} | Observações: ${aluno.obs||'Nenhuma'} | Interesses: ${aluno.interesses||'Não informado'}
