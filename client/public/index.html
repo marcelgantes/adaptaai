@@ -1480,6 +1480,11 @@ async function gerarAdaptacoes() {
   progBar.classList.remove('show');progFill.style.width='0%';
   document.getElementById('btn-gerar').disabled=false;
   showToast(`✅ ${total} adaptação${total>1?'ões':''} pronta${total>1?'s':''}!`);
+  // Scroll automático para mostrar a adaptação gerada
+  setTimeout(()=>{
+    const resultArea=document.getElementById('resultado-area');
+    if(resultArea) resultArea.scrollIntoView({behavior:'smooth',block:'start'});
+  }, 300);
 }
 
 function parseAdaptacao(texto) {
@@ -1650,9 +1655,11 @@ function renderRegistroPedagogicoHtml(adaptacao) {
   if(aluno?.altas_habilidades) conds.push('Altas habilidades');
 
   return `<div style="font-family:'DM Sans',sans-serif;max-width:720px">
+
+    <!-- Cabeçalho identificador -->
     <div style="background:rgba(124,58,237,0.06);border:1px solid rgba(124,58,237,0.2);border-radius:14px;padding:20px;margin-bottom:16px">
       <div style="font-size:11px;font-weight:700;color:var(--accent2);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:12px">📋 Registro Pedagógico — Exclusivo do Professor</div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:13px;margin-bottom:12px">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:13px">
         <div><span style="color:var(--muted)">Aluno:</span> <strong>${aluno?.nome||'—'}</strong></div>
         <div><span style="color:var(--muted)">Disciplina:</span> <strong>${d.disciplina||'—'}</strong></div>
         <div><span style="color:var(--muted)">Referencial:</span> <strong>${rp.refCurr||meta.estado||'BNCC'}</strong></div>
@@ -1660,39 +1667,46 @@ function renderRegistroPedagogicoHtml(adaptacao) {
       </div>
     </div>
 
+    <!-- Objetivos -->
     <div style="background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:20px;margin-bottom:16px">
       <div style="font-weight:700;font-size:14px;margin-bottom:12px;color:var(--accent)">🎯 Objetivos de Aprendizagem</div>
-      ${(rp.objetivos||[]).map((o,i)=>`<div style="display:flex;gap:10px;margin-bottom:8px;font-size:13px"><span style="color:var(--accent);font-weight:700;flex-shrink:0">${i+1}.</span><span>${o}</span></div>`).join('')}
+      ${(rp.objetivos||[]).length
+        ? (rp.objetivos||[]).map((o,i)=>`<div style="display:flex;gap:10px;margin-bottom:8px;font-size:13px"><span style="color:var(--accent);font-weight:700;flex-shrink:0">${i+1}.</span><span>${o}</span></div>`).join('')
+        : '<p style="font-size:13px;color:var(--muted)">Nenhum objetivo gerado.</p>'}
     </div>
 
+    <!-- Habilidades BNCC -->
     <div style="background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:20px;margin-bottom:16px">
-      <div style="font-weight:700;font-size:14px;margin-bottom:12px;color:var(--accent2)">📚 Habilidades BNCC</div>
+      <div style="font-weight:700;font-size:14px;margin-bottom:4px;color:var(--accent2)">📚 Habilidades — Base Nacional Comum Curricular (BNCC)</div>
+      <p style="font-size:11px;color:var(--muted);margin-bottom:12px">Documento federal que orienta o currículo de todas as escolas brasileiras.</p>
       ${(rp.habilidadesBNCC||rp.habilidades||[]).length
-        ? (rp.habilidadesBNCC||rp.habilidades||[]).map(h=>`<div style="display:flex;gap:10px;margin-bottom:8px;font-size:13px;align-items:flex-start"><span style="background:rgba(124,58,237,0.1);color:var(--accent2);padding:2px 8px;border-radius:6px;font-size:11px;font-weight:700;flex-shrink:0;white-space:nowrap">${h.codigo}</span><span>${h.descricao}</span></div>`).join('')
-        : '<p style="font-size:13px;color:var(--muted)">Nenhuma habilidade BNCC identificada.</p>'}
-      <div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--border);font-size:11px;color:var(--muted)">
-        Códigos conforme a <strong>Base Nacional Comum Curricular (BNCC)</strong>.
-      </div>
+        ? (rp.habilidadesBNCC||rp.habilidades||[]).map(h=>`
+          <div style="display:flex;gap:10px;margin-bottom:10px;font-size:13px;align-items:flex-start;padding:10px;background:rgba(124,58,237,0.04);border-radius:8px">
+            <span style="background:rgba(124,58,237,0.12);color:var(--accent2);padding:3px 10px;border-radius:6px;font-size:11px;font-weight:700;flex-shrink:0;white-space:nowrap">${h.codigo}</span>
+            <span style="line-height:1.6">${h.descricao}</span>
+          </div>`).join('')
+        : '<p style="font-size:13px;color:var(--muted)">Nenhuma habilidade BNCC identificada para este conteúdo.</p>'}
     </div>
 
+    <!-- Habilidades Estadual -->
     ${(rp.habilidadesEstadual||[]).length ? `
     <div style="background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:20px;margin-bottom:16px">
-      <div style="font-weight:700;font-size:14px;margin-bottom:12px;color:var(--accent3)">🌿 Habilidades — ${rp.refCurr||meta.estado||'Referencial Estadual'}</div>
-      ${(rp.habilidadesEstadual||[]).map(h=>`<div style="display:flex;gap:10px;margin-bottom:8px;font-size:13px;align-items:flex-start"><span style="background:rgba(5,150,105,0.1);color:var(--accent3);padding:2px 8px;border-radius:6px;font-size:11px;font-weight:700;flex-shrink:0;white-space:nowrap">${h.codigo}</span><span>${h.descricao}</span></div>`).join('')}
-      <div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--border);font-size:11px;color:var(--muted)">
-        Códigos conforme o <strong>${rp.refCurr||'Referencial Curricular Estadual'}</strong>.
-      </div>
+      <div style="font-weight:700;font-size:14px;margin-bottom:4px;color:var(--accent3)">🌿 Habilidades — ${rp.refCurr||meta.estado||'Referencial Estadual'}</div>
+      <p style="font-size:11px;color:var(--muted);margin-bottom:12px">Documento orientador estadual que contextualiza a BNCC para a realidade local.</p>
+      ${(rp.habilidadesEstadual||[]).map(h=>`
+        <div style="display:flex;gap:10px;margin-bottom:10px;font-size:13px;align-items:flex-start;padding:10px;background:rgba(5,150,105,0.04);border-radius:8px">
+          <span style="background:rgba(5,150,105,0.12);color:var(--accent3);padding:3px 10px;border-radius:6px;font-size:11px;font-weight:700;flex-shrink:0;white-space:nowrap">${h.codigo}</span>
+          <span style="line-height:1.6">${h.descricao}</span>
+        </div>`).join('')}
     </div>` : ''}
 
-    <div style="background:#FFFBEB;border:2px dashed #FDE68A;border-radius:14px;padding:20px;margin-bottom:16px">
-      <div style="font-weight:700;font-size:13px;color:#92400E;margin-bottom:8px">💡 Dica Pedagógica</div>
-      <p style="font-size:13px;color:#78350F;margin:0;line-height:1.7">${d.dicaPedagogica||'—'}</p>
-    </div>
-
-    ${rp.orientacoes?`<div style="background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:20px">
-      <div style="font-weight:700;font-size:14px;margin-bottom:10px;color:var(--accent3)">📝 Orientações Metodológicas</div>
+    <!-- Orientações Metodológicas -->
+    ${rp.orientacoes ? `
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:20px;margin-bottom:16px">
+      <div style="font-weight:700;font-size:14px;margin-bottom:10px;color:var(--accent)">📝 Orientações Metodológicas</div>
       <p style="font-size:13px;line-height:1.8;margin:0">${rp.orientacoes}</p>
-    </div>`:''}
+    </div>` : ''}
+
   </div>`;
 }
 
@@ -2344,7 +2358,6 @@ async function baixarRegistroProfessor() {
     textoParts.push('',`---Habilidades ${rp.refCurr||'Referencial Estadual'}---`,'');
     rp.habilidadesEstadual.forEach(h=>textoParts.push(`${h.codigo} — ${h.descricao}`));
   }
-  textoParts.push('','---Dica Pedagógica---','',d.dicaPedagogica||'—');
   if(rp.orientacoes) textoParts.push('','---Orientações Metodológicas---','',rp.orientacoes);
   try{
     await criarDocx(`Registro_${nome}.docx`,`Registro Pedagógico — ${nome}`,textoParts.join('\n'));
