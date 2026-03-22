@@ -743,9 +743,11 @@ async function salvarHistoricoComConteudo(item, conteudo) {
 
   const{data,error}=await sb.from('historico').insert({...item, conteudo:conteudoCompacto, user_id:state.user.id}).select().single();
   if(error){
-    // Se falhou por tamanho, salva sem conteúdo
-    console.warn('Histórico: erro ao salvar com conteúdo, salvando sem:', error.message);
-    const{data:d2}=await sb.from('historico').insert({...item, user_id:state.user.id}).select().single();
+    showToast(`❌ Histórico erro: ${error.message}`,'warn');
+    console.warn('Histórico erro completo:', error);
+    // Tenta salvar sem conteúdo
+    const{data:d2, error:e2}=await sb.from('historico').insert({...item, user_id:state.user.id}).select().single();
+    if(e2) showToast(`❌ Histórico falhou completamente: ${e2.message}`,'warn');
     if(d2) state.historico.unshift(d2);
   } else {
     if(data) state.historico.unshift(data);
