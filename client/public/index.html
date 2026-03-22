@@ -11,6 +11,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="/habilidades_rg.js"></script>
 <style>
 :root {
   --bg:#f0f4f8;--surface:#fff;--surface2:#e8eef5;--border:#d0dae6;
@@ -1090,23 +1091,35 @@ function buildPrompt(aluno, texto, disciplina, nomeAtiv) {
     : 'BNCC';
 
   // Instrução adicional para Rio Grande município
-  const instrucaoMunicipal = estado === 'RS_RG' ? `
+  // Instrução adicional para Rio Grande município — injeta habilidades reais do documento
+  let instrucaoMunicipal = '';
+  if (estado === 'RS_RG') {
+    const mapaDiscRG = {
+      'Biologia':'CI','Ciências':'CI','Química':'CI','Física':'CI',
+      'Língua Portuguesa':'LP','Português':'LP',
+      'Matemática':'MA','História':'HI','Geografia':'GE',
+      'Artes':'AR','Educação Física':'EF','Inglês':'LI','Espanhol':'LE',
+    };
+    const etapas = meta.etapas || [];
+    const etapaRG = etapas.includes('ef2') ? 'ef2' : 'ef1';
+    const discAtual = (disciplina || meta.disciplinas?.[0] || '').trim();
+    const codDisc = mapaDiscRG[discAtual];
+    let habReais = 'Consulte o documento oficial da SMEd para os códigos desta disciplina.';
+    if (codDisc && typeof HABILIDADES_RG !== 'undefined' && HABILIDADES_RG[codDisc]?.[etapaRG]) {
+      const lista = HABILIDADES_RG[codDisc][etapaRG].slice(0, 30);
+      habReais = lista.map(h => `${h.c}: ${h.d}`).join('\n');
+    }
+    instrucaoMunicipal = `
 
 REFERENCIAL MUNICIPAL — Rio Grande/RS:
-O professor atua no município de Rio Grande/RS. O documento orientador curricular local é o "Documento Orientador Curricular do Território Rio-grandino", publicado pela SMEd em 2020.
-Disponível em: https://www.riogrande.rs.gov.br/smed/?page_id=38648
-Documento EF: https://www.riogrande.rs.gov.br/smed/externo/20200324-doc_ensino_fundamental.pdf
-Documento EI: https://www.riogrande.rs.gov.br/smed/externo/20200331-ped-doc_educacao_infantil.pdf
+Documento: "Documento Orientador Curricular do Território Rio-grandino" (SMEd/Rio Grande-RS, 2020)
+URL: https://www.riogrande.rs.gov.br/smed/?page_id=38648
 
-FORMATO DOS CÓDIGOS RIO-GRANDINOS:
-O documento usa o código BNCC acrescido do sufixo municipal. Exemplos reais:
-- EF12LP11–RG11 (habilidade de LP para 1º e 2º ano, especificação Rio-grandina 11)
-- EF15AR01–RG01 (habilidade de Artes para 1º ao 5º ano, especificação Rio-grandina 01)
-O padrão é: [código BNCC]–RG[número sequencial]
+HABILIDADES REAIS DO DOCUMENTO RIO-GRANDINO — ${discAtual||'disciplina'} (${etapaRG==='ef2'?'Anos Finais EF':'Anos Iniciais EF'}):
+${habReais}
 
-Nas habilidadesEstadual, use OBRIGATORIAMENTE este formato composto: código BNCC + sufixo –RGxx.
-Se não souber o número RG exato, use –RG01, –RG02, etc. sequencialmente.
-Nunca invente códigos BNCC — use sempre códigos reais.` : '';
+INSTRUÇÃO CRÍTICA: Use EXCLUSIVAMENTE os códigos listados acima nas habilidadesEstadual. NÃO invente códigos. Selecione os 2 a 4 mais relevantes para o conteúdo adaptado.`;
+  }
   const discProf = meta.disciplinas?.length ? meta.disciplinas.join(', ') : (disciplina || 'Geral');
 
   // ── BLOCO 1: ESTRUTURA DO TEXTO ──────────────────────────────
