@@ -1091,10 +1091,22 @@ function buildPrompt(aluno, texto, disciplina, nomeAtiv) {
 
   // Instrução adicional para Rio Grande município
   const instrucaoMunicipal = estado === 'RS_RG' ? `
+
 REFERENCIAL MUNICIPAL — Rio Grande/RS:
-O professor atua no município de Rio Grande/RS. O documento orientador curricular local é o "Documento Orientador Curricular do Território Rio-grandino", publicado pela SMEd em 2020, disponível em https://www.riogrande.rs.gov.br/smed/?page_id=38648.
-Este documento é alinhado à BNCC e obrigatório para todas as redes de ensino do município.
-Nas habilidadesEstadual, use o Documento Rio-grandino como referência. Se não houver código municipal específico para o conteúdo, referencie a habilidade BNCC com a nota: "Alinhado ao Documento Orientador Curricular do Território Rio-grandino — SMEd Rio Grande/RS".` : '';
+O professor atua no município de Rio Grande/RS. O documento orientador curricular local é o "Documento Orientador Curricular do Território Rio-grandino", publicado pela SMEd em 2020.
+Disponível em: https://www.riogrande.rs.gov.br/smed/?page_id=38648
+Documento EF: https://www.riogrande.rs.gov.br/smed/externo/20200324-doc_ensino_fundamental.pdf
+Documento EI: https://www.riogrande.rs.gov.br/smed/externo/20200331-ped-doc_educacao_infantil.pdf
+
+FORMATO DOS CÓDIGOS RIO-GRANDINOS:
+O documento usa o código BNCC acrescido do sufixo municipal. Exemplos reais:
+- EF12LP11–RG11 (habilidade de LP para 1º e 2º ano, especificação Rio-grandina 11)
+- EF15AR01–RG01 (habilidade de Artes para 1º ao 5º ano, especificação Rio-grandina 01)
+O padrão é: [código BNCC]–RG[número sequencial]
+
+Nas habilidadesEstadual, use OBRIGATORIAMENTE este formato composto: código BNCC + sufixo –RGxx.
+Se não souber o número RG exato, use –RG01, –RG02, etc. sequencialmente.
+Nunca invente códigos BNCC — use sempre códigos reais.` : '';
   const discProf = meta.disciplinas?.length ? meta.disciplinas.join(', ') : (disciplina || 'Geral');
 
   // ── BLOCO 1: ESTRUTURA DO TEXTO ──────────────────────────────
@@ -1255,7 +1267,7 @@ Responda APENAS com este JSON (sem markdown, sem \`\`\`):
   "registroPedagogico": {
     "objetivos": ["objetivo de aprendizagem 1", "objetivo 2", "objetivo 3"],
     "habilidadesBNCC": [{"codigo": "EF06CI01", "descricao": "descrição da habilidade conforme BNCC"}],
-    "habilidadesEstadual": [{"codigo": "código estadual ou BNCC", "descricao": "descrição conforme ${refCurr}"}],
+    "habilidadesEstadual": [{"codigo": "EF06CI01–RG01", "descricao": "descrição conforme ${refCurr} — formato: código BNCC + sufixo –RGxx para Rio Grande/RS"}],
     "refCurr": "${refCurr}",
     "orientacoes": "orientações metodológicas específicas para trabalhar este conteúdo com este perfil de aluno",
     "dicaPedagogica": "sugestão prática e concreta específica para o diagnóstico deste aluno"
