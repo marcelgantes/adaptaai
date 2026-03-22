@@ -721,8 +721,35 @@ async function salvarHistorico(item) {
 }
 
 async function salvarHistoricoComConteudo(item, conteudo) {
-  const{data}=await sb.from('historico').insert({...item, conteudo, user_id:state.user.id}).select().single();
-  if(data) state.historico.unshift(data);
+  // Remove habilidades RG brutas do conteúdo antes de salvar — são grandes e reconstruíveis
+  let conteudoCompacto = conteudo;
+  try {
+    if (conteudo?.tipo === 'json' && conteudo?.data?.registroPedagogico) {
+      const rp = conteudo.data.registroPedagogico;
+      // Limita cada lista de habilidades a 5 itens para economizar espaço
+      conteudoCompacto = {
+        ...conteudo,
+        data: {
+          ...conteudo.data,
+          registroPedagogico: {
+            ...rp,
+            habilidadesBNCC: (rp.habilidadesBNCC||rp.habilidades||[]).slice(0,5),
+            habilidadesEstadual: (rp.habilidadesEstadual||[]).slice(0,5),
+          }
+        }
+      };
+    }
+  } catch(e) { conteudoCompacto = conteudo; }
+
+  const{data,error}=await sb.from('historico').insert({...item, conteudo:conteudoCompacto, user_id:state.user.id}).select().single();
+  if(error){
+    // Se falhou por tamanho, salva sem conteúdo
+    console.warn('Histórico: erro ao salvar com conteúdo, salvando sem:', error.message);
+    const{data:d2}=await sb.from('historico').insert({...item, user_id:state.user.id}).select().single();
+    if(d2) state.historico.unshift(d2);
+  } else {
+    if(data) state.historico.unshift(data);
+  }
   renderHistorico();
 }
 
@@ -1301,6 +1328,43 @@ REGRAS CRÍTICAS:
 
 }
 
+// Prompt simplificado para partes 2+ de textos longos — sem habilidades RG, sem registro pedagógico
+// Isso reduz tokens e melhora a qualidade do JSON em partes secundárias
+function buildPromptContinuacao(aluno, texto, disciplina, numParte) {
+  const fragMap = {
+    baixa: 'Texto corrido, parágrafos fluidos.',
+    media: 'Parágrafos curtos, máximo 3 frases.',
+    alta: 'Blocos bem curtos, um conceito por item.',
+  };
+  const abstracaoEfetiva = aluno.tea ? 'nao_abstrai' : (aluno.abstracao || 'media');
+  const abstMap = {
+    alta: 'Use analogias e exemplos do cotidiano.',
+    media: 'Exemplos simples e diretos.',
+    baixa: 'Linguagem concreta e direta.',
+    nao_abstrai: 'Tudo literal. Zero metáforas.',
+  };
+  const conds = [];
+  if(aluno.tea) conds.push('TEA: linguagem 100% literal, previsibilidade explícita');
+  if(aluno.tdah) conds.push('TDAH: blocos curtos, um item por vez, pausas estratégicas');
+  if(aluno.dislexia) conds.push('Dislexia: frases curtas max 15 palavras, voz ativa');
+  if(aluno.tipografia==='bastao') conds.push('TODO o texto em CAIXA ALTA');
+
+  return `Você é especialista em educação inclusiva. Esta é a PARTE ${numParte} de um material longo. Reescreva APENAS esta parte respeitando o perfil do aluno. Responda SOMENTE com JSON válido.
+
+PERFIL: Estrutura: ${fragMap[aluno.fragmentacao]||fragMap['media']} | Abstração: ${abstMap[abstracaoEfetiva]} ${conds.length?'| '+conds.join(' | '):''}
+
+MATERIAL PARTE ${numParte}:
+${texto}
+
+JSON (sem markdown, sem \`\`\`):
+{
+  "passos": [{"numero": 1, "texto": "frase adaptada", "destaque": "palavra-chave"}],
+  "resumo": [{"titulo": "Conceito", "conteudo": "definição curta"}]
+}
+
+REGRAS: Preserve todos os fatos, nomes, datas e dados específicos. 4 a 6 passos. 2 a 4 resumos.`;
+}
+
 function buildPromptPictogramas(aluno,texto,disciplina,nomeAtiv) {
   return `Você é especialista em CAA e ARASAAC. Extraia 8-14 conceitos do material para um aluno NÃO ALFABETIZADO.
 REGRAS IMPORTANTES:
@@ -1407,10 +1471,32 @@ async function gerarAdaptacoes() {
 
   // Se for imagem, usa texto vazio — a IA vai ler a imagem diretamente
   const texto = textoDigitado || '[MATERIAL ENVIADO COMO IMAGEM — leia a imagem para extrair o conteúdo e adaptar]';
-  const partes = imagem ? [texto] : dividirTexto(texto);
-  const textoLongo=partes.length>1;
-  if(textoLongo) showToast(`📄 Texto longo — dividido em ${partes.length} partes`);
+  const textoLongo = !imagem && texto.length > 6000;
 
+  // Para textos longos: resume primeiro, depois adapta — uma chamada só
+  let textoParaAdaptar = texto;
+  if(textoLongo){
+    showToast('📄 Texto longo — resumindo antes de adaptar...');
+    progFill.style.width='10%';
+    try{
+      const resumoRaw = await chamarAPI(`Você é um assistente pedagógico. Leia o texto abaixo e produza um resumo estruturado com os conceitos principais, fatos importantes, datas, nomes e dados específicos. Preserve TODOS os dados concretos (nomes, datas, números, lugares). O resumo deve ter entre 1500 e 3000 caracteres, organizado em tópicos claros.
+
+TEXTO:
+${texto}
+
+Responda apenas com o resumo estruturado, sem explicações adicionais.`);
+      if(resumoRaw && resumoRaw.length > 200){
+        textoParaAdaptar = resumoRaw;
+        showToast('✅ Resumo gerado — adaptando...');
+      }
+    }catch(e){
+      // Se falhar o resumo, usa os primeiros 6000 chars
+      textoParaAdaptar = texto.substring(0, 6000);
+      showToast('⚠️ Resumo falhou — usando início do texto','warn');
+    }
+  }
+
+  progFill.style.width='20%';
   const total=alunosParaAdaptar.length;let done=0;
 
   // Mostra área de resultado imediatamente com tabs — resultado vai aparecendo progressivamente
@@ -1422,7 +1508,7 @@ async function gerarAdaptacoes() {
   for(const aluno of alunosParaAdaptar){
     if(aluno.fragmentacao==='nao_alfabetizado'){
       try{
-        const texto_resumido=imagem?'[veja a imagem]':texto.substring(0,6000);
+        const texto_resumido=imagem?'[veja a imagem]':textoParaAdaptar.substring(0,6000);
         const result=await chamarAPI(buildPromptPictogramas(aluno,texto_resumido,disciplina,nomeAtiv), imagem);
         let conceitos=[];
         try{conceitos=JSON.parse(result.replace(/```json|```/g,'').trim());}catch(e){}
@@ -1431,60 +1517,10 @@ async function gerarAdaptacoes() {
       }catch(e){state.adaptacoes[aluno.id]={tipo:'pictograma',conceitos:[],pictogramas:[],nomeAtiv,disciplina};}
     }else{
       try{
-        if(textoLongo){
-          const resultados=[];
-          for(let pi=0;pi<partes.length;pi++){
-            progFill.style.width=`${Math.round(((done+(pi+0.5)/partes.length)/total)*100)}%`;
-            const promptParte=buildPrompt(aluno,partes[pi],disciplina,pi===0?nomeAtiv:`${nomeAtiv} — parte ${pi+1}`);
-            let result='';
-            try{result=await chamarAPI(promptParte, pi===0?imagem:null);}
-            catch(e){result='';}
-            resultados.push(result);
-            if(pi<partes.length-1) await new Promise(r=>setTimeout(r,1000));
-          }
-
-          // Parseia cada parte como JSON — ignora partes inválidas
-          const jsons=resultados.map(r=>{
-            if(!r) return null;
-            try{
-              const clean=r.replace(/```json|```/g,'').trim();
-              // Tenta parsear direto
-              return JSON.parse(clean);
-            }catch(e){
-              // Tenta extrair JSON do meio do texto
-              const match=r.match(/\{[\s\S]*\}/);
-              if(match){try{return JSON.parse(match[0]);}catch(e2){return null;}}
-              return null;
-            }
-          }).filter(Boolean);
-
-          if(jsons.length>0){
-            const base=jsons[0];
-            // Renumera passos das partes extras para continuar a numeração
-            let numOffset=(base.passos||[]).length;
-            const passosExtras=jsons.slice(1).flatMap(j=>{
-              return (j.passos||[]).map(p=>({...p,numero:p.numero+numOffset}));
-            });
-            const resumoTodos=jsons.flatMap(j=>j.resumo||[]).slice(0,4);
-            const jsonFinal={
-              ...base,
-              nomeAtividade:nomeAtiv||base.nomeAtividade,
-              passos:[...(base.passos||[]),...passosExtras],
-              resumo:resumoTodos.length>0?resumoTodos:(base.resumo||[]),
-              // Questões e registro pedagógico sempre da primeira parte (mais completa)
-              questoes:base.questoes||[],
-              dicaPedagogica:base.dicaPedagogica||'',
-              registroPedagogico:base.registroPedagogico||{},
-            };
-            state.adaptacoes[aluno.id]={tipo:'json',data:jsonFinal};
-          } else {
-            state.adaptacoes[aluno.id]={tipo:'erro',msg:'⚠️ Não foi possível processar o material. Tente com um texto mais curto.'};
-          }
-        } else {
-          const result=await chamarAPI(buildPrompt(aluno,texto,disciplina,nomeAtiv), imagem);
-          if(!result) throw new Error('empty');
-          state.adaptacoes[aluno.id]=parseAdaptacao(result);
-        }
+        // Uma única chamada com o texto resumido ou original
+        const result=await chamarAPI(buildPrompt(aluno,textoParaAdaptar,disciplina,nomeAtiv), imagem);
+        if(!result) throw new Error('empty');
+        state.adaptacoes[aluno.id]=parseAdaptacao(result);
       }catch(e){
         const msg=e.message==='rate_limit'?'⚠️ Limite de requisições — aguarde 30s e tente novamente.':'⚠️ Erro de conexão. Tente novamente.';
         state.adaptacoes[aluno.id]={tipo:'erro',msg};
