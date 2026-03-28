@@ -8,7 +8,7 @@ const Auth = {
   async loginGoogle() {
     const { error } = await sb.auth.signInWithOAuth({
       provider: 'google',
-      options: { redirectTo: window.location.origin }
+      options: { redirectTo: window.location.origin + '/app' }
     });
     if (error) UI.toast('Erro ao entrar com Google: ' + error.message, 'erro');
   },
