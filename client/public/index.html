@@ -2,2784 +2,481 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Adapta Aí — Inclusão que funciona</title>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Adapta Aí</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/css/app.css">
+<script defer src="/_vercel/insights/script.js"></script>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════
+     TELA: LOGIN / CADASTRO
+════════════════════════════════════════════ -->
+<div id="tela-auth" class="tela ativa">
+  <div class="auth-container">
+    <div class="auth-logo">
+      <div class="logo-mark">✦</div>
+      <h1>Adapta Aí</h1>
+      <p>Inclusão que funciona na prática</p>
+    </div>
+
+    <!-- Abas -->
+    <div class="auth-tabs">
+      <button class="auth-tab ativa" data-tab="login" onclick="UI.trocarAba('login')">Entrar</button>
+      <button class="auth-tab" data-tab="cadastro" onclick="UI.trocarAba('cadastro')">Criar conta</button>
+    </div>
+
+    <!-- Login -->
+    <div id="form-login" class="auth-form">
+      <button class="btn-google" onclick="Auth.loginGoogle()">
+        <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#4285F4" d="M47.5 24.6c0-1.6-.1-3.1-.4-4.6H24v8.7h13.2c-.6 3-2.3 5.5-4.9 7.2v6h8c4.7-4.3 7.2-10.7 7.2-17.3z"/><path fill="#34A853" d="M24 48c6.5 0 11.9-2.1 15.9-5.8l-8-6c-2.1 1.4-4.8 2.3-7.9 2.3-6.1 0-11.2-4.1-13.1-9.6H2.6v6.2C6.5 42.8 14.7 48 24 48z"/><path fill="#FBBC05" d="M10.9 28.9c-.5-1.4-.7-2.8-.7-4.4s.3-3 .7-4.4v-6.2H2.6C1 17.2 0 20.5 0 24s1 6.8 2.6 9.9l8.3-5z"/><path fill="#EA4335" d="M24 9.5c3.4 0 6.5 1.2 8.9 3.5l6.7-6.7C35.9 2.5 30.4 0 24 0 14.7 0 6.5 5.2 2.6 14.1l8.3 6.2C12.8 13.6 17.9 9.5 24 9.5z"/></svg>
+        Entrar com Google
+      </button>
+      <div class="divisor"><span>ou</span></div>
+      <div class="campo">
+        <label>E-mail</label>
+        <input type="email" id="login-email" placeholder="professor@escola.edu.br" autocomplete="email">
+      </div>
+      <div class="campo">
+        <label>Senha</label>
+        <input type="password" id="login-senha" placeholder="••••••••" autocomplete="current-password">
+      </div>
+      <div id="login-erro" class="msg-erro" style="display:none"></div>
+      <button class="btn-primario" onclick="Auth.loginEmail()">Entrar</button>
+    </div>
+
+    <!-- Cadastro -->
+    <div id="form-cadastro" class="auth-form" style="display:none">
+      <button class="btn-google" onclick="Auth.loginGoogle()">
+        <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#4285F4" d="M47.5 24.6c0-1.6-.1-3.1-.4-4.6H24v8.7h13.2c-.6 3-2.3 5.5-4.9 7.2v6h8c4.7-4.3 7.2-10.7 7.2-17.3z"/><path fill="#34A853" d="M24 48c6.5 0 11.9-2.1 15.9-5.8l-8-6c-2.1 1.4-4.8 2.3-7.9 2.3-6.1 0-11.2-4.1-13.1-9.6H2.6v6.2C6.5 42.8 14.7 48 24 48z"/><path fill="#FBBC05" d="M10.9 28.9c-.5-1.4-.7-2.8-.7-4.4s.3-3 .7-4.4v-6.2H2.6C1 17.2 0 20.5 0 24s1 6.8 2.6 9.9l8.3-5z"/><path fill="#EA4335" d="M24 9.5c3.4 0 6.5 1.2 8.9 3.5l6.7-6.7C35.9 2.5 30.4 0 24 0 14.7 0 6.5 5.2 2.6 14.1l8.3 6.2C12.8 13.6 17.9 9.5 24 9.5z"/></svg>
+        Cadastrar com Google
+      </button>
+      <div class="divisor"><span>ou</span></div>
+      <div class="campo">
+        <label>Seu nome</label>
+        <input type="text" id="cad-nome" placeholder="Prof. Maria Silva" autocomplete="name">
+      </div>
+      <div class="campo">
+        <label>E-mail</label>
+        <input type="email" id="cad-email" placeholder="professor@escola.edu.br" autocomplete="email">
+      </div>
+      <div class="campo">
+        <label>Senha</label>
+        <input type="password" id="cad-senha" placeholder="mínimo 6 caracteres" autocomplete="new-password">
+      </div>
+      <div id="cadastro-erro" class="msg-erro" style="display:none"></div>
+      <button class="btn-primario" onclick="Auth.cadastrarEmail()">Criar conta</button>
+      <p class="termos">Ao criar sua conta você concorda com nossa <a href="#" onclick="return false">Política de Privacidade</a>.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     TELA: PERFIL (preenchido após primeiro login)
+════════════════════════════════════════════ -->
+<div id="tela-perfil" class="tela" style="display:none">
+  <div class="perfil-container">
+    <div class="perfil-header">
+      <div class="logo-mark small">✦</div>
+      <h2>Complete seu perfil</h2>
+      <p>Isso ajuda a personalizar as adaptações para seus alunos</p>
+    </div>
+
+    <div class="campo">
+      <label>Qual disciplina você leciona?</label>
+      <select id="perfil-disciplina">
+        <option value="">Selecione...</option>
+        <option>Biologia</option>
+        <option>Ciências</option>
+        <option>Matemática</option>
+        <option>Física</option>
+        <option>Química</option>
+        <option>Língua Portuguesa</option>
+        <option>História</option>
+        <option>Geografia</option>
+        <option>Artes</option>
+        <option>Educação Física</option>
+        <option>Inglês</option>
+        <option>Espanhol</option>
+        <option>Filosofia</option>
+        <option>Sociologia</option>
+        <option>AEE</option>
+        <option>Outra</option>
+      </select>
+    </div>
+
+    <div class="campo">
+      <label>Para quais níveis você leciona?</label>
+      <div class="checkboxes-nivel">
+        <label class="check-nivel"><input type="checkbox" value="ei"> <span>Educação Infantil</span></label>
+        <label class="check-nivel"><input type="checkbox" value="ef1"> <span>EF I (1º ao 5º)</span></label>
+        <label class="check-nivel"><input type="checkbox" value="ef2"> <span>EF II (6º ao 9º)</span></label>
+        <label class="check-nivel"><input type="checkbox" value="em"> <span>Ensino Médio</span></label>
+      </div>
+    </div>
+
+    <div class="campo">
+      <label>Estado</label>
+      <select id="perfil-estado">
+        <option value="">Selecione...</option>
+        <option value="AC">Acre</option>
+        <option value="AL">Alagoas</option>
+        <option value="AM">Amazonas</option>
+        <option value="AP">Amapá</option>
+        <option value="BA">Bahia</option>
+        <option value="CE">Ceará</option>
+        <option value="DF">Distrito Federal</option>
+        <option value="ES">Espírito Santo</option>
+        <option value="GO">Goiás</option>
+        <option value="MA">Maranhão</option>
+        <option value="MG">Minas Gerais</option>
+        <option value="MS">Mato Grosso do Sul</option>
+        <option value="MT">Mato Grosso</option>
+        <option value="PA">Pará</option>
+        <option value="PB">Paraíba</option>
+        <option value="PE">Pernambuco</option>
+        <option value="PI">Piauí</option>
+        <option value="PR">Paraná</option>
+        <option value="RJ">Rio de Janeiro</option>
+        <option value="RN">Rio Grande do Norte</option>
+        <option value="RO">Rondônia</option>
+        <option value="RR">Roraima</option>
+        <option value="RS">Rio Grande do Sul</option>
+        <option value="SC">Santa Catarina</option>
+        <option value="SE">Sergipe</option>
+        <option value="SP">São Paulo</option>
+        <option value="TO">Tocantins</option>
+      </select>
+    </div>
+
+    <div class="campo">
+      <label>Cidade</label>
+      <input type="text" id="perfil-cidade" placeholder="Ex: Rio Grande">
+    </div>
+
+    <div id="perfil-erro" class="msg-erro" style="display:none"></div>
+    <button class="btn-primario" onclick="Auth.salvarPerfil()">Salvar e continuar →</button>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     APP PRINCIPAL
+════════════════════════════════════════════ -->
+<div id="tela-app" class="tela" style="display:none">
+
+  <!-- Topbar mobile -->
+  <div class="topbar-mobile">
+    <div class="topbar-logo">✦ Adapta Aí</div>
+    <button class="btn-menu" onclick="UI.toggleMenu()" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+
+  <div class="app-layout">
+
+    <!-- Sidebar -->
+    <nav class="sidebar" id="sidebar">
+      <div class="sidebar-logo">
+        <div class="logo-mark small">✦</div>
+        <span>Adapta Aí</span>
+      </div>
+      <div class="sidebar-nav">
+        <button class="nav-item ativo" data-tela="turmas" onclick="UI.navegar('turmas')">
+          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          Turmas
+        </button>
+        <button class="nav-item" data-tela="historico" onclick="UI.navegar('historico')">
+          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+          Histórico
+        </button>
+      </div>
+      <div class="sidebar-footer">
+        <div class="user-info">
+          <div class="user-avatar" id="user-avatar">?</div>
+          <div class="user-dados">
+            <span id="user-nome">Professor</span>
+            <span id="user-disciplina" class="user-sub"></span>
+          </div>
+        </div>
+        <button class="btn-sair" onclick="Auth.sair()" title="Sair">
+          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        </button>
+      </div>
+    </nav>
+
+    <!-- Overlay mobile -->
+    <div class="sidebar-overlay" id="sidebar-overlay" onclick="UI.fecharMenu()"></div>
+
+    <!-- Conteúdo principal -->
+    <main class="app-main">
+
+      <!-- PÁGINA: TURMAS -->
+      <div id="pagina-turmas" class="pagina ativa">
+        <div class="pagina-header">
+          <h2>Minhas Turmas</h2>
+          <button class="btn-primario btn-sm" onclick="Turmas.abrirModalNova()">+ Nova turma</button>
+        </div>
+        <div id="turmas-lista" class="turmas-grid">
+          <!-- renderizado via JS -->
+        </div>
+      </div>
+
+      <!-- PÁGINA: DETALHE DA TURMA -->
+      <div id="pagina-turma-detalhe" class="pagina" style="display:none">
+        <div class="pagina-header">
+          <button class="btn-voltar" onclick="UI.navegar('turmas')">← Voltar</button>
+          <div class="header-info">
+            <h2 id="detalhe-turma-nome"></h2>
+            <span id="detalhe-turma-meta" class="header-meta"></span>
+          </div>
+          <button class="btn-primario btn-sm" onclick="Alunos.abrirModalNovo()">+ Novo aluno</button>
+        </div>
+        <div id="alunos-lista" class="alunos-grid">
+          <!-- renderizado via JS -->
+        </div>
+      </div>
+
+      <!-- PÁGINA: ADAPTAÇÃO -->
+      <div id="pagina-adaptacao" class="pagina" style="display:none">
+        <div class="pagina-header">
+          <button class="btn-voltar" onclick="UI.voltarDaAdaptacao()">← Voltar</button>
+          <h2>Adaptar material</h2>
+        </div>
+        <div class="adaptacao-layout">
+          <div class="adaptacao-aluno-info" id="adaptacao-aluno-info"></div>
+
+          <!-- Upload -->
+          <div class="upload-area" id="upload-area"
+            ondragover="event.preventDefault();this.classList.add('dragover')"
+            ondragleave="this.classList.remove('dragover')"
+            ondrop="Adaptacao.handleDrop(event)">
+            <input type="file" id="upload-input" accept=".pdf,.docx,.doc,.txt"
+              onchange="Adaptacao.handleFile(this.files[0])" style="display:none">
+            <div id="upload-idle">
+              <div class="upload-icon">📄</div>
+              <p><strong>Arraste o arquivo aqui</strong></p>
+              <p class="upload-sub">PDF, DOCX ou TXT</p>
+              <button class="btn-secundario btn-sm" onclick="document.getElementById('upload-input').click()">
+                Escolher arquivo
+              </button>
+            </div>
+            <div id="upload-ok" style="display:none">
+              <div class="upload-icon">✅</div>
+              <p id="upload-nome-arquivo"></p>
+              <button class="btn-link" onclick="Adaptacao.limparArquivo()">Trocar arquivo</button>
+            </div>
+          </div>
+
+          <!-- Ou cole o texto -->
+          <div class="ou-cole">
+            <span>ou cole o texto diretamente</span>
+          </div>
+          <textarea id="material-texto" placeholder="Cole aqui o conteúdo do material..." rows="6"></textarea>
+
+          <!-- Botão gerar -->
+          <button class="btn-primario btn-gerar" id="btn-gerar" onclick="Adaptacao.gerar()">
+            ✨ Gerar adaptação
+          </button>
+
+          <!-- Progresso -->
+          <div class="progresso" id="progresso" style="display:none">
+            <div class="progresso-barra">
+              <div class="progresso-fill" id="progresso-fill"></div>
+            </div>
+            <p id="progresso-msg">Gerando adaptação...</p>
+          </div>
+
+          <!-- Resultado -->
+          <div id="resultado-area" style="display:none">
+            <div class="resultado-header">
+              <h3>Adaptação gerada</h3>
+              <button class="btn-link" onclick="Adaptacao.novaAdaptacao()">🔄 Nova adaptação</button>
+            </div>
+            <div id="resultado-conteudo" class="resultado-conteudo"></div>
+
+            <!-- Personalizar -->
+            <details class="personalizar-bloco">
+              <summary>⚙️ Personalizar adaptação</summary>
+              <div class="personalizar-grid" id="personalizar-grid">
+                <label class="param-check"><input type="checkbox" value="fonte_ampliada"> <span><strong>Fonte ampliada</strong> — texto maior para facilitar leitura</span></label>
+                <label class="param-check"><input type="checkbox" value="espacamento"> <span><strong>Espaçamento ampliado</strong> — mais espaço entre linhas</span></label>
+                <label class="param-check"><input type="checkbox" value="frases_curtas"> <span><strong>Frases curtas</strong> — máximo 15 palavras por frase</span></label>
+                <label class="param-check"><input type="checkbox" value="vocabulario"> <span><strong>Vocabulário acessível</strong> — troca termos complexos</span></label>
+                <label class="param-check"><input type="checkbox" value="sem_metaforas"> <span><strong>Sem metáforas</strong> — linguagem 100% literal</span></label>
+                <label class="param-check"><input type="checkbox" value="destacar_chave"> <span><strong>Destacar palavras-chave</strong> — negrito nos termos importantes</span></label>
+                <label class="param-check"><input type="checkbox" value="caixa_alta"> <span><strong>Caixa alta</strong> — todo o texto em maiúsculas</span></label>
+                <label class="param-check"><input type="checkbox" value="uma_coluna"> <span><strong>Diagramação em uma coluna</strong> — layout linear</span></label>
+              </div>
+              <button class="btn-secundario btn-sm" onclick="Adaptacao.regerarComPersonalizacao()" style="margin-top:12px">
+                Regerar com personalizações
+              </button>
+            </details>
+
+            <!-- Downloads -->
+            <div class="downloads">
+              <button class="btn-download docx" onclick="Downloads.baixarDocx()">
+                📥 Baixar DOCX
+              </button>
+              <button class="btn-download pdf" onclick="Downloads.baixarPdf()">
+                🖨️ Baixar PDF
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PÁGINA: HISTÓRICO -->
+      <div id="pagina-historico" class="pagina" style="display:none">
+        <div class="pagina-header">
+          <h2>Histórico</h2>
+        </div>
+        <div id="historico-lista">
+          <!-- renderizado via JS -->
+        </div>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     MODAIS
+════════════════════════════════════════════ -->
+
+<!-- Modal: Nova turma -->
+<div id="modal-nova-turma" class="modal-overlay" style="display:none" onclick="UI.fecharModal(event)">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>Nova turma</h3>
+      <button class="btn-fechar" onclick="UI.fecharModalId('modal-nova-turma')">✕</button>
+    </div>
+    <div class="campo">
+      <label>Nome da turma</label>
+      <input type="text" id="turma-nome" placeholder="Ex: 7º Ano A" autocomplete="off">
+    </div>
+    <div class="campo">
+      <label>Ano letivo</label>
+      <input type="text" id="turma-ano" placeholder="Ex: 2026" value="2026" autocomplete="off">
+    </div>
+    <div id="modal-turma-erro" class="msg-erro" style="display:none"></div>
+    <div class="modal-footer">
+      <button class="btn-secundario" onclick="UI.fecharModalId('modal-nova-turma')">Cancelar</button>
+      <button class="btn-primario" onclick="Turmas.salvar()">Criar turma</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Editar turma -->
+<div id="modal-editar-turma" class="modal-overlay" style="display:none" onclick="UI.fecharModal(event)">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>Editar turma</h3>
+      <button class="btn-fechar" onclick="UI.fecharModalId('modal-editar-turma')">✕</button>
+    </div>
+    <div class="campo">
+      <label>Nome da turma</label>
+      <input type="text" id="turma-edit-nome" autocomplete="off">
+    </div>
+    <div class="campo">
+      <label>Ano letivo</label>
+      <input type="text" id="turma-edit-ano" autocomplete="off">
+    </div>
+    <div id="modal-turma-edit-erro" class="msg-erro" style="display:none"></div>
+    <div class="modal-footer">
+      <button class="btn-secundario" onclick="UI.fecharModalId('modal-editar-turma')">Cancelar</button>
+      <button class="btn-primario" onclick="Turmas.salvarEdicao()">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Novo aluno -->
+<div id="modal-novo-aluno" class="modal-overlay" style="display:none" onclick="UI.fecharModal(event)">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>Novo aluno incluso</h3>
+      <button class="btn-fechar" onclick="UI.fecharModalId('modal-novo-aluno')">✕</button>
+    </div>
+    <p class="modal-sub">Use um apelido ou código para preservar a identidade do aluno.</p>
+    <div class="campo">
+      <label>Nome ou apelido</label>
+      <input type="text" id="aluno-nome" placeholder="Ex: Aluno 1 ou João P." autocomplete="off">
+    </div>
+    <div class="campo">
+      <label>Diagnóstico</label>
+      <div class="diagnosticos-grid">
+        <label class="diagnostico-item">
+          <input type="radio" name="diagnostico" value="tea">
+          <div class="diagnostico-card">
+            <span class="diag-emoji">🔵</span>
+            <strong>TEA</strong>
+            <small>Transtorno do Espectro Autista</small>
+          </div>
+        </label>
+        <label class="diagnostico-item">
+          <input type="radio" name="diagnostico" value="tdah">
+          <div class="diagnostico-card">
+            <span class="diag-emoji">⚡</span>
+            <strong>TDAH</strong>
+            <small>Déficit de Atenção e Hiperatividade</small>
+          </div>
+        </label>
+        <label class="diagnostico-item">
+          <input type="radio" name="diagnostico" value="dislexia">
+          <div class="diagnostico-card">
+            <span class="diag-emoji">📖</span>
+            <strong>Dislexia</strong>
+            <small>Dificuldade de leitura e escrita</small>
+          </div>
+        </label>
+        <label class="diagnostico-item">
+          <input type="radio" name="diagnostico" value="discalculia">
+          <div class="diagnostico-card">
+            <span class="diag-emoji">🔢</span>
+            <strong>Discalculia</strong>
+            <small>Dificuldade com números e matemática</small>
+          </div>
+        </label>
+        <label class="diagnostico-item">
+          <input type="radio" name="diagnostico" value="altas_habilidades">
+          <div class="diagnostico-card">
+            <span class="diag-emoji">⭐</span>
+            <strong>Altas Habilidades</strong>
+            <small>Superdotação</small>
+          </div>
+        </label>
+      </div>
+    </div>
+    <div class="campo">
+      <label>Observações <span class="opcional">(opcional)</span></label>
+      <textarea id="aluno-obs" placeholder="Informações relevantes sobre o aluno..." rows="3"></textarea>
+    </div>
+    <div id="modal-aluno-erro" class="msg-erro" style="display:none"></div>
+    <div class="modal-footer">
+      <button class="btn-secundario" onclick="UI.fecharModalId('modal-novo-aluno')">Cancelar</button>
+      <button class="btn-primario" id="btn-salvar-aluno" onclick="Alunos.salvar()">Salvar aluno</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div id="toast" class="toast" style="display:none"></div>
+
+<!-- Supabase -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<!-- Libs para download -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script src="/habilidades_rg.js"></script>
-<style>
-:root {
-  --bg:#f0f4f8;--surface:#fff;--surface2:#e8eef5;--border:#d0dae6;
-  --accent:#2563eb;--accent2:#7c3aed;--accent3:#059669;
-  --warn:#ea580c;--danger:#dc2626;--text:#1e293b;--muted:#64748b;--card:#fff;
-}
-*{box-sizing:border-box;margin:0;padding:0;}
-body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
-::-webkit-scrollbar{width:6px;}::-webkit-scrollbar-track{background:var(--bg);}::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
-.app{display:flex;flex-direction:column;min-height:100vh;}
-.page{display:none;flex-direction:column;min-height:100vh;}
-.page.active{display:flex;}
-h1,h2,h3,h4{font-family:'Syne',sans-serif;}
-#page-login{background:var(--bg);align-items:center;justify-content:center;position:relative;overflow:hidden;}
-#page-login::before{content:'';position:absolute;width:600px;height:600px;background:radial-gradient(circle,rgba(79,156,249,0.12) 0%,transparent 70%);top:-150px;right:-150px;pointer-events:none;}
-#page-login::after{content:'';position:absolute;width:400px;height:400px;background:radial-gradient(circle,rgba(167,139,250,0.1) 0%,transparent 70%);bottom:-100px;left:-100px;pointer-events:none;}
-.login-box{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:48px 44px;width:440px;position:relative;z-index:1;animation:fadeUp 0.6s ease;}
-.login-logo{display:flex;align-items:center;gap:12px;margin-bottom:32px;}
-.login-box h2{font-size:26px;font-weight:800;margin-bottom:6px;}
-.login-box p{color:var(--muted);font-size:14px;margin-bottom:32px;}
-.field{margin-bottom:18px;}
-.field label{display:block;font-size:12px;font-weight:500;color:var(--muted);margin-bottom:7px;text-transform:uppercase;letter-spacing:0.05em;}
-.field input,.field select,.field textarea{width:100%;padding:12px 14px;background:var(--bg);border:1px solid var(--border);border-radius:10px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:14px;transition:border-color 0.2s;outline:none;}
-.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--accent);}
-.field textarea{resize:vertical;min-height:80px;}
-.field select option{background:var(--surface);}
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:12px 20px;border-radius:10px;font-family:'Syne',sans-serif;font-weight:700;font-size:14px;cursor:pointer;border:none;transition:all 0.2s;text-decoration:none;}
-.btn-primary{background:linear-gradient(135deg,var(--accent),#3b82f6);color:white;width:100%;}
-.btn-primary:hover{opacity:0.9;transform:translateY(-1px);}
-.btn-google{background:white;color:#333;border:1px solid var(--border);width:100%;gap:10px;}
-.btn-google:hover{border-color:var(--accent);}
-.btn-secondary{background:var(--surface2);color:var(--text);border:1px solid var(--border);}
-.btn-secondary:hover{border-color:var(--accent);color:var(--accent);}
-.btn-accent2{background:linear-gradient(135deg,var(--accent2),#8b5cf6);color:white;}
-.btn-accent2:hover{opacity:0.9;transform:translateY(-1px);}
-.btn-success{background:linear-gradient(135deg,var(--accent3),#059669);color:white;}
-.btn-success:hover{opacity:0.9;transform:translateY(-1px);}
-.btn-danger{background:var(--surface2);color:var(--danger);border:1px solid var(--border);}
-.btn-danger:hover{border-color:var(--danger);}
-.btn-sm{padding:7px 14px;font-size:12px;border-radius:8px;}
-.login-divider{display:flex;align-items:center;gap:12px;margin:20px 0;}
-.login-divider::before,.login-divider::after{content:'';flex:1;height:1px;background:var(--border);}
-.login-divider span{font-size:12px;color:var(--muted);}
-.login-toggle{text-align:center;margin-top:20px;font-size:13px;color:var(--muted);}
-.login-toggle a{color:var(--accent);cursor:pointer;font-weight:500;}
-#login-error{display:none;padding:12px 14px;background:rgba(220,38,38,0.08);border:1px solid rgba(220,38,38,0.2);border-radius:8px;color:var(--danger);font-size:13px;margin-bottom:16px;}
-.main-layout{display:flex;flex:1;overflow:hidden;height:100vh;}
-.sidebar{width:240px;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;padding:24px 0;flex-shrink:0;}
-.sidebar-logo{padding:0 20px 24px;border-bottom:1px solid var(--border);margin-bottom:16px;}
-.nav-section{padding:0 12px;margin-bottom:8px;}
-.nav-label{font-size:10px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em;padding:0 8px;margin-bottom:6px;}
-.nav-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;cursor:pointer;font-size:14px;color:var(--muted);transition:all 0.2s;margin-bottom:2px;}
-.nav-item:hover{background:var(--surface2);color:var(--text);}
-.nav-item.active{background:rgba(37,99,235,0.10);color:var(--accent);font-weight:500;}
-.nav-item .nav-icon{width:18px;text-align:center;}
-.sidebar-bottom{margin-top:auto;padding:16px 12px 0;border-top:1px solid var(--border);}
-.user-chip{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;cursor:pointer;transition:background 0.2s;}
-.user-chip:hover{background:var(--surface2);}
-.user-avatar{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent2));display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;color:white;flex-shrink:0;}
-.user-info{flex:1;min-width:0;}
-.user-info .u-name{font-size:13px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.user-info .u-role{font-size:11px;color:var(--muted);}
-.logout-btn{background:none;border:none;color:var(--muted);cursor:pointer;font-size:16px;padding:4px;flex-shrink:0;}
-.logout-btn:hover{color:var(--danger);}
-.main-content{flex:1;overflow-y:auto;padding:32px;}
-.content-panel{display:none;}
-.content-panel.active{display:block;animation:fadeIn 0.3s ease;}
-.page-header{margin-bottom:28px;}
-.page-header h2{font-size:26px;font-weight:800;}
-.page-header p{color:var(--muted);font-size:14px;margin-top:4px;}
-.cards-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px;}
-.turma-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px;cursor:pointer;transition:all 0.2s;}
-.turma-card:hover{border-color:var(--accent);transform:translateY(-2px);}
-.turma-card .tc-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:12px;}
-.turma-card .tc-icon{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;}
-.tc-meta{font-size:12px;color:var(--muted);margin-bottom:8px;}
-.tc-name{font-family:'Syne',sans-serif;font-weight:700;font-size:16px;margin-bottom:4px;}
-.tc-badge{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:500;}
-.badge-ef1{background:rgba(79,156,249,0.15);color:var(--accent);}
-.badge-ef2{background:rgba(167,139,250,0.15);color:var(--accent2);}
-.badge-em{background:rgba(52,211,153,0.15);color:var(--accent3);}
-.tc-alunos{font-size:12px;color:var(--muted);margin-top:12px;padding-top:12px;border-top:1px solid var(--border);display:flex;justify-content:space-between;}
-.dash-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px;cursor:pointer;transition:all 0.2s;}
-.action-card{transition:transform 0.2s;}
-.action-card:hover{transform:translateY(-2px);opacity:0.92;}
-.dash-card:hover{border-color:var(--accent);transform:translateY(-2px);}
-.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:100;display:none;align-items:center;justify-content:center;backdrop-filter:blur(4px);}
-.modal-overlay.open{display:flex;}
-.modal{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:32px;width:500px;max-width:95vw;max-height:90vh;overflow-y:auto;animation:fadeUp 0.3s ease;}
-.modal h3{font-size:20px;font-weight:800;margin-bottom:6px;}
-.modal .modal-sub{color:var(--muted);font-size:13px;margin-bottom:24px;}
-.modal-footer{display:flex;gap:10px;justify-content:flex-end;margin-top:24px;}
-.aluno-list{display:flex;flex-direction:column;gap:10px;}
-.aluno-row{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px 20px;display:flex;align-items:center;gap:16px;cursor:pointer;transition:all 0.2s;}
-.aluno-row:hover{border-color:var(--accent2);}
-.aluno-avatar{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;flex-shrink:0;}
-.aluno-info{flex:1;}
-.aluno-name{font-weight:600;font-size:14px;}
-.aluno-tags{display:flex;flex-wrap:wrap;gap:4px;margin-top:4px;}
-.tag{padding:2px 8px;border-radius:20px;font-size:10px;font-weight:500;}
-.tag-blue{background:rgba(79,156,249,0.15);color:var(--accent);}
-.tag-purple{background:rgba(167,139,250,0.15);color:var(--accent2);}
-.tag-green{background:rgba(52,211,153,0.15);color:var(--accent3);}
-.tag-orange{background:rgba(251,146,60,0.15);color:var(--warn);}
-.param-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;}
-.param-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px;}
-.param-card h4{font-size:13px;font-weight:600;color:var(--muted);margin-bottom:14px;display:flex;align-items:center;gap:6px;}
-.param-select-wrap{display:flex;flex-direction:column;gap:10px;}
-.param-select{width:100%;padding:11px 14px;background:var(--bg);border:1px solid var(--border);border-radius:10px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:14px;font-weight:500;cursor:pointer;outline:none;transition:border-color 0.2s;-webkit-appearance:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%238b92a8' d='M6 8L1 3h10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center;padding-right:36px;}
-.param-select:focus{border-color:var(--accent);}
-.param-desc-box{padding:10px 14px;background:rgba(79,156,249,0.07);border:1px solid rgba(79,156,249,0.15);border-radius:8px;font-size:12px;color:var(--muted);line-height:1.6;min-height:42px;}
-.check-group{display:flex;flex-direction:column;gap:8px;}
-.check-item{display:flex;align-items:center;gap:8px;cursor:pointer;font-size:13px;}
-.check-item input{width:16px;height:16px;accent-color:var(--accent);cursor:pointer;}
-.adaptar-layout{display:grid;grid-template-columns:1fr 1fr;gap:24px;}
-.upload-zone{border:2px dashed var(--border);border-radius:14px;padding:32px 24px;text-align:center;cursor:pointer;transition:all 0.2s;min-height:110px;display:flex;align-items:center;justify-content:center;}
-.upload-zone:hover{border-color:var(--accent);background:rgba(79,156,249,0.04);}
-.upload-zone>div{width:100%;text-align:center;}
-.upload-zone.dragover{border-color:var(--accent);background:rgba(79,156,249,0.08);}
-.upload-icon{font-size:32px;margin-bottom:8px;}
-.upload-zone p{color:var(--muted);font-size:13px;}
-.upload-zone strong{color:var(--text);}
-.upload-zone-sm{padding:16px 24px;min-height:70px;}
-.aluno-select-list{display:flex;flex-direction:column;gap:8px;max-height:300px;overflow-y:auto;}
-.aluno-check-row{display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--bg);border:1px solid var(--border);border-radius:10px;cursor:pointer;transition:all 0.2s;}
-.aluno-check-row:hover{border-color:var(--accent2);}
-.aluno-check-row input[type=checkbox]{accent-color:var(--accent2);width:16px;height:16px;}
-.resultado-tabs{display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap;}
-.rtab{padding:8px 16px;border-radius:8px;border:1px solid var(--border);background:var(--bg);color:var(--muted);font-size:13px;cursor:pointer;transition:all 0.2s;}
-.rtab.active{background:rgba(167,139,250,0.15);border-color:var(--accent2);color:var(--accent2);font-weight:500;}
-.resultado-box{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:24px;min-height:300px;}
-.resultado-content{font-size:14px;line-height:1.8;}
-.loading-dots{display:flex;gap:6px;justify-content:center;align-items:center;height:200px;}
-.loading-dots span{width:10px;height:10px;border-radius:50%;background:var(--accent);animation:bounce 0.8s ease infinite;}
-.loading-dots span:nth-child(2){background:var(--accent2);animation-delay:0.15s;}
-.loading-dots span:nth-child(3){background:var(--accent3);animation-delay:0.3s;}
-.progress-bar{height:4px;background:var(--border);border-radius:2px;overflow:hidden;margin-top:16px;display:none;}
-.progress-bar.show{display:block;}
-.progress-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:2px;transition:width 0.5s;}
-.historico-item{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px 20px;margin-bottom:10px;display:flex;align-items:center;gap:16px;}
-.hist-icon{width:38px;height:38px;background:rgba(167,139,250,0.15);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;}
-.hist-info{flex:1;}
-.hist-title{font-weight:600;font-size:14px;}
-.hist-meta{font-size:12px;color:var(--muted);margin-top:2px;}
-.alert{padding:14px 16px;border-radius:10px;font-size:13px;margin-bottom:16px;display:flex;align-items:flex-start;gap:10px;}
-.alert-info{background:rgba(37,99,235,0.08);border:1px solid rgba(37,99,235,0.2);color:#1d4ed8;}
-.alert-success{background:rgba(5,150,105,0.08);border:1px solid rgba(5,150,105,0.2);color:#065f46;}
-.section-title{font-size:16px;font-weight:700;margin-bottom:16px;display:flex;align-items:center;gap:8px;}
-.divider{height:1px;background:var(--border);margin:24px 0;}
-.empty-state{text-align:center;padding:60px 20px;color:var(--muted);}
-.empty-state .empty-icon{font-size:48px;margin-bottom:16px;opacity:0.5;}
-.empty-state p{font-size:14px;}
-.back-btn{display:inline-flex;align-items:center;gap:6px;color:var(--muted);font-size:13px;cursor:pointer;margin-bottom:20px;transition:color 0.2s;background:none;border:none;}
-.back-btn:hover{color:var(--text);}
-.perfil-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;}
-.perfil-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:24px;}
-.perfil-card h4{font-size:14px;font-weight:700;margin-bottom:16px;display:flex;align-items:center;gap:8px;}
-.etapa-checks{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px;}
-.mobile-topbar{display:none;align-items:center;justify-content:space-between;padding:14px 16px;background:var(--surface);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:50;flex-shrink:0;}
-.hamburger{background:none;border:1px solid var(--border);border-radius:8px;width:36px;height:36px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;cursor:pointer;padding:0;}
-.hamburger span{display:block;width:16px;height:2px;background:var(--text);border-radius:2px;}
-.sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:98;backdrop-filter:blur(2px);}
-.sidebar-overlay.open{display:block;}
-.bottom-nav{display:none;position:fixed;bottom:0;left:0;right:0;background:var(--surface);border-top:1px solid var(--border);z-index:50;padding:8px 0 calc(8px + env(safe-area-inset-bottom));}
-.bottom-nav-inner{display:flex;justify-content:space-around;align-items:center;}
-.bnav-item{display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 16px;border-radius:10px;cursor:pointer;border:none;background:none;color:var(--muted);font-family:'DM Sans',sans-serif;transition:color 0.2s;}
-.bnav-item.active{color:var(--accent);}
-.bnav-item .bicon{font-size:20px;}
-.bnav-item .blabel{font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;}
-#loading-overlay{position:fixed;inset:0;background:var(--bg);z-index:999;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:16px;}
-#loading-overlay.hidden{display:none;}
-#loading-overlay .spinner{width:40px;height:40px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin 0.8s linear infinite;}
-@keyframes spin{to{transform:rotate(360deg);}}
-@media(max-width:900px){.adaptar-layout{grid-template-columns:1fr;}.param-grid{grid-template-columns:1fr;}.perfil-grid{grid-template-columns:1fr;}}
-@media(max-width:640px){
-  .mobile-topbar{display:flex;}.bottom-nav{display:block;}
-  .main-layout{flex-direction:column;height:auto;overflow:visible;}
-  .sidebar{position:fixed;top:0;left:-260px;width:260px;height:100vh;z-index:99;transition:left 0.3s ease;overflow-y:auto;}
-  .sidebar.open{left:0;}
-  .main-content{padding:16px;min-height:calc(100vh - 60px);padding-bottom:80px;}
-  .login-box{width:94vw;padding:32px 20px;}
-  .cards-grid{grid-template-columns:1fr;}
-  .modal{width:96vw;padding:24px 16px;}
-  .modal-footer{flex-direction:column;}
-  .modal-footer .btn{width:100%;}
-  .etapa-checks{grid-template-columns:1fr;}
-}
-@keyframes fadeUp{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);}}
-@keyframes fadeIn{from{opacity:0;}to{opacity:1;}}
-@keyframes bounce{0%,100%{transform:translateY(0);}50%{transform:translateY(-10px);}}
-@media print{
-  body *{visibility:hidden;}
-  #print-area,#print-area *{visibility:visible;}
-  #print-area{position:fixed;top:0;left:0;width:100%;padding:24px;font-family:'Calibri',sans-serif;font-size:13px;line-height:1.8;}
-  @page{margin:1.5cm;}
-}
-</style>
-</head>
-<body>
-<div id="loading-overlay"><div class="spinner"></div><p style="font-size:13px;color:var(--muted)">Carregando...</p></div>
-<div class="app">
-
-<!-- LOGIN -->
-<div class="page" id="page-login">
-  <div class="login-box">
-    <div class="login-logo"><img src="/logo.png" alt="Adapta Aí" style="height:44px;object-fit:contain"></div>
-    <h2 id="login-title">Bem-vindo de volta</h2>
-    <p id="login-sub">Acesse sua conta para gerenciar suas turmas e adaptações</p>
-    <div id="login-error"></div>
-    <div class="field"><label>E-mail</label><input type="email" id="login-email" placeholder="professor@escola.edu.br"></div>
-    <div class="field"><label>Senha</label><input type="password" id="login-pass" placeholder="••••••••"></div>
-    <div class="field" id="field-nome" style="display:none"><label>Seu nome</label><input type="text" id="login-nome" placeholder="Prof. Marcel Gantes"></div>
-    <div class="field" id="field-termos" style="display:none">
-      <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;text-transform:none;letter-spacing:0;font-size:13px;color:var(--text)">
-        <input type="checkbox" id="aceite-termos" style="width:16px;height:16px;margin-top:2px;accent-color:var(--accent);flex-shrink:0">
-        <span>Li e aceito a <a href="/privacidade.html" target="_blank" style="color:var(--accent);font-weight:500">Política de Privacidade</a> e os <a href="/privacidade.html#s9" target="_blank" style="color:var(--accent);font-weight:500">Termos de Uso</a></span>
-      </label>
-    </div>
-    <button class="btn btn-primary" onclick="doEmailAuth()" style="margin-top:8px" id="btn-auth">Entrar na plataforma →</button>
-    <div class="login-divider"><span>ou</span></div>
-    <button class="btn btn-google" onclick="doGoogleLogin()">
-      <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#4285F4" d="M47.5 24.6c0-1.6-.1-3.1-.4-4.6H24v8.7h13.2c-.6 3-2.3 5.5-4.9 7.2v6h8c4.7-4.3 7.2-10.7 7.2-17.3z"/><path fill="#34A853" d="M24 48c6.5 0 11.9-2.1 15.9-5.8l-8-6c-2.1 1.4-4.8 2.3-7.9 2.3-6.1 0-11.2-4.1-13.1-9.6H2.6v6.2C6.5 42.8 14.7 48 24 48z"/><path fill="#FBBC05" d="M10.9 28.9c-.5-1.4-.7-2.8-.7-4.4s.3-3 .7-4.4v-6.2H2.6C1 17.2 0 20.5 0 24s1 6.8 2.6 9.9l8.3-5z"/><path fill="#EA4335" d="M24 9.5c3.4 0 6.5 1.2 8.9 3.5l6.7-6.7C35.9 2.5 30.4 0 24 0 14.7 0 6.5 5.2 2.6 14.1l8.3 6.2C12.8 13.6 17.9 9.5 24 9.5z"/></svg>
-      Entrar com Google
-    </button>
-    <p style="font-size:11px;color:var(--muted);text-align:center;margin-top:10px;line-height:1.6">Ao entrar, você concorda com nossa <a href="/privacidade.html" target="_blank" style="color:var(--accent)">Política de Privacidade</a> e <a href="/privacidade.html#s9" target="_blank" style="color:var(--accent)">Termos de Uso</a></p>
-    <div class="login-toggle"><a onclick="toggleLoginMode()">Não tem conta? <strong>Criar agora</strong></a></div>
-  </div>
-</div>
-
-<!-- APP -->
-<div class="page" id="page-app">
-  <div class="mobile-topbar">
-    <div class="logo-mark"><img src="/logo.png" alt="Adapta Aí" style="height:28px;object-fit:contain"></div>
-    <button class="hamburger" onclick="toggleSidebar()"><span></span><span></span><span></span></button>
-  </div>
-  <div class="sidebar-overlay" id="sidebar-overlay" onclick="closeSidebar()"></div>
-  <div class="main-layout">
-    <div class="sidebar" id="main-sidebar">
-      <div class="sidebar-logo"><img src="/logo.png" alt="Adapta Aí" style="height:36px;object-fit:contain;max-width:180px"></div>
-      <div class="nav-section">
-        <div class="nav-label">Principal</div>
-        <div class="nav-item active" onclick="showPanel('dashboard')" id="nav-dashboard"><span class="nav-icon">🏠</span> Início</div>
-        <div class="nav-item" onclick="showPanel('turmas')" id="nav-turmas"><span class="nav-icon">🏫</span> Turmas</div>
-        <div class="nav-item" onclick="showPanel('alunos')" id="nav-alunos"><span class="nav-icon">👥</span> Alunos</div>
-        <div class="nav-item" onclick="showPanel('adaptar')" id="nav-adaptar"><span class="nav-icon">✨</span> Adaptar Material</div>
-        <div class="nav-item" onclick="showPanel('pei')" id="nav-pei"><span class="nav-icon">📋</span> Gerar PEI</div>
-        <div class="nav-item" onclick="showPanel('historico')" id="nav-historico"><span class="nav-icon">📁</span> Histórico</div>
-      </div>
-      <div class="nav-section">
-        <div class="nav-label">Conta</div>
-        <div class="nav-item" onclick="showPanel('perfil')" id="nav-perfil"><span class="nav-icon">👤</span> Meu Perfil</div>
-        <div class="nav-item" onclick="alert('Em breve!')"><span class="nav-icon">📖</span> Guia de uso</div>
-      </div>
-      <div class="sidebar-bottom">
-        <div class="user-chip" onclick="showPanel('perfil')" title="Editar perfil">
-          <div class="user-avatar" id="sidebar-avatar">?</div>
-          <div class="user-info"><div class="u-name" id="sidebar-name">Carregando...</div><div class="u-role" id="sidebar-email"></div></div>
-          <button class="logout-btn" onclick="event.stopPropagation();doLogout()" title="Sair">↩</button>
-        </div>
-      </div>
-    </div>
-
-    <div class="main-content">
-
-      <!-- DASHBOARD -->
-      <div class="content-panel active" id="panel-dashboard">
-        <div style="margin-bottom:32px">
-          <h2 style="font-size:24px;font-weight:800;margin-bottom:4px">Olá, <span id="dash-nome-prof">Professor</span>! 👋</h2>
-          <p style="color:var(--muted);font-size:14px" id="dash-subtitulo">O que vamos fazer hoje?</p>
-        </div>
-        <div id="dash-empty" style="display:none;text-align:center;padding:48px 20px;background:var(--card);border:2px dashed var(--border);border-radius:16px;margin-bottom:28px">
-          <div style="font-size:52px;margin-bottom:16px">🎒</div>
-          <h3 style="font-size:20px;font-weight:800;margin-bottom:8px">Vamos começar?</h3>
-          <p style="color:var(--muted);font-size:14px;max-width:360px;margin:0 auto 24px">Cadastre sua primeira turma e seus alunos inclusos para começar.</p>
-          <button class="btn btn-primary" style="width:auto;padding:12px 28px" onclick="openModal('modal-nova-turma')">🏫 Criar minha primeira turma</button>
-        </div>
-        <div id="dash-acoes" style="display:none">
-          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px">
-            <div onclick="showPanel('adaptar')" class="action-card" style="background:linear-gradient(135deg,var(--accent),#3b82f6);border-radius:14px;padding:20px;cursor:pointer;color:white"><div style="font-size:26px;margin-bottom:10px">✨</div><div style="font-weight:700;font-size:15px;margin-bottom:4px">Adaptar material</div><div style="font-size:12px;opacity:0.85">Gerar versões para cada aluno</div></div>
-            <div onclick="showPanel('pei')" class="action-card" style="background:linear-gradient(135deg,var(--accent2),#8b5cf6);border-radius:14px;padding:20px;cursor:pointer;color:white"><div style="font-size:26px;margin-bottom:10px">📋</div><div style="font-weight:700;font-size:15px;margin-bottom:4px">Gerar PEI</div><div style="font-size:12px;opacity:0.85">Plano educacional individual</div></div>
-            <div onclick="showPanel('turmas')" class="action-card" style="background:linear-gradient(135deg,var(--accent3),#059669);border-radius:14px;padding:20px;cursor:pointer;color:white"><div style="font-size:26px;margin-bottom:10px">🏫</div><div style="font-weight:700;font-size:15px;margin-bottom:4px">Minhas Turmas</div><div style="font-size:12px;opacity:0.85">Ver turmas e alunos inclusos</div></div>
-          </div>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px">
-            <div onclick="openModal('modal-nova-turma')" class="action-card" style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px;cursor:pointer;display:flex;align-items:center;gap:14px">
-              <div style="width:42px;height:42px;border-radius:10px;background:rgba(37,99,235,0.1);display:flex;align-items:center;justify-content:center;font-size:20px">🏫</div>
-              <div><div style="font-weight:700;font-size:14px">Criar turma</div><div style="font-size:12px;color:var(--muted)">Adicionar nova turma</div></div>
-            </div>
-            <div onclick="openModalNovoAlunoDashboard()" class="action-card" style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px;cursor:pointer;display:flex;align-items:center;gap:14px">
-              <div style="width:42px;height:42px;border-radius:10px;background:rgba(124,58,237,0.1);display:flex;align-items:center;justify-content:center;font-size:20px">👤</div>
-              <div><div style="font-weight:700;font-size:14px">Cadastrar aluno</div><div style="font-size:12px;color:var(--muted)">Incluir aluno em turma</div></div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- TURMAS -->
-      <div class="content-panel" id="panel-turmas">
-        <div class="page-header" style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:12px">
-          <div><h2>Turmas</h2><p>Gerencie suas turmas e alunos inclusos</p></div>
-          <button class="btn btn-primary" style="width:auto" onclick="openModal('modal-nova-turma')">+ Nova turma</button>
-        </div>
-        <div class="cards-grid" id="turmas-grid"></div>
-      </div>
-
-      <!-- DETALHE TURMA -->
-      <div class="content-panel" id="panel-turma-detalhe">
-        <button class="back-btn" onclick="showPanel('turmas')">← Voltar para turmas</button>
-        <div class="page-header" style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:12px">
-          <div><h2 id="detalhe-nome">Turma</h2><p id="detalhe-meta" style="color:var(--muted);font-size:14px"></p></div>
-          <div style="display:flex;gap:10px;flex-wrap:wrap">
-            <button class="btn btn-accent2" style="width:auto" onclick="openModalNovoAluno()">+ Novo aluno incluso</button>
-            <button class="btn btn-primary" style="width:auto" onclick="adaptarEstaTurma()">✨ Adaptar material para esta turma →</button>
-          </div>
-        </div>
-        <div class="aluno-list" id="alunos-list"></div>
-      </div>
-
-      <!-- PERFIL ALUNO -->
-      <div class="content-panel" id="panel-aluno-perfil">
-        <button class="back-btn" id="back-to-turma">← Voltar para turma</button>
-        <div class="page-header"><div><h2 id="aluno-nome-titulo">Aluno</h2><p style="color:var(--muted);font-size:14px">Perfil anônimo — parâmetros de adaptação</p></div></div>
-        <div class="param-grid" id="param-grid-content"></div>
-        <div style="margin-top:24px;padding-top:20px;border-top:1px solid var(--border);display:flex;gap:12px;align-items:center;">
-          <button class="btn btn-success" style="width:auto" onclick="salvarAluno()">💾 Salvar perfil do aluno</button>
-          <button class="back-btn" style="margin:0" onclick="openTurma(state.turmaSelecionada)">← Voltar sem salvar</button>
-        </div>
-      </div>
-
-      <!-- ALUNOS -->
-      <div class="content-panel" id="panel-alunos">
-        <div class="page-header"><div><h2>👥 Alunos Inclusos</h2><p>Todos os alunos cadastrados nas suas turmas</p></div></div>
-        <div class="field" style="margin-bottom:16px"><label>Filtrar por turma</label><select id="alunos-filtro-turma" onchange="renderPainelAlunos()"><option value="">Todas as turmas</option></select></div>
-        <div id="alunos-painel-list"></div>
-      </div>
-
-      <!-- PERFIL DO PROFESSOR -->
-      <div class="content-panel" id="panel-perfil">
-        <div class="page-header"><h2>👤 Meu Perfil</h2><p>Suas informações profissionais — usadas para personalizar adaptações e PEIs</p></div>
-        <div class="perfil-grid">
-          <div class="perfil-card">
-            <h4>🏫 Dados Profissionais</h4>
-            <div class="field"><label>Seu nome completo</label><input type="text" id="perfil-nome" placeholder="Prof. Marcel Gantes"></div>
-            <div class="field"><label>Nome da escola (opcional)</label><input type="text" id="perfil-escola" placeholder="E.E. Prof. João da Silva"></div>
-            <div class="field"><label>Estado de atuação</label>
-              <select id="perfil-estado">
-                <option value="BNCC">Nacional (BNCC)</option>
-                <option value="RS">Rio Grande do Sul — Referencial Curricular Gaúcho</option>
-                <option value="RS_RG">Rio Grande/RS — Documento Orientador Rio-grandino</option>
-                <option value="SP">São Paulo — Currículo Paulista</option>
-                <option value="RJ">Rio de Janeiro — Currículo Carioca</option>
-                <option value="MG">Minas Gerais — CBC/BNCC</option>
-                <option value="PR">Paraná — CREP</option>
-                <option value="SC">Santa Catarina — DCSC</option>
-                <option value="BA">Bahia — DCRB</option>
-                <option value="PE">Pernambuco — BNCC/PE</option>
-                <option value="CE">Ceará — BNCC/CE</option>
-                <option value="GO">Goiás — DC-GO</option>
-                <option value="MT">Mato Grosso — BNCC/MT</option>
-                <option value="MS">Mato Grosso do Sul — BNCC/MS</option>
-                <option value="PA">Pará — BNCC/PA</option>
-                <option value="AM">Amazonas — BNCC/AM</option>
-                <option value="OUTRO">Outro estado</option>
-              </select>
-            </div>
-          </div>
-          <div class="perfil-card">
-            <h4>📚 Disciplinas que leciona</h4>
-            <p style="font-size:12px;color:var(--muted);margin-bottom:12px">Selecione todas que se aplicam. Isso ajuda a IA a gerar adaptações mais precisas.</p>
-            <div class="check-group" id="perfil-disciplinas-list">
-              <label class="check-item"><input type="checkbox" value="Biologia"> <span>Biologia</span></label>
-              <label class="check-item"><input type="checkbox" value="Matemática"> <span>Matemática</span></label>
-              <label class="check-item"><input type="checkbox" value="Física"> <span>Física</span></label>
-              <label class="check-item"><input type="checkbox" value="Química"> <span>Química</span></label>
-              <label class="check-item"><input type="checkbox" value="Português"> <span>Língua Portuguesa</span></label>
-              <label class="check-item"><input type="checkbox" value="História"> <span>História</span></label>
-              <label class="check-item"><input type="checkbox" value="Geografia"> <span>Geografia</span></label>
-              <label class="check-item"><input type="checkbox" value="Ciências"> <span>Ciências</span></label>
-              <label class="check-item"><input type="checkbox" value="Inglês"> <span>Inglês</span></label>
-              <label class="check-item"><input type="checkbox" value="Espanhol"> <span>Espanhol</span></label>
-              <label class="check-item"><input type="checkbox" value="Artes"> <span>Artes</span></label>
-              <label class="check-item"><input type="checkbox" value="Educação Física"> <span>Educação Física</span></label>
-              <label class="check-item"><input type="checkbox" value="Filosofia"> <span>Filosofia</span></label>
-              <label class="check-item"><input type="checkbox" value="Sociologia"> <span>Sociologia</span></label>
-              <label class="check-item"><input type="checkbox" value="AEE"> <span>AEE (Atend. Ed. Especializado)</span></label>
-            </div>
-          </div>
-          <div class="perfil-card">
-            <h4>🎓 Etapas de ensino que atua</h4>
-            <p style="font-size:12px;color:var(--muted);margin-bottom:12px">Selecione as etapas em que você leciona.</p>
-            <div class="check-group etapa-checks">
-              <label class="check-item"><input type="checkbox" id="etapa-ei"> <span>Educação Infantil</span></label>
-              <label class="check-item"><input type="checkbox" id="etapa-ef1"> <span>EF I (1º–5º ano)</span></label>
-              <label class="check-item"><input type="checkbox" id="etapa-ef2"> <span>EF II (6º–9º ano)</span></label>
-              <label class="check-item"><input type="checkbox" id="etapa-em"> <span>Ensino Médio</span></label>
-              <label class="check-item"><input type="checkbox" id="etapa-eja"> <span>EJA</span></label>
-              <label class="check-item"><input type="checkbox" id="etapa-superior"> <span>Superior</span></label>
-            </div>
-          </div>
-          <div class="perfil-card">
-            <h4>🔒 Conta e segurança</h4>
-            <p style="font-size:13px;color:var(--muted);margin-bottom:8px">E-mail: <strong id="perfil-email-display">—</strong></p>
-            <p style="font-size:12px;color:var(--muted);margin-bottom:20px;line-height:1.6">Para sua segurança, recomendamos sair da plataforma em computadores compartilhados.</p>
-            <button class="btn btn-danger" style="width:100%" onclick="doLogout()">🚪 Sair da Conta</button>
-          </div>
-        </div>
-        <div style="margin-top:20px">
-          <button class="btn btn-primary" style="width:auto;padding:14px 32px" onclick="salvarPerfilProfessor()">💾 Salvar perfil</button>
-        </div>
-      </div>
-
-      <!-- ADAPTAR -->
-      <div class="content-panel" id="panel-adaptar">
-        <div class="page-header"><h2>✨ Adaptar Material</h2><p>Envie um conteúdo e gere adaptações individualizadas para cada aluno</p></div>
-        <div class="adaptar-layout">
-          <div>
-            <div class="section-title">1. Conteúdo a adaptar</div>
-            <label for="file-input" class="upload-zone" id="upload-zone" ondragover="event.preventDefault();this.classList.add('dragover')" ondragleave="this.classList.remove('dragover')" ondrop="handleDrop(event)">
-              <input type="file" id="file-input" accept=".pdf,.docx,.doc,.txt,.png,.jpg,.jpeg,.webp" style="display:none;position:absolute" onchange="handleFileSelect(this.files[0])">
-              <div id="upload-idle"><div class="upload-icon">📎</div><p><strong>Arraste o arquivo aqui</strong> ou clique para selecionar</p><p style="margin-top:6px;font-size:12px">PDF · DOCX · TXT · PNG · JPG — até 10MB</p></div>
-              <div id="upload-loading" style="display:none"><div class="loading-dots" style="height:60px"><span></span><span></span><span></span></div></div>
-              <div id="upload-success" style="display:none"><div style="font-size:28px;margin-bottom:8px">✅</div><p id="upload-filename" style="font-weight:600;font-size:14px"></p><p id="upload-charcount" style="font-size:12px;color:var(--accent3);margin-top:4px"></p><p style="font-size:11px;color:var(--muted);margin-top:6px">Clique para trocar</p></div>
-              <div id="upload-error" style="display:none"><div style="font-size:28px;margin-bottom:8px">⚠️</div><p id="upload-errmsg" style="font-size:13px;color:var(--warn)"></p></div>
-            </label>
-            <div style="display:flex;align-items:center;gap:10px;margin:14px 0"><div style="flex:1;height:1px;background:var(--border)"></div><span style="font-size:11px;color:var(--muted);font-weight:600">OU COLE O TEXTO DIRETO</span><div style="flex:1;height:1px;background:var(--border)"></div></div>
-            <div class="field"><label>Texto do material</label><textarea id="material-texto" rows="8" placeholder="O texto extraído aparecerá aqui. Você também pode colar diretamente..."></textarea></div>
-            <div class="field"><label>Disciplina</label><input type="text" id="material-disciplina" placeholder="Ex: Biologia, Matemática..."></div>
-            <div class="field"><label>Nome da atividade (opcional)</label><input type="text" id="material-nome" placeholder="Ex: Atividade sobre fotossíntese"></div>
-          </div>
-          <div>
-            <div class="section-title">2. Selecionar alunos</div>
-            <div class="field"><label>Turma</label><select id="adaptar-turma" onchange="loadAlunosParaAdaptar()"><option value="">Selecione uma turma...</option></select></div>
-            <div class="aluno-select-list" id="aluno-select-list"><div class="empty-state"><div class="empty-icon">👆</div><p>Selecione uma turma acima</p></div></div>
-          </div>
-        </div>
-        <div class="divider"></div>
-        <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap">
-          <button class="btn btn-accent2" style="width:auto" onclick="gerarAdaptacoes()" id="btn-gerar">🤖 Gerar adaptações com IA</button>
-          <span style="font-size:12px;color:var(--muted)">A IA respeitará os parâmetros individuais de cada aluno</span>
-        </div>
-        <div class="progress-bar" id="prog-bar"><div class="progress-fill" id="prog-fill" style="width:0%"></div></div>
-        <div id="resultado-area" style="display:none;margin-top:28px">
-          <div class="divider"></div>
-          <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:16px">
-            <div class="section-title" style="margin-bottom:0">3. Adaptações geradas</div>
-            <button class="btn btn-secondary" style="width:auto" onclick="novaAdaptacao()">🔄 Nova adaptação</button>
-          </div>
-          <div class="alert alert-success">✅ Adaptações prontas!</div>
-          <div class="resultado-tabs" id="resultado-tabs"></div>
-          <!-- Abas material aluno / registro pedagógico -->
-          <div style="display:flex;gap:8px;margin-bottom:16px">
-            <button id="aba-aluno" onclick="mostrarAba('aluno')" style="padding:8px 16px;border-radius:8px;border:none;background:var(--accent);color:white;font-family:'Syne',sans-serif;font-weight:700;font-size:13px;cursor:pointer">📄 Material do aluno</button>
-            <button id="aba-professor" onclick="mostrarAba('professor')" style="padding:8px 16px;border-radius:8px;border:1px solid var(--border);background:var(--bg);color:var(--muted);font-family:'Syne',sans-serif;font-weight:700;font-size:13px;cursor:pointer">📋 Registro pedagógico</button>
-          </div>
-          <div class="resultado-box">
-            <div class="resultado-content" id="resultado-text"></div>
-            <div id="resultado-registro" style="display:none;font-size:14px;line-height:1.8"></div>
-          </div>
-          <div style="display:flex;gap:10px;margin-top:16px;flex-wrap:wrap;align-items:center">
-            <button class="btn btn-success" style="width:auto" onclick="baixarDocx()">📥 DOCX do aluno</button>
-            <button class="btn btn-primary" style="width:auto" onclick="baixarTodos()">📦 Todos em DOCX</button>
-            <button class="btn btn-secondary" style="width:auto" onclick="baixarPdf()">🖨️ Baixar PDF</button>
-            <button class="btn btn-accent2" style="width:auto" onclick="baixarRegistroProfessor()">📋 Registro do professor</button>
-            <button class="btn btn-secondary" style="width:auto" onclick="togglePrevia()" id="btn-previa">👁 Prévia</button>
-          </div>
-          <div id="previa-docx" style="display:none;margin-top:16px;background:white;border:2px solid var(--border);border-radius:14px;padding:32px 40px;font-family:'Calibri',sans-serif;font-size:14px;line-height:1.8;color:#1E293B;box-shadow:0 4px 20px rgba(0,0,0,0.08)">
-            <div id="previa-conteudo"></div>
-          </div>
-        </div>
-      </div>
-
-      <!-- PEI -->
-      <div class="content-panel" id="panel-pei">
-        <div class="page-header"><h2>📋 PEI — Plano Educacional Individualizado</h2><p>Gerado a partir do planejamento da turma, adaptado para cada aluno incluso</p></div>
-        <div class="alert alert-info">⚖️ <strong>Obrigação legal:</strong> O PEI deve ser elaborado em até 30 dias letivos do início do ano (Lei 13.146/2015).</div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px">
-          <div class="field"><label>Turma</label><select id="pei-turma" onchange="loadAlunosPei()"><option value="">Selecione uma turma...</option></select></div>
-          <div class="field"><label>Período</label><input type="text" id="pei-periodo" placeholder="Ex: 1º Trimestre 2026"></div>
-        </div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px">
-          <div class="field"><label>Professor(a)</label><input type="text" id="pei-professor" placeholder="Prof. Marcel Gantes"></div>
-          <div class="field"><label>Disciplina</label><input type="text" id="pei-disciplina" placeholder="Ex: Biologia..."></div>
-        </div>
-        <div class="field" style="margin-bottom:16px">
-          <label>📚 Planejamento da turma neurotípica</label>
-          <label for="pei-file-input" class="upload-zone upload-zone-sm" id="pei-upload-zone" style="margin-bottom:12px" ondragover="event.preventDefault();this.classList.add('dragover')" ondragleave="this.classList.remove('dragover')" ondrop="handlePeiDrop(event)">
-            <input type="file" id="pei-file-input" accept=".pdf,.docx,.doc,.txt" style="display:none;position:absolute" onchange="handlePeiFileSelect(this.files[0])">
-            <div id="pei-upload-idle"><div style="font-size:22px;margin-bottom:6px">📎</div><p><strong>Arraste o arquivo aqui</strong> ou clique para selecionar</p><p style="margin-top:4px;font-size:12px">PDF · DOCX · TXT</p></div>
-            <div id="pei-upload-loading" style="display:none"><div class="loading-dots" style="height:40px"><span></span><span></span><span></span></div></div>
-            <div id="pei-upload-success" style="display:none"><div style="font-size:20px;margin-bottom:4px">✅</div><p id="pei-upload-filename" style="font-weight:600;font-size:13px"></p><p style="font-size:11px;color:var(--muted);margin-top:4px">Clique para trocar</p></div>
-            <div id="pei-upload-error" style="display:none"><div style="font-size:20px;margin-bottom:4px">⚠️</div><p id="pei-upload-errmsg" style="font-size:13px;color:var(--warn)"></p></div>
-          </label>
-          <textarea id="pei-planejamento" rows="6" placeholder="O texto extraído aparecerá aqui. Você também pode colar diretamente..."></textarea>
-        </div>
-        <div class="section-title" style="margin-bottom:12px">👥 Selecione os alunos inclusos</div>
-        <div id="pei-alunos-checkboxes" style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:20px"><span style="color:var(--muted);font-size:13px">Selecione uma turma primeiro</span></div>
-        <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap">
-          <button class="btn btn-accent2" style="width:auto" onclick="gerarPei()" id="btn-gerar-pei">📋 Gerar PEI com IA</button>
-        </div>
-        <div class="progress-bar" id="prog-bar-pei"><div class="progress-fill" id="prog-fill-pei" style="width:0%"></div></div>
-        <div id="pei-resultado" style="display:none;margin-top:28px">
-          <div class="divider"></div>
-          <div class="section-title">📄 PEI gerado</div>
-          <div class="alert alert-success">✅ PEI pronto!</div>
-          <div id="pei-tabs" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px"></div>
-          <div class="resultado-box"><div class="resultado-content" id="pei-texto"></div></div>
-          <div style="display:flex;gap:10px;margin-top:16px">
-            <button class="btn btn-success" style="width:auto" onclick="baixarPei()">📥 Baixar PEI do aluno selecionado</button>
-            <button class="btn btn-primary" style="width:auto" onclick="baixarTodosPei()">📦 Baixar todos em DOCX</button>
-          </div>
-        </div>
-      </div>
-
-      <!-- HISTÓRICO -->
-      <div class="content-panel" id="panel-historico">
-        <div class="page-header"><h2>📁 Histórico de Atividades</h2><p>Registro de tudo que foi gerado</p></div>
-        <div id="historico-list"></div>
-      </div>
-
-    </div>
-  </div>
-</div>
-
-<!-- MODALS -->
-<div class="modal-overlay" id="modal-nova-turma">
-  <div class="modal">
-    <h3>Nova turma</h3><p class="modal-sub">Crie uma turma para organizar seus alunos inclusos</p>
-    <div class="field"><label>Nome da turma</label><input type="text" id="nt-nome" placeholder="Ex: 8º ano B, 3º EM Tarde..."></div>
-    <div class="field"><label>Etapa de ensino</label><select id="nt-etapa"><option value="">Selecione...</option><option value="ef1">EF I (1º–5º ano)</option><option value="ef2">EF II (6º–9º ano)</option><option value="em">Ensino Médio</option><option value="ei">Educação Infantil</option><option value="eja">EJA</option></select></div>
-    <div class="field"><label>Disciplina principal</label><input type="text" id="nt-disciplina" placeholder="Ex: Biologia, Matemática..."></div>
-    <div class="field"><label>Ano letivo</label><input type="text" id="nt-ano" placeholder="2026" value="2026"></div>
-    <div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal('modal-nova-turma')">Cancelar</button><button class="btn btn-primary" style="width:auto" onclick="criarTurma()">Criar turma →</button></div>
-  </div>
-</div>
-<div class="modal-overlay" id="modal-novo-aluno">
-  <div class="modal">
-    <h3>Novo aluno incluso</h3><p class="modal-sub">O cadastro é anônimo — use um apelido ou código</p>
-    <div class="field"><label>Identificação</label><input type="text" id="na-nome" placeholder="Ex: Aluno A, Código 04..."></div>
-    <div class="field"><label>Turma</label><select id="na-turma"><option value="">Selecione uma turma...</option></select></div>
-    <div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal('modal-novo-aluno')">Cancelar</button><button class="btn btn-accent2" style="width:auto" onclick="criarAluno()">Criar aluno →</button></div>
-  </div>
-</div>
-
-</div><!-- .app -->
-
-<nav class="bottom-nav">
-  <div class="bottom-nav-inner">
-    <button class="bnav-item active" id="bnav-dashboard" onclick="showPanel('dashboard');setBottomNav('dashboard')"><span class="bicon">🏠</span><span class="blabel">Início</span></button>
-    <button class="bnav-item" id="bnav-turmas" onclick="showPanel('turmas');setBottomNav('turmas')"><span class="bicon">🏫</span><span class="blabel">Turmas</span></button>
-    <button class="bnav-item" id="bnav-alunos" onclick="showPanel('alunos');setBottomNav('alunos')"><span class="bicon">👥</span><span class="blabel">Alunos</span></button>
-    <button class="bnav-item" id="bnav-adaptar" onclick="showPanel('adaptar');setBottomNav('adaptar')"><span class="bicon">✨</span><span class="blabel">Adaptar</span></button>
-    <button class="bnav-item" id="bnav-historico" onclick="showPanel('historico');setBottomNav('historico')"><span class="bicon">📁</span><span class="blabel">Histórico</span></button>
-  </div>
-</nav>
-
-<script>
-const SUPABASE_URL='https://ttyxcayltmgdtshohxzk.supabase.co';
-const SUPABASE_KEY='sb_publishable_uPQpcbgyBu9X0xJmfd9bdA_yOr53tnI';
-const sb=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
-pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
-
-let state={user:null,turmas:[],alunos:[],historico:[],turmaSelecionada:null,alunoSelecionado:null,adaptacoes:{},alunoAdaptacaoAtual:null,peiAtual:null};
-
-async function init() {
-  const { data: { session } } = await sb.auth.getSession();
-  if(session){state.user=session.user;await loadData();showApp();}
-  else showLogin();
-  document.getElementById('loading-overlay').classList.add('hidden');
-  sb.auth.onAuthStateChange(async(event,session)=>{
-    if(event==='SIGNED_IN'&&session){state.user=session.user;await loadData();showApp();document.getElementById('loading-overlay').classList.add('hidden');}
-    else if(event==='SIGNED_OUT'){state.user=null;state.turmas=[];state.alunos=[];state.historico=[];showLogin();}
-  });
-}
-
-async function loadData() {
-  const uid=state.user.id;
-  const [{data:turmas},{data:alunos},{data:historico}]=await Promise.all([
-    sb.from('turmas').select('*').eq('user_id',uid).order('created_at'),
-    sb.from('alunos').select('*').eq('user_id',uid).order('created_at'),
-    sb.from('historico').select('*').eq('user_id',uid).order('created_at',{ascending:false}).limit(50),
-  ]);
-  state.turmas=turmas||[];state.alunos=alunos||[];state.historico=historico||[];
-}
-
-function showApp() {
-  document.getElementById('page-login').classList.remove('active');
-  document.getElementById('page-app').classList.add('active');
-  const nome=state.user.user_metadata?.name||state.user.email?.split('@')[0]||'Professor';
-  document.getElementById('sidebar-avatar').textContent=nome.charAt(0).toUpperCase();
-  document.getElementById('sidebar-name').textContent=nome;
-  document.getElementById('sidebar-email').textContent=state.user.email;
-  renderAll();
-}
-
-function showLogin() {
-  document.getElementById('page-app').classList.remove('active');
-  document.getElementById('page-login').classList.add('active');
-}
-
-let loginMode='login';
-function toggleLoginMode() {
-  loginMode=loginMode==='login'?'signup':'login';
-  document.getElementById('login-title').textContent=loginMode==='login'?'Bem-vindo de volta':'Criar conta';
-  document.getElementById('login-sub').textContent=loginMode==='login'?'Acesse sua conta para gerenciar suas turmas e adaptações':'Crie sua conta gratuita';
-  document.getElementById('btn-auth').textContent=loginMode==='login'?'Entrar na plataforma →':'Criar conta →';
-  document.getElementById('field-nome').style.display=loginMode==='signup'?'block':'none';
-  document.getElementById('field-termos').style.display=loginMode==='signup'?'block':'none';
-  document.querySelector('.login-toggle').innerHTML=loginMode==='login'
-    ?'<a onclick="toggleLoginMode()">Não tem conta? <strong>Criar agora</strong></a>'
-    :'<a onclick="toggleLoginMode()">Já tem conta? <strong>Fazer login</strong></a>';
-  hideLoginError();
-}
-function showLoginError(msg){const el=document.getElementById('login-error');el.textContent=msg;el.style.display='block';}
-function hideLoginError(){document.getElementById('login-error').style.display='none';}
-
-async function doEmailAuth() {
-  const email=document.getElementById('login-email').value.trim();
-  const pass=document.getElementById('login-pass').value;
-  hideLoginError();
-  if(!email||!pass) return showLoginError('Preencha e-mail e senha.');
-  document.getElementById('btn-auth').textContent='Aguarde...';
-  document.getElementById('btn-auth').disabled=true;
-  try {
-    if(loginMode==='login'){
-      const{error}=await sb.auth.signInWithPassword({email,password:pass});
-      if(error) showLoginError('E-mail ou senha incorretos.');
-    } else {
-      const nome=document.getElementById('login-nome').value.trim();
-      const aceite=document.getElementById('aceite-termos')?.checked;
-      if(!aceite){showLoginError('Você precisa aceitar os Termos de Uso e a Política de Privacidade.');document.getElementById('btn-auth').textContent='Criar conta →';document.getElementById('btn-auth').disabled=false;return;}
-      const{error}=await sb.auth.signUp({email,password:pass,options:{data:{name:nome||email.split('@')[0]}}});
-      if(error) showLoginError(error.message);
-      else showLoginError('✅ Conta criada! Faça login.');
-    }
-  } catch(e){showLoginError('Erro de conexão.');}
-  document.getElementById('btn-auth').textContent=loginMode==='login'?'Entrar na plataforma →':'Criar conta →';
-  document.getElementById('btn-auth').disabled=false;
-}
-
-async function doGoogleLogin(){await sb.auth.signInWithOAuth({provider:'google',options:{redirectTo:window.location.origin+'/app'}});}
-async function doLogout(){await sb.auth.signOut();}
-
-async function criarTurma() {
-  const nome=document.getElementById('nt-nome').value.trim();
-  const etapa=document.getElementById('nt-etapa').value;
-  const disciplina=document.getElementById('nt-disciplina').value.trim();
-  const ano=document.getElementById('nt-ano').value;
-  if(!nome||!etapa) return showToast('⚠️ Preencha nome e etapa','warn');
-  const cores=['#4f9cf9','#a78bfa','#34d399','#fb923c','#f87171'];
-  const{data,error}=await sb.from('turmas').insert({user_id:state.user.id,nome,etapa,disciplina:disciplina||'Geral',ano,cor:cores[state.turmas.length%cores.length]}).select().single();
-  if(error) return showToast('❌ Erro ao criar turma: '+error.message,'warn');
-  state.turmas.push(data);
-  closeModal('modal-nova-turma');
-  ['nt-nome','nt-disciplina'].forEach(id=>document.getElementById(id).value='');
-  document.getElementById('nt-etapa').value='';
-  renderAll();
-  showToast('✅ Turma criada!');
-}
-
-async function criarAluno() {
-  const nome=document.getElementById('na-nome').value.trim();
-  const turmaId=document.getElementById('na-turma').value;
-  if(!nome) return showToast('⚠️ Informe um identificador','warn');
-  if(!turmaId) return showToast('⚠️ Selecione uma turma','warn');
-  const{data,error}=await sb.from('alunos').insert({user_id:state.user.id,turma_id:turmaId,nome,fragmentacao:'media',abstracao:'media',mediacao:'guiado',tipografia:'normal',dislexia:false,tdah:false,tea:false,baixa_visao:false,altas_habilidades:false,interesses:'',obs:''}).select().single();
-  if(error) return showToast('❌ Erro ao criar aluno: '+error.message,'warn');
-  state.alunos.push(data);
-  closeModal('modal-novo-aluno');
-  document.getElementById('na-nome').value='';
-  populateAdaptarTurmas();populatePeiTurmas();renderPainelAlunos();updateStats();
-  showToast('✅ Aluno criado! Configure os parâmetros.');
-  openTurma(turmaId);
-  setTimeout(()=>openAluno(data.id),100);
-}
-
-async function salvarAluno() {
-  const a=state.alunos.find(x=>x.id===state.alunoSelecionado);
-  if(!a) return;
-  // Lê do select se visível, senão do hidden input com default calculado
-  const getVal=(id)=>document.getElementById(id)?.value||document.getElementById(id+'-hidden')?.value||null;
-  const tea=document.getElementById('p-tea')?.checked||false;
-  const tdah=document.getElementById('p-tdah')?.checked||false;
-  const dislexia=document.getElementById('p-dislexia')?.checked||false;
-  const updates={
-    fragmentacao:getVal('p-fragmentacao')||(tea||tdah||dislexia?'alta':a.fragmentacao),
-    abstracao:getVal('p-abstracao')||(tea?'nao_abstrai':a.abstracao),
-    mediacao:getVal('p-mediacao')||(tea||tdah?'passo_a_passo':a.mediacao),
-    tipografia:getVal('p-tipografia')||a.tipografia||'normal',
-    dislexia,
-    tdah,
-    tea,
-    baixa_visao:document.getElementById('p-baixa-visao')?.checked||false,
-    altas_habilidades:document.getElementById('p-altas-habilidades')?.checked||false,
-    interesses:document.getElementById('p-interesses')?.value||'',
-    obs:document.getElementById('p-obs')?.value||'',
-  };
-  const{error}=await sb.from('alunos').update(updates).eq('id',a.id);
-  if(error) return showToast('❌ Erro ao salvar','warn');
-  Object.assign(a,updates);
-  showToast('✅ Perfil salvo!');
-  setTimeout(()=>openTurma(state.turmaSelecionada),800);
-}
-
-async function salvarHistorico(item) {
-  const{data}=await sb.from('historico').insert({...item,user_id:state.user.id}).select().single();
-  if(data) state.historico.unshift(data);
-  renderHistorico();
-}
-
-async function salvarHistoricoComConteudo(item, conteudo) {
-  // Remove habilidades RG brutas do conteúdo antes de salvar — são grandes e reconstruíveis
-  let conteudoCompacto = conteudo;
-  try {
-    if (conteudo?.tipo === 'json' && conteudo?.data?.registroPedagogico) {
-      const rp = conteudo.data.registroPedagogico;
-      // Limita cada lista de habilidades a 5 itens para economizar espaço
-      conteudoCompacto = {
-        ...conteudo,
-        data: {
-          ...conteudo.data,
-          registroPedagogico: {
-            ...rp,
-            habilidadesBNCC: (rp.habilidadesBNCC||rp.habilidades||[]).slice(0,5),
-            habilidadesEstadual: (rp.habilidadesEstadual||[]).slice(0,5),
-          }
-        }
-      };
-    }
-  } catch(e) { conteudoCompacto = conteudo; }
-
-  const{data,error}=await sb.from('historico').insert({...item, conteudo:conteudoCompacto, user_id:state.user.id}).select().single();
-  if(error){
-    showToast(`❌ Histórico erro: ${error.message}`,'warn');
-    console.warn('Histórico erro completo:', error);
-    // Tenta salvar sem conteúdo
-    const{data:d2, error:e2}=await sb.from('historico').insert({...item, user_id:state.user.id}).select().single();
-    if(e2) showToast(`❌ Histórico falhou completamente: ${e2.message}`,'warn');
-    if(d2) state.historico.unshift(d2);
-  } else {
-    if(data) state.historico.unshift(data);
-  }
-  renderHistorico();
-}
-
-async function salvarPerfilProfessor() {
-  const nome=document.getElementById('perfil-nome').value.trim();
-  const escola=document.getElementById('perfil-escola').value.trim();
-  const estado=document.getElementById('perfil-estado').value;
-  const disciplinas=Array.from(document.querySelectorAll('#perfil-disciplinas-list input:checked')).map(cb=>cb.value);
-  const etapas=[];
-  ['ei','ef1','ef2','em','eja','superior'].forEach(e=>{if(document.getElementById('etapa-'+e)?.checked) etapas.push(e);});
-  const{error}=await sb.auth.updateUser({data:{name:nome||state.user.user_metadata?.name,escola,estado,disciplinas,etapas}});
-  if(error) return showToast('❌ Erro ao salvar perfil','warn');
-  if(!state.user.user_metadata) state.user.user_metadata={};
-  Object.assign(state.user.user_metadata,{name:nome,escola,estado,disciplinas,etapas});
-  document.getElementById('sidebar-name').textContent=nome||state.user.user_metadata?.name||'Professor';
-  showToast('✅ Perfil atualizado!');
-}
-
-function carregarDadosPerfil() {
-  const meta=state.user?.user_metadata||{};
-  document.getElementById('perfil-nome').value=meta.name||'';
-  document.getElementById('perfil-escola').value=meta.escola||'';
-  document.getElementById('perfil-estado').value=meta.estado||'BNCC';
-  document.getElementById('perfil-email-display').textContent=state.user?.email||'';
-  const discs=meta.disciplinas||[];
-  document.querySelectorAll('#perfil-disciplinas-list input').forEach(cb=>{cb.checked=discs.includes(cb.value);});
-  const etapas=meta.etapas||[];
-  ['ei','ef1','ef2','em','eja','superior'].forEach(e=>{const el=document.getElementById('etapa-'+e);if(el) el.checked=etapas.includes(e);});
-  const profEl=document.getElementById('pei-professor');
-  if(profEl&&!profEl.value) profEl.value=meta.name||'';
-}
-
-function renderAll(){renderTurmas();renderDashboard();renderHistorico();updateStats();populateAdaptarTurmas();populatePeiTurmas();}
-function etapaLabel(etapa){if(etapa==='ef1') return{label:'EF I',cls:'badge-ef1'};if(etapa==='ef2') return{label:'EF II',cls:'badge-ef2'};if(etapa==='ei') return{label:'Ed. Inf.',cls:'badge-ef1'};if(etapa==='eja') return{label:'EJA',cls:'badge-ef2'};return{label:'EM',cls:'badge-em'};}
-function etapaIcon(etapa){if(etapa==='ef1') return '🎒';if(etapa==='ef2') return '📚';if(etapa==='ei') return '🌱';if(etapa==='eja') return '📖';return '🎓';}
-
-function renderTurmas() {
-  const grid=document.getElementById('turmas-grid');
-  if(!state.turmas.length){grid.innerHTML='<div class="empty-state"><div class="empty-icon">🏫</div><p>Nenhuma turma cadastrada.<br>Clique em "+ Nova turma" para começar.</p></div>';return;}
-  grid.innerHTML=state.turmas.map(t=>{
-    const et=etapaLabel(t.etapa);
-    const alunos=state.alunos.filter(a=>a.turma_id===t.id);
-    return `<div class="turma-card" onclick="openTurma('${t.id}')">
-      <div class="tc-header"><div class="tc-icon" style="background:${t.cor}22">${etapaIcon(t.etapa)}</div><span class="tc-badge ${et.cls}">${et.label}</span></div>
-      <div class="tc-name">${t.nome}</div><div class="tc-meta">${t.disciplina} · ${t.ano}</div>
-      <div class="tc-alunos"><span>👥 ${alunos.length} aluno${alunos.length!==1?'s':''} incluso${alunos.length!==1?'s':''}</span>
-      <div style="display:flex;gap:8px;align-items:center"><span style="color:var(--accent);font-weight:500">Ver →</span>
-      <span onclick="event.stopPropagation();confirmarApagarTurma('${t.id}','${t.nome}')" style="color:var(--danger);font-size:12px;cursor:pointer;padding:2px 8px;border-radius:6px;border:1px solid var(--danger);opacity:0.7" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0.7">🗑</span></div></div>
-    </div>`;
-  }).join('');
-}
-
-function renderDashboard() {
-  const temTurmas=state.turmas.length>0;
-  const nome=state.user?.user_metadata?.name||state.user?.email?.split('@')[0]||'Professor';
-  document.getElementById('dash-nome-prof').textContent=nome;
-  document.getElementById('dash-subtitulo').textContent=temTurmas?'O que vamos fazer hoje?':'Vamos configurar a plataforma juntos!';
-  document.getElementById('dash-empty').style.display=temTurmas?'none':'block';
-  document.getElementById('dash-acoes').style.display=temTurmas?'block':'none';
-}
-
-function renderPainelAlunos() {
-  const filtroSel=document.getElementById('alunos-filtro-turma');
-  if(filtroSel&&filtroSel.options.length===1) state.turmas.forEach(t=>{const opt=document.createElement('option');opt.value=t.id;opt.textContent=t.nome;filtroSel.appendChild(opt);});
-  const turmaFiltro=filtroSel?filtroSel.value||null:null;
-  const alunos=turmaFiltro?state.alunos.filter(a=>a.turma_id===turmaFiltro):state.alunos;
-  const list=document.getElementById('alunos-painel-list');
-  if(!list) return;
-  if(!alunos.length){list.innerHTML='<div class="empty-state"><div class="empty-icon">👥</div><p>Nenhum aluno incluso cadastrado.</p><button class="btn btn-primary" style="width:auto;margin-top:12px" onclick="showPanel(\'turmas\')">Ir para Turmas</button></div>';return;}
-  const colors=['#2563eb','#7c3aed','#059669','#ea580c','#dc2626','#d97706','#0284c7','#9333ea'];
-  const porTurma={};
-  alunos.forEach(a=>{if(!porTurma[a.turma_id]) porTurma[a.turma_id]=[];porTurma[a.turma_id].push(a);});
-  let html='';
-  Object.keys(porTurma).forEach(tid=>{
-    const turma=state.turmas.find(t=>t.id===tid);if(!turma) return;
-    html+=`<div class="section-title" style="margin-top:20px">${turma.nome} — ${turma.disciplina}</div>`;
-    html+='<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;margin-bottom:8px">';
-    porTurma[tid].forEach((a,i)=>{
-      const cor=colors[i%colors.length];const tags=[];
-      if(a.dislexia) tags.push('Dislexia');if(a.tdah) tags.push('TDAH');if(a.tea) tags.push('TEA');
-      html+=`<div onclick="openTurma('${a.turma_id}');setTimeout(()=>openAluno('${a.id}'),100)" class="dash-card" style="display:flex;align-items:center;gap:10px">
-        <div style="width:38px;height:38px;border-radius:50%;background:${cor};display:flex;align-items:center;justify-content:center;color:white;font-weight:700;font-size:15px;flex-shrink:0">${a.nome.charAt(0)}</div>
-        <div style="min-width:0"><div style="font-weight:600;font-size:13px">${a.nome}</div><div style="font-size:11px;color:var(--muted)">${tags.length?tags.join(', '):'Sem tags'}</div></div>
-      </div>`;
-    });
-    html+='</div>';
-  });
-  list.innerHTML=html;
-}
-
-function updateStats(){renderDashboard();}
-
-function openTurma(id) {
-  state.turmaSelecionada=id;
-  const t=state.turmas.find(x=>x.id===id);if(!t) return;
-  const et=etapaLabel(t.etapa);
-  document.getElementById('detalhe-nome').textContent=t.nome;
-  document.getElementById('detalhe-meta').innerHTML=`<span class="tc-badge ${et.cls}" style="margin-right:8px">${et.label}</span>${t.disciplina} · ${t.ano}`;
-  renderAlunosList(id);showPanel('turma-detalhe');
-  document.getElementById('nav-turmas').classList.add('active');
-}
-
-function adaptarEstaTurma() {
-  // Verifica se a turma tem alunos cadastrados
-  const alunosDaTurma=state.alunos.filter(a=>a.turma_id===state.turmaSelecionada);
-  if(!alunosDaTurma.length){
-    showToast('👤 Ops! Precisamos cadastrar um aluno primeiro.','warn');
-    return;
-  }
-  // Navega para adaptação com a turma atual já selecionada
-  showPanel('adaptar');
-  const sel=document.getElementById('adaptar-turma');
-  if(sel&&state.turmaSelecionada){
-    sel.value=state.turmaSelecionada;
-    loadAlunosParaAdaptar();
-  }
-  // Preenche disciplina da turma automaticamente se campo vazio
-  const turma=state.turmas.find(t=>t.id===state.turmaSelecionada);
-  const discInput=document.getElementById('material-disciplina');
-  if(turma&&discInput&&!discInput.value) discInput.value=turma.disciplina;
-}
-
-const alunoColors=['#4f9cf9','#a78bfa','#34d399','#fb923c','#f87171','#fbbf24','#60a5fa','#c084fc'];
-
-function renderAlunosList(turmaId) {
-  const alunos=state.alunos.filter(a=>a.turma_id===turmaId);
-  const list=document.getElementById('alunos-list');
-  if(!alunos.length){list.innerHTML='<div class="empty-state"><div class="empty-icon">👥</div><p>Nenhum aluno incluso cadastrado ainda.</p></div>';return;}
-  const fragLabel={baixa:'Frag. Baixa',media:'Frag. Média',alta:'Frag. Alta',nao_alfabetizado:'🖼️ Não alfab.'};
-  list.innerHTML=alunos.map((a,i)=>{
-    const tags=[];
-    if(a.dislexia) tags.push('<span class="tag tag-orange">Dislexia</span>');
-    if(a.tdah) tags.push('<span class="tag tag-orange">TDAH</span>');
-    if(a.tea) tags.push('<span class="tag tag-orange">TEA</span>');
-    if(a.altas_habilidades) tags.push('<span class="tag tag-blue">⭐ Altas hab.</span>');
-    if(a.fragmentacao) tags.push(`<span class="tag tag-blue">${fragLabel[a.fragmentacao]||a.fragmentacao}</span>`);
-    return `<div class="aluno-row" onclick="openAluno('${a.id}')">
-      <div class="aluno-avatar" style="background:${alunoColors[i%8]}22;color:${alunoColors[i%8]}">${a.nome.charAt(0)}</div>
-      <div class="aluno-info"><div class="aluno-name">${a.nome}</div><div class="aluno-tags">${tags.join('')}</div></div>
-      <div style="display:flex;gap:8px;align-items:center;flex-shrink:0">
-        <button class="btn btn-secondary btn-sm" onclick="event.stopPropagation();openAluno('${a.id}')">Editar →</button>
-        <button class="btn btn-sm" onclick="event.stopPropagation();confirmarApagarAluno('${a.id}','${a.nome}')" style="color:var(--danger);border:1px solid var(--border);background:var(--surface2)">🗑</button>
-      </div>
-    </div>`;
-  }).join('');
-}
-
-function openAluno(id) {
-  const a=state.alunos.find(x=>x.id===id);
-  state.alunoSelecionado=id;
-  document.getElementById('aluno-nome-titulo').textContent=a.nome;
-  document.getElementById('back-to-turma').onclick=()=>openTurma(state.turmaSelecionada);
-  renderParamGrid(a);showPanel('aluno-perfil');
-}
-
-const fragOpts=[{value:'baixa',label:'📄 Baixa',desc:'Texto contínuo e fluido, sem divisões.'},{value:'media',label:'📋 Média',desc:'Parágrafos curtos, conceitos separados.'},{value:'alta',label:'📌 Alta',desc:'Blocos curtos, um conceito por bloco.'},{value:'nao_alfabetizado',label:'🖼️ Não alfabetizado',desc:'Material convertido em prancha de pictogramas (ARASAAC).'}];
-const abstOpts=[{value:'alta',label:'🔭 Alta',desc:'Inclui inferências, analogias e exemplos.'},{value:'media',label:'🔬 Média',desc:'Explica com exemplos simples e diretos.'},{value:'baixa',label:'🧱 Baixa',desc:'Linguagem direta e concreta.'},{value:'nao_abstrai',label:'🔤 Não abstrai',desc:'Tudo literal. Sem inferências ou analogias.'}];
-const medOpts=[{value:'autonomo',label:'🦅 Autônomo',desc:'Enunciado direto, sem instruções extras.'},{value:'guiado',label:'🤝 Guiado',desc:'Inclui instruções e exemplos de apoio.'},{value:'passo_a_passo',label:'📋 Passo a passo',desc:'Cada etapa explicada detalhadamente.'}];
-const tipoOpts=[{value:'normal',label:'Abc Normal',desc:'Fonte padrão com maiúsculas e minúsculas.'},{value:'bastao',label:'ABC Bastão',desc:'Texto em caixa alta.'}];
-
-function paramSelect(id,label,icon,desc,options,currentVal) {
-  return `<div class="param-card"><h4>${icon} ${label}</h4><p style="font-size:12px;color:var(--muted);margin-bottom:14px">${desc}</p><div class="param-select-wrap"><select id="${id}" class="param-select" onchange="updateParamDesc('${id}')">${options.map(o=>`<option value="${o.value}" ${currentVal===o.value?'selected':''}>${o.label}</option>`).join('')}</select><div class="param-desc-box" id="desc-${id}">${options.find(o=>o.value===currentVal)?.desc||''}</div></div></div>`;
-}
-
-function updateParamDesc(id) {
-  const val=document.getElementById(id).value;
-  const maps={'p-fragmentacao':fragOpts,'p-abstracao':abstOpts,'p-mediacao':medOpts,'p-tipografia':tipoOpts};
-  const found=maps[id]?.find(o=>o.value===val);
-  if(found) document.getElementById('desc-'+id).textContent=found.desc;
-}
-
-function renderParamGrid(a) {
-  const isNaoAlf=a.fragmentacao==='nao_alfabetizado';
-
-  // Defaults automáticos por diagnóstico
-  const fragDefault = isNaoAlf ? 'nao_alfabetizado' : (a.tea ? 'alta' : a.tdah ? 'alta' : a.dislexia ? 'alta' : a.fragmentacao||'media');
-  const abstDefault = a.tea ? 'nao_abstrai' : (a.abstracao||'media');
-  const medDefault  = a.tea ? 'passo_a_passo' : a.tdah ? 'passo_a_passo' : (a.mediacao||'guiado');
-  const tipoDefault = a.tipografia||'normal';
-
-  document.getElementById('param-grid-content').innerHTML=`
-
-    <!-- BLOCO 1: DIAGNÓSTICO — vem primeiro -->
-    <div class="param-card" style="grid-column:1/-1;border:2px solid rgba(37,99,235,0.2);background:rgba(37,99,235,0.03)">
-      <h4 style="font-size:15px;color:var(--text)">🩺 Diagnóstico do aluno</h4>
-      <p style="font-size:12px;color:var(--muted);margin-bottom:16px">Marque o(s) diagnóstico(s) do aluno. Os parâmetros serão ajustados automaticamente.</p>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-        <label class="check-item" style="padding:10px 14px;background:var(--bg);border:1px solid var(--border);border-radius:10px;cursor:pointer;transition:all 0.2s" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border)'">
-          <input type="checkbox" id="p-dislexia" ${a.dislexia?'checked':''} onchange="atualizarDefaultsDiagnostico()">
-          <span><strong>Dislexia</strong><br><span style="font-size:11px;color:var(--muted);font-weight:400">Frases curtas, espaçamento maior</span></span>
-        </label>
-        <label class="check-item" style="padding:10px 14px;background:var(--bg);border:1px solid var(--border);border-radius:10px;cursor:pointer;transition:all 0.2s" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border)'">
-          <input type="checkbox" id="p-tdah" ${a.tdah?'checked':''} onchange="atualizarDefaultsDiagnostico()">
-          <span><strong>TDAH</strong><br><span style="font-size:11px;color:var(--muted);font-weight:400">Blocos curtos, um item por vez</span></span>
-        </label>
-        <label class="check-item" style="padding:10px 14px;background:var(--bg);border:1px solid var(--border);border-radius:10px;cursor:pointer;transition:all 0.2s" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border)'">
-          <input type="checkbox" id="p-tea" ${a.tea?'checked':''} onchange="atualizarDefaultsDiagnostico()">
-          <span><strong>TEA</strong><br><span style="font-size:11px;color:var(--muted);font-weight:400">Linguagem literal, sem metáforas</span></span>
-        </label>
-        <label class="check-item" style="padding:10px 14px;background:var(--bg);border:1px solid var(--border);border-radius:10px;cursor:pointer;transition:all 0.2s" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border)'">
-          <input type="checkbox" id="p-baixa-visao" ${a.baixa_visao?'checked':''} onchange="atualizarDefaultsDiagnostico()">
-          <span><strong>Baixa visão</strong><br><span style="font-size:11px;color:var(--muted);font-weight:400">Sem tabelas ou layouts complexos</span></span>
-        </label>
-        <label class="check-item" style="padding:10px 14px;background:rgba(251,191,36,0.08);border:1px solid rgba(251,191,36,0.3);border-radius:10px;cursor:pointer;grid-column:1/-1;transition:all 0.2s" onmouseover="this.style.borderColor='#f59e0b'" onmouseout="this.style.borderColor='rgba(251,191,36,0.3)'">
-          <input type="checkbox" id="p-altas-habilidades" ${a.altas_habilidades?'checked':''} onchange="atualizarDefaultsDiagnostico()">
-          <span><strong>⭐ Altas habilidades / Superdotação</strong><br><span style="font-size:11px;color:var(--muted);font-weight:400">Aprofundar, desafiar e enriquecer o conteúdo</span></span>
-        </label>
-      </div>
-    </div>
-
-    <!-- BLOCO 2: PERSONALIZAÇÃO — expansível -->
-    <div class="param-card" style="grid-column:1/-1">
-      <button onclick="togglePersonalizacao()" style="width:100%;display:flex;align-items:center;justify-content:space-between;background:none;border:none;cursor:pointer;padding:0;font-family:'DM Sans',sans-serif">
-        <h4 style="font-size:14px;margin:0;display:flex;align-items:center;gap:8px">⚙️ Personalizar parâmetros <span style="font-size:11px;color:var(--muted);font-weight:400">(opcional)</span></h4>
-        <span id="personalizacao-seta" style="font-size:16px;color:var(--muted);transition:transform 0.2s">▾</span>
-      </button>
-      <p style="font-size:12px;color:var(--muted);margin-top:6px;margin-bottom:0">Os parâmetros já foram ajustados pelo diagnóstico. Clique para refinar manualmente.</p>
-      <div id="personalizacao-conteudo" style="display:none;margin-top:16px">
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
-          ${!isNaoAlf ? `
-          <div>
-            ${paramSelect('p-fragmentacao','Nível de leitura','📝','Define o formato do material.',fragOpts,fragDefault)}
-          </div>
-          <div>
-            ${paramSelect('p-abstracao','Nível de abstração','🧩','Define se usa analogias ou mantém tudo literal.',abstOpts,abstDefault)}
-          </div>
-          <div>
-            ${paramSelect('p-mediacao','Mediação / Autonomia','🧭','Define se o aluno precisa de instruções detalhadas.',medOpts,medDefault)}
-          </div>
-          <div>
-            ${paramSelect('p-tipografia','Tipo de letra','🔤','Define o formato de texto.',tipoOpts,tipoDefault)}
-          </div>
-          ` : `
-          <div style="grid-column:1/-1">
-            ${paramSelect('p-fragmentacao','Nível de leitura','📝','Define o formato do material.',fragOpts,fragDefault)}
-          </div>
-          `}
-        </div>
-      </div>
-      ${isNaoAlf ? '' : `
-      <!-- Campos ocultos com valores default para garantir que buildPrompt sempre tenha os valores -->
-      <input type="hidden" id="p-fragmentacao-hidden" value="${fragDefault}">
-      <input type="hidden" id="p-abstracao-hidden" value="${abstDefault}">
-      <input type="hidden" id="p-mediacao-hidden" value="${medDefault}">
-      <input type="hidden" id="p-tipografia-hidden" value="${tipoDefault}">
-      `}
-    </div>
-
-    <!-- BLOCO 3: INTERESSES E OBSERVAÇÕES -->
-    <div class="param-card" style="grid-column:1/-1">
-      <h4>🎯 Interesses e hiperfoco</h4>
-      <p style="font-size:12px;color:var(--muted);margin-bottom:10px">A IA usará esses interesses para tornar o conteúdo mais relevante para o aluno.</p>
-      <textarea id="p-interesses" rows="3" placeholder="Ex: adora dinossauros, tem hiperfoco em astronomia, gosta de Minecraft..." style="width:100%;min-height:80px">${a.interesses||''}</textarea>
-    </div>
-    <div class="param-card" style="grid-column:1/-1">
-      <h4>📌 Observações pedagógicas</h4>
-      <p style="font-size:12px;color:var(--muted);margin-bottom:10px">Contexto adicional que a IA deve considerar na adaptação.</p>
-      <textarea id="p-obs" rows="4" placeholder="Ex: aprende melhor com exemplos do cotidiano, responde bem a desafios..." style="width:100%;min-height:100px">${a.obs||''}</textarea>
-    </div>`;
-
-  // Listener para o select de fragmentação quando aberto
-  const fragSel=document.getElementById('p-fragmentacao');
-  if(fragSel){
-    fragSel.addEventListener('change',function(){
-      renderParamGrid({...state.alunos.find(x=>x.id===state.alunoSelecionado),fragmentacao:this.value});
-    });
-  }
-}
-
-function togglePersonalizacao() {
-  const conteudo=document.getElementById('personalizacao-conteudo');
-  const seta=document.getElementById('personalizacao-seta');
-  if(!conteudo||!seta) return;
-  const aberto=conteudo.style.display!=='none';
-  conteudo.style.display=aberto?'none':'block';
-  seta.style.transform=aberto?'rotate(0deg)':'rotate(180deg)';
-}
-
-function atualizarDefaultsDiagnostico() {
-  const tea=document.getElementById('p-tea')?.checked||false;
-  const tdah=document.getElementById('p-tdah')?.checked||false;
-  const dislexia=document.getElementById('p-dislexia')?.checked||false;
-
-  // Só atualiza se o painel de personalização estiver fechado
-  const conteudo=document.getElementById('personalizacao-conteudo');
-  const painelAberto=conteudo&&conteudo.style.display!=='none';
-  if(painelAberto) return; // professor está personalizando manualmente, não sobrescreve
-
-  // Ajusta defaults baseado em diagnóstico
-  const fragSel=document.getElementById('p-fragmentacao');
-  const abstSel=document.getElementById('p-abstracao');
-  const medSel=document.getElementById('p-mediacao');
-
-  if(tea){
-    if(abstSel){abstSel.value='nao_abstrai';updateParamDesc('p-abstracao');}
-    if(medSel){medSel.value='passo_a_passo';updateParamDesc('p-mediacao');}
-    if(fragSel){fragSel.value='alta';updateParamDesc('p-fragmentacao');}
-    showToast('⚠️ TEA ativo: parâmetros ajustados automaticamente','warn');
-  } else if(tdah){
-    if(fragSel){fragSel.value='alta';updateParamDesc('p-fragmentacao');}
-    if(medSel){medSel.value='passo_a_passo';updateParamDesc('p-mediacao');}
-  } else if(dislexia){
-    if(fragSel){fragSel.value='alta';updateParamDesc('p-fragmentacao');}
-  }
-}
-
-function openModalNovoAluno() {
-  const sel=document.getElementById('na-turma');
-  let html='<option value="">Selecione uma turma...</option>';
-  state.turmas.forEach(t=>{html+=`<option value="${t.id}">${t.nome} — ${t.disciplina}</option>`;});
-  sel.innerHTML=html;
-  if(state.turmaSelecionada) sel.value=state.turmaSelecionada;
-  openModal('modal-novo-aluno');
-}
-
-function openModalNovoAlunoDashboard() {
-  if(!state.turmas.length){showToast('⚠️ Crie uma turma primeiro!','warn');openModal('modal-nova-turma');return;}
-  openModalNovoAluno();
-}
-
-function populateAdaptarTurmas() {
-  const sel=document.getElementById('adaptar-turma');
-  let html='<option value="">Selecione uma turma...</option>';
-  state.turmas.forEach(t=>{html+=`<option value="${t.id}">${t.nome} — ${t.disciplina}</option>`;});
-  sel.innerHTML=html;
-}
-
-function populatePeiTurmas() {
-  const sel=document.getElementById('pei-turma');if(!sel) return;
-  let html='<option value="">Selecione uma turma...</option>';
-  state.turmas.forEach(t=>{html+=`<option value="${t.id}">${t.nome} — ${t.disciplina}</option>`;});
-  sel.innerHTML=html;
-}
-
-function loadAlunosParaAdaptar() {
-  const turmaId=document.getElementById('adaptar-turma').value;
-  const list=document.getElementById('aluno-select-list');
-  if(!turmaId){list.innerHTML='<div class="empty-state"><div class="empty-icon">👆</div><p>Selecione uma turma</p></div>';return;}
-  const alunos=state.alunos.filter(a=>a.turma_id===turmaId);
-  if(!alunos.length){list.innerHTML='<div class="empty-state"><div class="empty-icon">👥</div><p>Nenhum aluno nesta turma</p></div>';return;}
-  list.innerHTML=alunos.map((a,i)=>`<div class="aluno-check-row"><input type="checkbox" id="check-${a.id}" value="${a.id}" checked><div class="aluno-avatar" style="width:28px;height:28px;font-size:11px;background:${alunoColors[i%8]}22;color:${alunoColors[i%8]}">${a.nome.charAt(0)}</div><label for="check-${a.id}" style="cursor:pointer;font-size:13px;flex:1">${a.nome}</label></div>`).join('');
-}
-
-function loadAlunosPei() {
-  const turmaId=document.getElementById('pei-turma').value;
-  const container=document.getElementById('pei-alunos-checkboxes');
-  if(!turmaId){container.innerHTML='<span style="color:var(--muted);font-size:13px">Selecione uma turma primeiro</span>';return;}
-  const alunos=state.alunos.filter(a=>a.turma_id===turmaId);
-  if(!alunos.length){container.innerHTML='<span style="color:var(--muted);font-size:13px">Nenhum aluno nesta turma</span>';return;}
-  container.innerHTML=alunos.map(a=>`<label style="display:flex;align-items:center;gap:8px;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:10px 14px;cursor:pointer;font-size:13px;font-weight:500"><input type="checkbox" value="${a.id}" style="accent-color:var(--accent2);width:16px;height:16px"> ${a.nome}</label>`).join('');
-}
-
-// ═══════════════════════════════════════════════════════════════
-// BUILD PROMPT — versão com blocos por diagnóstico (v2.0)
-// Baseado em diretrizes de Neuropsicologia Pedagógica
-// ═══════════════════════════════════════════════════════════════
-function buildPrompt(aluno, texto, disciplina, nomeAtiv) {
-  const meta = state.user?.user_metadata || {};
-  const estado = meta.estado || 'BNCC';
-  const refCurr = estado === 'RS_RG' ? 'Documento Orientador Curricular do Território Rio-grandino (SMEd/Rio Grande-RS)'
-    : estado === 'RS' ? 'Referencial Curricular Gaúcho'
-    : estado === 'SP' ? 'Currículo Paulista'
-    : estado === 'RJ' ? 'Currículo Carioca'
-    : estado === 'PR' ? 'CREP/Paraná'
-    : estado === 'SC' ? 'DCSC/Santa Catarina'
-    : 'BNCC';
-
-  // Instrução adicional para Rio Grande município
-  // Instrução adicional para Rio Grande município — injeta habilidades reais do documento
-  let instrucaoMunicipal = '';
-  if (estado === 'RS_RG') {
-    const mapaDiscRG = {
-      'Biologia':'CI','Ciências':'CI','Química':'CI','Física':'CI',
-      'Língua Portuguesa':'LP','Português':'LP',
-      'Matemática':'MA','História':'HI','Geografia':'GE',
-      'Artes':'AR','Educação Física':'EF','Inglês':'LI','Espanhol':'LE',
-    };
-    const etapas = meta.etapas || [];
-    const etapaRG = etapas.includes('ef2') ? 'ef2' : 'ef1';
-    const discAtual = (disciplina || meta.disciplinas?.[0] || '').trim();
-    const codDisc = mapaDiscRG[discAtual];
-    let habReais = 'Consulte o documento oficial da SMEd para os códigos desta disciplina.';
-    if (codDisc && typeof HABILIDADES_RG !== 'undefined' && HABILIDADES_RG[codDisc]?.[etapaRG]) {
-      const lista = HABILIDADES_RG[codDisc][etapaRG].slice(0, 30);
-      habReais = lista.map(h => `${h.c}: ${h.d}`).join('\n');
-    }
-    instrucaoMunicipal = `
-
-REFERENCIAL MUNICIPAL — Rio Grande/RS:
-Documento: "Documento Orientador Curricular do Território Rio-grandino" (SMEd/Rio Grande-RS, 2020)
-URL: https://www.riogrande.rs.gov.br/smed/?page_id=38648
-
-HABILIDADES REAIS DO DOCUMENTO RIO-GRANDINO — ${discAtual||'disciplina'} (${etapaRG==='ef2'?'Anos Finais EF':'Anos Iniciais EF'}):
-${habReais}
-
-INSTRUÇÃO CRÍTICA: Use EXCLUSIVAMENTE os códigos listados acima nas habilidadesEstadual. NÃO invente códigos. Selecione os 2 a 4 mais relevantes para o conteúdo adaptado.`;
-  }
-  const discProf = meta.disciplinas?.length ? meta.disciplinas.join(', ') : (disciplina || 'Geral');
-
-  // ── BLOCO 1: ESTRUTURA DO TEXTO ──────────────────────────────
-  const fragMap = {
-    baixa: 'Escreva em texto corrido, parágrafos fluidos, sem divisões. Máximo 5 frases por parágrafo.',
-    media: 'Escreva em parágrafos curtos. Máximo 3 frases por parágrafo. Um conceito central por parágrafo.',
-    alta: 'Escreva em blocos bem curtos. Um único conceito por bloco. Use listas numeradas sempre que possível. Nunca agrupe dois conceitos no mesmo item.',
-  };
-
-  // ── BLOCO 2: ABSTRAÇÃO ───────────────────────────────────────
-  // TEA sempre sobrescreve abstração — linguagem figurada é contraindicada
-  const abstracaoEfetiva = aluno.tea ? 'nao_abstrai' : (aluno.abstracao || 'media');
-  const abstMap = {
-    alta: 'Use analogias ricas, metáforas e exemplos do cotidiano para aprofundar a compreensão.',
-    media: 'Explique cada conceito com um exemplo simples e direto. Evite jargões sem explicação.',
-    baixa: 'Use linguagem concreta e direta. Prefira exemplos físicos e visíveis. Evite abstrações.',
-    nao_abstrai: 'Tudo literal e concreto. Zero metáforas, zero analogias, zero linguagem figurada. Apenas fatos observáveis e verificáveis.',
-  };
-
-  // ── BLOCO 3: MEDIAÇÃO ────────────────────────────────────────
-  const medMap = {
-    autonomo: 'Enunciados diretos, sem instruções de apoio. O aluno navega sozinho.',
-    guiado: 'Inclua uma instrução curta de apoio antes de cada seção. Ex: "Leia com atenção:" ou "Responda:".',
-    passo_a_passo: 'Use marcadores sequenciais explícitos em cada etapa: "Primeiro...", "Depois...", "Em seguida...", "Por fim...". Nunca pule etapas.',
-  };
-
-  // ── BLOCO 4: CONDIÇÕES ESPECÍFICAS POR DIAGNÓSTICO ──────────
-  const blocosDiagnostico = [];
-
-  if (aluno.tea) {
-    blocosDiagnostico.push(`
-TEA — TRANSTORNO DO ESPECTRO AUTISTA:
-- Use linguagem 100% literal. ZERO metáforas, expressões idiomáticas ou linguagem figurada. Exemplo do que EVITAR: "a célula é uma fábrica". Exemplo do que USAR: "a célula produz energia e proteínas".
-- Estruture com previsibilidade explícita: indique o que virá a seguir. Ex: "Agora você vai ler sobre...", "Depois, você vai responder...".
-- Aplique a técnica Dizer-Mostrar-Fazer: (1) explique o conceito em palavras simples, (2) dê um exemplo concreto e observável, (3) proponha que o aluno aplique ou responda.
-- Comandos curtos e diretos. Um comando por vez. Nunca junte dois comandos na mesma frase.
-- Evite ironia, sarcasmo, duplo sentido ou qualquer ambiguidade linguística.
-- Espaçamento entre linhas generoso. Não use tabelas complexas ou layouts densos.`);
-  }
-
-  if (aluno.tdah) {
-    blocosDiagnostico.push(`
-TDAH — TRANSTORNO DE DÉFICIT DE ATENÇÃO E HIPERATIVIDADE:
-- Divida o material em blocos pequenos e bem separados visualmente. Nunca dois conceitos no mesmo bloco.
-- Uma tarefa por vez. Nunca liste múltiplas instruções juntas.
-- Inicie cada instrução com um verbo de ação claro: "Leia", "Circule", "Escreva", "Observe", "Responda".
-- Destaque palavras-chave em negrito para ancorar a atenção.
-- Elimine completamente informações secundárias, curiosidades e detalhes dispensáveis — apenas o essencial.
-- Frases curtas. Máximo 15 palavras por frase. Uma ideia por frase.
-- Após 2 a 3 blocos de conteúdo, insira explicitamente: "⏸ Pausa — respire fundo antes de continuar."`);
-  }
-
-  if (aluno.dislexia) {
-    blocosDiagnostico.push(`
-DISLEXIA:
-- Frases curtas e diretas. Máximo 15 palavras por frase. Uma ideia por frase.
-- Use voz ativa sempre. Exemplo do que EVITAR: "A energia é produzida pela célula". Exemplo do que USAR: "A célula produz energia".
-- Evite dupla negação. Exemplo do que EVITAR: "não é incorreto". Exemplo do que USAR: "está correto".
-- Elimine palavras desnecessárias. Prefira frases simples e diretas.
-- Separe visualmente cada questão e cada seção com espaço generoso.
-- Use marcadores visuais claros (▸, números) para listas.
-- Não use itálico. Use negrito apenas para palavras-chave essenciais.`);
-  }
-
-  if (aluno.baixa_visao) {
-    blocosDiagnostico.push(`
-BAIXA VISÃO:
-- Sem tabelas, gráficos ou elementos visuais de qualquer tipo.
-- Descreva em palavras qualquer informação que normalmente seria apresentada visualmente.
-- Estrutura linear, sem colunas paralelas ou layouts complexos.
-- Frases descritivas e completas, sem depender de posição espacial.`);
-  }
-
-  // ── BLOCO 5: ALTAS HABILIDADES ───────────────────────────────
-  let blocoAltasHabilidades = '';
-  if (aluno.altas_habilidades) {
-    blocoAltasHabilidades = `
-
-ALTAS HABILIDADES / SUPERDOTAÇÃO — ENRIQUECIMENTO CURRICULAR:
-- NÃO simplifique. NÃO reduza. Aprofunde além do nível da série.
-- Posicione o aluno como PRODUTOR de conhecimento, não consumidor: proponha que ele explique, crie, analise, questione ou aplique em novo contexto.
-- Inclua pelo menos uma conexão interdisciplinar (ex: relacione o conceito com outra área do conhecimento — Física, Filosofia, Matemática, Arte, etc.).
-- Inclua ao menos uma questão de raciocínio crítico ou investigativo aberta, sem resposta única óbvia.
-- O material deve provocar três dimensões: habilidade (conteúdo avançado) + envolvimento (desafio real) + criatividade (produção original).
-- Se o aluno tem interesses declarados, use-os como porta de entrada para o conteúdo avançado.`;
-  }
-
-  // ── BLOCO 6: DUPLA EXCEPCIONALIDADE ─────────────────────────
-  let blocoDuplaExcep = '';
-  const temDiagnostico = aluno.tea || aluno.tdah || aluno.dislexia;
-  if (aluno.altas_habilidades && temDiagnostico) {
-    blocoDuplaExcep = `
-
-DUPLA EXCEPCIONALIDADE (Altas Habilidades + diagnóstico):
-- NUNCA use remediação de déficit como foco principal. Use o talento como âncora pedagógica.
-- O interesse profundo do aluno é a porta de entrada para superar a barreira neurocognitiva.
-- Equilibre: desafie o intelecto respeitando os limites sensoriais ou executivos do diagnóstico.
-- Altas Habilidades e TEA não são excludentes: use linguagem literal E conteúdo aprofundado ao mesmo tempo.
-- Altas Habilidades e TDAH não são excludentes: use blocos curtos E conteúdo desafiador ao mesmo tempo.`;
-  }
-
-  // ── BLOCO 7: INTERESSES E OBSERVAÇÕES ───────────────────────
-  const blocoInteresses = aluno.interesses
-    ? `\nINTERESSES / HIPERFOCO DO ALUNO: "${aluno.interesses}" — use exemplos, analogias e contextos relacionados a esses interesses sempre que possível. Isso aumenta significativamente o engajamento e a retenção.`
-    : '';
-  const blocoObs = aluno.obs
-    ? `\nOBSERVAÇÕES PEDAGÓGICAS: ${aluno.obs}`
-    : '';
-
-  // ── BLOCO 8: TIPOGRAFIA ──────────────────────────────────────
-  const blocoTipografia = aluno.tipografia === 'bastao'
-    ? '\nTIPOGRAFIA BASTÃO: escreva TODO o texto em CAIXA ALTA. Gere no mínimo 6 passos. Revise cuidadosamente a acentuação — FUNDAÇÃO (não FUNDACÃO), GEOGRÁFICA (não GEGRÁFICA).'
-    : '';
-
-  // ── MONTAGEM FINAL ───────────────────────────────────────────
-  const instrucoesDiagnostico = blocosDiagnostico.length
-    ? '\n\nINSTRUÇÕES ESPECÍFICAS POR DIAGNÓSTICO (OBRIGATÓRIAS):\n' + blocosDiagnostico.join('\n')
-    : '';
-
-  return `Você é especialista em educação inclusiva com formação em Neuropsicologia Pedagógica. Reescreva o material abaixo respeitando RIGOROSAMENTE o perfil do aluno descrito. Responda SOMENTE com um JSON válido, sem markdown, sem explicações fora do JSON.
-
-PERFIL DO ALUNO:
-- Estrutura do texto: ${fragMap[aluno.fragmentacao] || fragMap['media']}
-- Nível de abstração: ${abstMap[abstracaoEfetiva] || abstMap['media']}${aluno.tea && aluno.abstracao === 'alta' ? ' [TEA ativo: abstração forçada para literal — linguagem figurada é contraindicada para este perfil]' : ''}
-- Mediação: ${medMap[aluno.mediacao] || medMap['guiado']}${instrucoesDiagnostico}${blocoAltasHabilidades}${blocoDuplaExcep}${blocoInteresses}${blocoObs}${blocoTipografia}
-
-CONTEXTO PEDAGÓGICO:
-- Disciplina: ${discProf}
-- Referência curricular: ${refCurr}
-- Escola: ${meta.escola || '—'}${instrucaoMunicipal}
-
-MATERIAL ORIGINAL:
-${texto}
-
-Responda APENAS com este JSON (sem markdown, sem \`\`\`):
-{
-  "nomeAtividade": "título pedagógico curto",
-  "disciplina": "${disciplina || discProf}",
-  "passos": [
-    {"numero": 1, "texto": "frase reescrita respeitando o perfil", "destaque": "palavra-chave"}
-  ],
-  "resumo": [
-    {"titulo": "Conceito", "conteudo": "definição curta e adequada ao perfil"}
-  ],
-  "questoes": [
-    {
-      "tipo": "multipla",
-      "enunciado": "pergunta adequada ao perfil",
-      "opcoes": ["A) opção correta", "B) opção errada"],
-      "gabarito": "A"
-    },
-    {
-      "tipo": "vf",
-      "enunciado": "afirmação para julgar",
-      "gabarito": "V"
-    }
-  ],
-  "registroPedagogico": {
-    "objetivos": ["objetivo de aprendizagem 1", "objetivo 2", "objetivo 3"],
-    "habilidadesBNCC": [{"codigo": "EF06CI01", "descricao": "descrição da habilidade conforme BNCC"}],
-    "habilidadesEstadual": [{"codigo": "EF06CI01–RG01", "descricao": "descrição conforme ${refCurr} — formato: código BNCC + sufixo –RGxx para Rio Grande/RS"}],
-    "refCurr": "${refCurr}",
-    "orientacoes": "orientações metodológicas específicas para trabalhar este conteúdo com este perfil de aluno",
-    "dicaPedagogica": "sugestão prática e concreta específica para o diagnóstico deste aluno"
-  }
-}
-
-REGRAS CRÍTICAS:
-1. NÃO copie frases do original. REESCREVA completamente com linguagem adequada ao perfil.
-2. PRESERVAÇÃO DE FATOS — OBRIGATÓRIO: mantenha todos os dados específicos do original: nomes próprios, datas, números, nomes de lugares e pessoas. Se o original cita "Umbu, Vieira e Tupi-Guarani", esses três nomes DEVEM aparecer na adaptação. Se cita "1737", esse ano DEVE aparecer. NUNCA substitua um dado concreto por uma generalização vaga.
-3. Só mude a forma de apresentar — nunca o conteúdo factual.
-4. passos: 4 a 8 itens. Um conceito por passo. Linguagem do perfil.
-5. resumo: exatamente 4 cards com os conceitos-chave do conteúdo.
-6. questoes: 2 de múltipla escolha (2 opções cada) + 1 V/F. Gabarito sempre correto. Português correto e formal.
-7. habilidadesBNCC: 2 a 4 habilidades reais da BNCC com códigos corretos (ex: EF06CI01, EM13CNT101).
-8. habilidadesEstadual: habilidades equivalentes do ${refCurr}. Se o estado tiver numeração própria use-a; senão referencie a BNCC com nota de contextualização estadual.
-9. orientacoes: 3 a 5 linhas com estratégias metodológicas para o diagnóstico específico.
-10. dicaPedagogica vai APENAS no registroPedagogico — NÃO aparece no material do aluno.`;
-
-}
-
-// Prompt simplificado para partes 2+ de textos longos — sem habilidades RG, sem registro pedagógico
-// Isso reduz tokens e melhora a qualidade do JSON em partes secundárias
-function buildPromptContinuacao(aluno, texto, disciplina, numParte) {
-  const fragMap = {
-    baixa: 'Texto corrido, parágrafos fluidos.',
-    media: 'Parágrafos curtos, máximo 3 frases.',
-    alta: 'Blocos bem curtos, um conceito por item.',
-  };
-  const abstracaoEfetiva = aluno.tea ? 'nao_abstrai' : (aluno.abstracao || 'media');
-  const abstMap = {
-    alta: 'Use analogias e exemplos do cotidiano.',
-    media: 'Exemplos simples e diretos.',
-    baixa: 'Linguagem concreta e direta.',
-    nao_abstrai: 'Tudo literal. Zero metáforas.',
-  };
-  const conds = [];
-  if(aluno.tea) conds.push('TEA: linguagem 100% literal, previsibilidade explícita');
-  if(aluno.tdah) conds.push('TDAH: blocos curtos, um item por vez, pausas estratégicas');
-  if(aluno.dislexia) conds.push('Dislexia: frases curtas max 15 palavras, voz ativa');
-  if(aluno.tipografia==='bastao') conds.push('TODO o texto em CAIXA ALTA');
-
-  return `Você é especialista em educação inclusiva. Esta é a PARTE ${numParte} de um material longo. Reescreva APENAS esta parte respeitando o perfil do aluno. Responda SOMENTE com JSON válido.
-
-PERFIL: Estrutura: ${fragMap[aluno.fragmentacao]||fragMap['media']} | Abstração: ${abstMap[abstracaoEfetiva]} ${conds.length?'| '+conds.join(' | '):''}
-
-MATERIAL PARTE ${numParte}:
-${texto}
-
-JSON (sem markdown, sem \`\`\`):
-{
-  "passos": [{"numero": 1, "texto": "frase adaptada", "destaque": "palavra-chave"}],
-  "resumo": [{"titulo": "Conceito", "conteudo": "definição curta"}]
-}
-
-REGRAS: Preserve todos os fatos, nomes, datas e dados específicos. 4 a 6 passos. 2 a 4 resumos.`;
-}
-
-function buildPromptPictogramas(aluno,texto,disciplina,nomeAtiv) {
-  return `Você é especialista em CAA e ARASAAC. Extraia 8-14 conceitos do material para um aluno NÃO ALFABETIZADO.
-REGRAS IMPORTANTES:
-- Use APENAS palavras simples, concretas e visualmente representáveis
-- Prefira substantivos e verbos no infinitivo (ex: "comer", "água", "escola")
-- Evite palavras abstratas, conjunções, artigos
-- O campo "busca_en" deve ser uma palavra simples em inglês que o ARASAAC reconhece bem
-- Para conceitos científicos, use a palavra do cotidiano (ex: "coração" não "miocárdio")
-${aluno.obs?'Observações do aluno: '+aluno.obs:''}
-MATERIAL (${disciplina}${nomeAtiv?' — '+nomeAtiv:''}):
-${texto}
-Responda SOMENTE com JSON válido, sem markdown, sem explicações:
-[{"palavra":"água","contexto":"beber água","busca_en":"water"},{"palavra":"escola","contexto":"ir à escola","busca_en":"school"}]`;
-}
-
-async function buscarPictogramas(conceitos) {
-  const resultados=[];
-  for(const c of conceitos){
-    try{
-      let resp=await fetch(`https://api.arasaac.org/api/pictograms/pt/search/${encodeURIComponent(c.palavra)}`);
-      let data=await resp.json();
-      if(!data||!data.length){
-        resp=await fetch(`https://api.arasaac.org/api/pictograms/en/search/${encodeURIComponent(c.busca_en||c.palavra)}`);
-        data=await resp.json();
-      }
-      if(!data||!data.length){
-        const semAcento=c.palavra.normalize('NFD').replace(/[\u0300-\u036f]/g,'');
-        resp=await fetch(`https://api.arasaac.org/api/pictograms/pt/search/${encodeURIComponent(semAcento)}`);
-        data=await resp.json();
-      }
-      if(data&&data.length){
-        const melhor=data.find(p=>p.schematic)||data[0];
-        resultados.push(melhor);
-      } else {
-        resultados.push(null);
-      }
-    }catch(e){resultados.push(null);}
-  }
-  return resultados;
-}
-
-function dividirTexto(texto, maxChars=6000) {
-  if(texto.length <= maxChars) return [texto];
-  const partes=[];
-  const paragrafos=texto.split(/\n\n+/);
-  let parteAtual='';
-  for(const par of paragrafos){
-    if((parteAtual+'\n\n'+par).length > maxChars && parteAtual){
-      partes.push(parteAtual.trim());
-      parteAtual=par;
-    } else {
-      parteAtual=parteAtual?parteAtual+'\n\n'+par:par;
-    }
-  }
-  if(parteAtual.trim()) partes.push(parteAtual.trim());
-  return partes;
-}
-
-async function chamarAPI(prompt, imagem=null, tentativas=3) {
-  for(let t=0;t<tentativas;t++){
-    // Monta conteúdo: texto puro ou multimodal (texto + imagem)
-    let content;
-    if(imagem){
-      content=[
-        {type:'image_url', image_url:{url: imagem.base64}},
-        {type:'text', text: prompt}
-      ];
-    } else {
-      content=prompt;
-    }
-    const r=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({messages:[{role:'user',content}]})});
-    if(r.ok){
-      const d=await r.json();
-      return d.content?.[0]?.text||'';
-    }
-    const txt=await r.text().catch(()=>'');
-    const isRate=txt.includes('rate')||txt.includes('Rate')||r.status===429;
-    if(isRate && t<tentativas-1){
-      showToast(`⏳ Limite atingido — aguardando 35s (tentativa ${t+2}/${tentativas})...`,'warn');
-      await new Promise(r=>setTimeout(r,35000));
-    } else {
-      throw new Error(isRate?'rate_limit':'server_error');
-    }
-  }
-}
-
-async function gerarAdaptacoes() {
-  const textoDigitado=document.getElementById('material-texto').value.trim();
-  const imagem=state.imagemMaterial||null;
-  const disciplina=document.getElementById('material-disciplina').value.trim()||'Geral';
-  const nomeAtiv=document.getElementById('material-nome').value.trim();
-
-  // Precisa de texto OU imagem
-  if(!textoDigitado && !imagem) return showToast('⚠️ Envie um arquivo ou cole o texto do material','warn');
-
-  const checkboxes=document.querySelectorAll('#aluno-select-list input[type=checkbox]:checked');
-  if(!checkboxes.length) return showToast('⚠️ Selecione pelo menos um aluno','warn');
-  const alunosParaAdaptar=state.alunos.filter(a=>Array.from(checkboxes).map(c=>c.value).includes(a.id));
-  document.getElementById('btn-gerar').disabled=true;
-  document.getElementById('resultado-area').style.display='none';
-  const progBar=document.getElementById('prog-bar');const progFill=document.getElementById('prog-fill');
-  progBar.classList.add('show');progFill.style.width='5%';
-  state.adaptacoes={};
-
-  // Se for imagem, usa texto vazio — a IA vai ler a imagem diretamente
-  const texto = textoDigitado || '[MATERIAL ENVIADO COMO IMAGEM — leia a imagem para extrair o conteúdo e adaptar]';
-  const textoLongo = !imagem && texto.length > 6000;
-
-  // Para textos longos: resume primeiro, depois adapta — uma chamada só
-  let textoParaAdaptar = texto;
-  if(textoLongo){
-    showToast('📄 Texto longo — resumindo antes de adaptar...');
-    progFill.style.width='10%';
-    try{
-      const resumoRaw = await chamarAPI(`Você é um assistente pedagógico. Leia o texto abaixo e produza um resumo estruturado com os conceitos principais, fatos importantes, datas, nomes e dados específicos. Preserve TODOS os dados concretos (nomes, datas, números, lugares). O resumo deve ter entre 1500 e 3000 caracteres, organizado em tópicos claros.
-
-TEXTO:
-${texto}
-
-Responda apenas com o resumo estruturado, sem explicações adicionais.`);
-      if(resumoRaw && resumoRaw.length > 200){
-        textoParaAdaptar = resumoRaw;
-        showToast('✅ Resumo gerado — adaptando...');
-      }
-    }catch(e){
-      // Se falhar o resumo, usa os primeiros 6000 chars
-      textoParaAdaptar = texto.substring(0, 6000);
-      showToast('⚠️ Resumo falhou — usando início do texto','warn');
-    }
-  }
-
-  progFill.style.width='20%';
-  const total=alunosParaAdaptar.length;let done=0;
-
-  // Mostra área de resultado imediatamente com tabs — resultado vai aparecendo progressivamente
-  document.getElementById('resultado-area').style.display='block';
-  document.getElementById('resultado-tabs').innerHTML=alunosParaAdaptar.map((a,i)=>`<div class="rtab ${i===0?'active':''}" onclick="mostrarAdaptacao('${a.id}',this)">${a.nome}</div>`).join('');
-  state.alunoAdaptacaoAtual=alunosParaAdaptar[0]?.id;
-  document.getElementById('resultado-text').innerHTML=`<div class="loading-dots" style="height:120px"><span></span><span></span><span></span></div>`;
-
-  for(const aluno of alunosParaAdaptar){
-    if(aluno.fragmentacao==='nao_alfabetizado'){
-      try{
-        const texto_resumido=imagem?'[veja a imagem]':textoParaAdaptar.substring(0,6000);
-        const result=await chamarAPI(buildPromptPictogramas(aluno,texto_resumido,disciplina,nomeAtiv), imagem);
-        let conceitos=[];
-        try{conceitos=JSON.parse(result.replace(/```json|```/g,'').trim());}catch(e){}
-        const pictogramas=await buscarPictogramas(conceitos);
-        state.adaptacoes[aluno.id]={tipo:'pictograma',conceitos,pictogramas,nomeAtiv,disciplina};
-      }catch(e){state.adaptacoes[aluno.id]={tipo:'pictograma',conceitos:[],pictogramas:[],nomeAtiv,disciplina};}
-    }else{
-      try{
-        // Uma única chamada com o texto resumido ou original
-        const result=await chamarAPI(buildPrompt(aluno,textoParaAdaptar,disciplina,nomeAtiv), imagem);
-        if(!result) throw new Error('empty');
-        state.adaptacoes[aluno.id]=parseAdaptacao(result);
-      }catch(e){
-        const msg=e.message==='rate_limit'?'⚠️ Limite de requisições — aguarde 30s e tente novamente.':'⚠️ Erro de conexão. Tente novamente.';
-        state.adaptacoes[aluno.id]={tipo:'erro',msg};
-      }
-    }
-
-    done++;
-    progFill.style.width=`${Math.round((done/total)*100)}%`;
-
-    // Mostra resultado do primeiro aluno assim que ficar pronto — não espera os outros
-    if(done===1){
-      const adapt=state.adaptacoes[aluno.id];
-      const box=document.getElementById('resultado-text');
-      if(adapt&&adapt.tipo==='pictograma') renderPrancha(adapt,box);
-      else if(adapt&&adapt.tipo==='erro') box.innerHTML=`<div style="padding:20px;color:var(--warn)">${adapt.msg}</div>`;
-      else if(adapt) box.innerHTML=renderAdaptacaoHtml(adapt);
-      mostrarAba('aluno');
-    }
-
-    const turma=state.turmas.find(t=>t.id===aluno.turma_id);
-    await salvarHistoricoComConteudo(
-      {aluno_id:aluno.id,aluno_nome:aluno.nome,titulo:nomeAtiv||disciplina,disciplina,turma_nome:turma?.nome||''},
-      state.adaptacoes[aluno.id]
-    );
-    if(done<total) await new Promise(r=>setTimeout(r,800));
-  }
-  progBar.classList.remove('show');progFill.style.width='0%';
-  document.getElementById('btn-gerar').disabled=false;
-  showToast(`✅ ${total} adaptação${total>1?'ões':''} pronta${total>1?'s':''}!`);
-  // Scroll automático para mostrar a adaptação gerada
-  setTimeout(()=>{
-    const resultArea=document.getElementById('resultado-area');
-    if(resultArea) resultArea.scrollIntoView({behavior:'smooth',block:'start'});
-  }, 300);
-}
-
-function parseAdaptacao(texto) {
-  try {
-    const clean=texto.replace(/```json|```/g,'').trim();
-    return {tipo:'json', data:JSON.parse(clean)};
-  } catch(e) {
-    return {tipo:'texto', data:texto};
-  }
-}
-
-function renderAdaptacaoHtml(adaptacao) {
-  if(!adaptacao||!adaptacao.tipo) return '<div style="padding:20px;color:var(--danger)">⚠️ Não foi possível gerar a adaptação. Verifique sua conexão e tente novamente.</div>';
-  if(adaptacao.tipo==='texto') {
-    const{registro,material}=extrairBlocos(adaptacao.data);
-    return (registro?`<div style="background:rgba(37,99,235,0.06);border:1px solid rgba(37,99,235,0.2);border-radius:10px;padding:14px 16px;margin-bottom:16px;font-size:13px">
-      <div style="font-weight:700;color:var(--accent);margin-bottom:6px;font-size:12px;text-transform:uppercase;letter-spacing:0.05em">📋 Registro Pedagógico (professor)</div>
-      ${markdownParaHtml(registro)}</div>`:'')
-      +markdownParaHtml(material);
-  }
-  const d=adaptacao.data;
-  if(!d) return '<div style="padding:20px;color:var(--danger)">⚠️ Resposta inválida da IA. Tente novamente.</div>';
-  let html=`
-    <div style="text-align:center;padding:0 0 24px;border-bottom:1px solid var(--border);margin-bottom:24px">
-      <span style="display:inline-block;padding:4px 14px;background:rgba(37,99,235,0.1);color:var(--accent);border-radius:20px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:10px">${esc2(d.disciplina||'')}</span>
-      <h2 style="font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:var(--text);margin:0 0 10px">${esc2(d.nomeAtividade||'')}</h2>
-      <div style="width:48px;height:3px;background:var(--accent);border-radius:2px;margin:0 auto"></div>
-    </div>
-    <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:24px;margin-bottom:20px">
-      <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px">
-        <div style="width:32px;height:32px;background:rgba(99,102,241,0.1);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px">📖</div>
-        <span style="font-family:'Syne',sans-serif;font-weight:800;font-size:15px;text-transform:uppercase;letter-spacing:0.05em">Aprenda Passo a Passo</span>
-      </div>
-      <div style="display:flex;flex-direction:column;gap:10px">
-        ${(d.passos||[]).map(p=>`
-        <div style="display:flex;align-items:flex-start;gap:12px;padding:12px 16px;background:#F8FAFC;border-radius:10px;border-left:4px solid var(--accent)">
-          <span style="display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;min-width:26px;background:var(--accent);color:white;border-radius:50%;font-weight:700;font-size:12px">${p.numero}</span>
-          <p style="margin:0;font-size:14px;line-height:1.7">${esc2(p.texto).replace(new RegExp(esc2(p.destaque||'XXXXX'),'gi'),m=>`<span style="background:#DBEAFE;padding:1px 5px;border-radius:4px;font-weight:600">${m}</span>`)}</p>
-        </div>`).join('')}
-      </div>
-    </div>
-    <div style="background:var(--accent);border-radius:16px;padding:24px;margin-bottom:20px;color:white">
-      <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px">
-        <span style="font-size:18px">⚡</span>
-        <span style="font-family:'Syne',sans-serif;font-weight:800;font-size:15px;text-transform:uppercase;letter-spacing:0.05em">Resumo Rápido</span>
-      </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-        ${(d.resumo||[]).map(r=>`
-        <div style="background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.2);border-radius:10px;padding:12px">
-          <div style="font-weight:700;font-size:13px;margin-bottom:4px">${esc2(r.titulo)}</div>
-          <div style="font-size:12px;opacity:0.9">${esc2(r.conteudo)}</div>
-        </div>`).join('')}
-      </div>
-    </div>
-    <div style="margin-bottom:20px">
-      <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
-        <div style="width:32px;height:32px;background:rgba(5,150,105,0.1);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px">✏️</div>
-        <span style="font-family:'Syne',sans-serif;font-weight:800;font-size:15px;text-transform:uppercase;letter-spacing:0.05em">Atividade</span>
-      </div>
-      <div style="display:flex;flex-direction:column;gap:12px">
-        ${(d.questoes||[]).map((q,qi)=>{
-          if(q.tipo==='multipla') return `
-          <div style="background:var(--surface);border:2px solid var(--border);border-radius:14px;padding:20px" class="questao-card">
-            <p style="font-weight:700;font-size:14px;margin:0 0 14px">QUESTÃO ${qi+1}. ${esc2(q.enunciado)}</p>
-            <div style="display:flex;flex-direction:column;gap:8px">
-              ${(q.opcoes||[]).map((op,oi)=>`
-              <div onclick="selecionarOpcao(this,'q${qi}')" data-idx="${oi}" style="display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:10px;border:1px solid var(--border);cursor:pointer;transition:all 0.2s" onmouseover="this.style.background='rgba(37,99,235,0.04)'" onmouseout="if(!this.classList.contains('selecionado')) this.style.background='transparent'">
-                <span style="width:20px;height:20px;border-radius:50%;border:2px solid var(--border);flex-shrink:0;display:inline-block" class="radio-circle"></span>
-                <span style="font-size:14px">${esc2(op)}</span>
-              </div>`).join('')}
-            </div>
-          </div>`;
-          if(q.tipo==='vf') return `
-          <div style="background:var(--surface);border:2px solid var(--border);border-radius:14px;padding:20px">
-            <p style="font-weight:700;font-size:14px;margin:0 0 14px">QUESTÃO ${qi+1}. Escreva V para VERDADEIRO ou F para FALSO:</p>
-            <div style="display:flex;align-items:center;gap:16px">
-              <span style="font-size:14px;flex:1">${esc2(q.enunciado)}</span>
-              <div style="width:52px;height:52px;border:3px dashed rgba(37,99,235,0.3);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:800;color:rgba(37,99,235,0.3)">( )</div>
-            </div>
-          </div>`;
-          return '';
-        }).join('')}
-      </div>
-    </div>
-    <div style="background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:20px;margin-bottom:20px">
-      <button onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display==='none'?'block':'none';this.querySelector('.seta').style.transform=this.nextElementSibling.style.display==='block'?'rotate(180deg)':'rotate(0deg)'"
-        style="width:100%;display:flex;align-items:center;justify-content:space-between;background:none;border:none;cursor:pointer;padding:0">
-        <div style="display:flex;align-items:center;gap:10px">
-          <div style="width:32px;height:32px;background:var(--surface2);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px">📝</div>
-          <span style="font-family:'Syne',sans-serif;font-weight:800;font-size:14px;text-transform:uppercase;letter-spacing:0.05em">Ver Gabarito</span>
-        </div>
-        <span class="seta" style="font-size:18px;color:var(--muted);transition:transform 0.2s">▾</span>
-      </button>
-      <div style="display:none;margin-top:16px;padding-top:16px;border-top:1px solid var(--border)">
-        ${(d.questoes||[]).map((q,qi)=>`
-        <p style="font-size:14px;margin:0 0 8px"><span style="font-weight:700;color:var(--accent)">QUESTÃO ${qi+1}:</span> ${esc2(q.gabarito)}</p>`).join('')}
-      </div>
-    </div>
-    ${d.dicaPedagogica?`
-    <div style="background:#FFFBEB;border:2px dashed #FDE68A;border-radius:14px;padding:20px">
-      <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
-        <span style="color:#D97706;font-size:18px">💡</span>
-        <span style="font-family:'Syne',sans-serif;font-weight:800;font-size:12px;color:#92400E;text-transform:uppercase;letter-spacing:0.08em">Dica Pedagógica</span>
-      </div>
-      <p style="font-size:13px;color:#78350F;margin:0;line-height:1.7;font-style:italic">${esc2(d.dicaPedagogica)}</p>
-    </div>`:''}
-  </div>`;
-  return html;
-}
-
-function esc2(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
-
-function selecionarOpcao(el, grupo) {
-  const card=el.closest('.questao-card')||el.parentElement.parentElement;
-  card.querySelectorAll('[data-idx]').forEach(opt=>{
-    opt.classList.remove('selecionado');
-    opt.style.background='transparent';
-    opt.style.borderColor='var(--border)';
-    const circle=opt.querySelector('.radio-circle');
-    if(circle){circle.style.background='transparent';circle.style.borderColor='var(--border)';}
-  });
-  el.classList.add('selecionado');
-  el.style.background='rgba(37,99,235,0.06)';
-  el.style.borderColor='var(--accent)';
-  const circle=el.querySelector('.radio-circle');
-  if(circle){circle.style.background='var(--accent)';circle.style.borderColor='var(--accent)';}
-}
-
-function extrairBlocos(texto) {
-  const regMatch = texto.match(/---REGISTRO PEDAGÓGICO---([\s\S]*?)---FIM REGISTRO---/);
-  const matMatch = texto.match(/---MATERIAL DO ALUNO---([\s\S]*?)---FIM MATERIAL---/);
-  return {
-    registro: regMatch ? regMatch[1].trim() : '',
-    material: matMatch ? matMatch[1].trim() : texto,
-  };
-}
-
-function mostrarAba(aba) {
-  const abaAluno=document.getElementById('aba-aluno');
-  const abaProfessor=document.getElementById('aba-professor');
-  const textoAluno=document.getElementById('resultado-text');
-  const textoRegistro=document.getElementById('resultado-registro');
-  if(aba==='aluno'){
-    abaAluno.style.background='var(--accent)';abaAluno.style.color='white';abaAluno.style.border='none';
-    abaProfessor.style.background='var(--bg)';abaProfessor.style.color='var(--muted)';abaProfessor.style.border='1px solid var(--border)';
-    textoAluno.style.display='block';textoRegistro.style.display='none';
-  } else {
-    abaProfessor.style.background='var(--accent2)';abaProfessor.style.color='white';abaProfessor.style.border='none';
-    abaAluno.style.background='var(--bg)';abaAluno.style.color='var(--muted)';abaAluno.style.border='1px solid var(--border)';
-    textoAluno.style.display='none';textoRegistro.style.display='block';
-    // Renderiza registro do aluno atual
-    const adapt=state.adaptacoes[state.alunoAdaptacaoAtual];
-    textoRegistro.innerHTML=renderRegistroPedagogicoHtml(adapt);
-  }
-}
-
-function renderRegistroPedagogicoHtml(adaptacao) {
-  if(!adaptacao||adaptacao.tipo!=='json'||!adaptacao.data) return '<div style="padding:20px;color:var(--muted)">Nenhum registro disponível.</div>';
-  const d=adaptacao.data;
-  const rp=d.registroPedagogico||{};
-  const meta=state.user?.user_metadata||{};
-  const aluno=state.alunos.find(a=>a.id===state.alunoAdaptacaoAtual);
-  const conds=[];
-  if(aluno?.tea) conds.push('TEA');
-  if(aluno?.tdah) conds.push('TDAH');
-  if(aluno?.dislexia) conds.push('Dislexia');
-  if(aluno?.baixa_visao) conds.push('Baixa visão');
-  if(aluno?.altas_habilidades) conds.push('Altas habilidades');
-
-  return `<div style="font-family:'DM Sans',sans-serif;max-width:720px">
-
-    <!-- Cabeçalho identificador -->
-    <div style="background:rgba(124,58,237,0.06);border:1px solid rgba(124,58,237,0.2);border-radius:14px;padding:20px;margin-bottom:16px">
-      <div style="font-size:11px;font-weight:700;color:var(--accent2);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:12px">📋 Registro Pedagógico — Exclusivo do Professor</div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:13px">
-        <div><span style="color:var(--muted)">Aluno:</span> <strong>${aluno?.nome||'—'}</strong></div>
-        <div><span style="color:var(--muted)">Disciplina:</span> <strong>${d.disciplina||'—'}</strong></div>
-        <div><span style="color:var(--muted)">Referencial:</span> <strong>${rp.refCurr||meta.estado||'BNCC'}</strong></div>
-        <div><span style="color:var(--muted)">Diagnóstico:</span> <strong>${conds.length?conds.join(', '):'Não especificado'}</strong></div>
-      </div>
-    </div>
-
-    <!-- Objetivos -->
-    <div style="background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:20px;margin-bottom:16px">
-      <div style="font-weight:700;font-size:14px;margin-bottom:12px;color:var(--accent)">🎯 Objetivos de Aprendizagem</div>
-      ${(rp.objetivos||[]).length
-        ? (rp.objetivos||[]).map((o,i)=>`<div style="display:flex;gap:10px;margin-bottom:8px;font-size:13px"><span style="color:var(--accent);font-weight:700;flex-shrink:0">${i+1}.</span><span>${o}</span></div>`).join('')
-        : '<p style="font-size:13px;color:var(--muted)">Nenhum objetivo gerado.</p>'}
-    </div>
-
-    <!-- Habilidades BNCC -->
-    <div style="background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:20px;margin-bottom:16px">
-      <div style="font-weight:700;font-size:14px;margin-bottom:4px;color:var(--accent2)">📚 Habilidades — Base Nacional Comum Curricular (BNCC)</div>
-      <p style="font-size:11px;color:var(--muted);margin-bottom:12px">Documento federal que orienta o currículo de todas as escolas brasileiras.</p>
-      ${(rp.habilidadesBNCC||rp.habilidades||[]).length
-        ? (rp.habilidadesBNCC||rp.habilidades||[]).map(h=>`
-          <div style="display:flex;gap:10px;margin-bottom:10px;font-size:13px;align-items:flex-start;padding:10px;background:rgba(124,58,237,0.04);border-radius:8px">
-            <span style="background:rgba(124,58,237,0.12);color:var(--accent2);padding:3px 10px;border-radius:6px;font-size:11px;font-weight:700;flex-shrink:0;white-space:nowrap">${h.codigo}</span>
-            <span style="line-height:1.6">${h.descricao}</span>
-          </div>`).join('')
-        : '<p style="font-size:13px;color:var(--muted)">Nenhuma habilidade BNCC identificada para este conteúdo.</p>'}
-    </div>
-
-    <!-- Habilidades Estadual -->
-    ${(rp.habilidadesEstadual||[]).length ? `
-    <div style="background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:20px;margin-bottom:16px">
-      <div style="font-weight:700;font-size:14px;margin-bottom:4px;color:var(--accent3)">🌿 Habilidades — ${rp.refCurr||meta.estado||'Referencial Estadual'}</div>
-      <p style="font-size:11px;color:var(--muted);margin-bottom:12px">Documento orientador estadual que contextualiza a BNCC para a realidade local.</p>
-      ${(rp.habilidadesEstadual||[]).map(h=>`
-        <div style="display:flex;gap:10px;margin-bottom:10px;font-size:13px;align-items:flex-start;padding:10px;background:rgba(5,150,105,0.04);border-radius:8px">
-          <span style="background:rgba(5,150,105,0.12);color:var(--accent3);padding:3px 10px;border-radius:6px;font-size:11px;font-weight:700;flex-shrink:0;white-space:nowrap">${h.codigo}</span>
-          <span style="line-height:1.6">${h.descricao}</span>
-        </div>`).join('')}
-    </div>` : ''}
-
-    <!-- Orientações Metodológicas -->
-    ${rp.orientacoes ? `
-    <div style="background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:20px;margin-bottom:16px">
-      <div style="font-weight:700;font-size:14px;margin-bottom:10px;color:var(--accent)">📝 Orientações Metodológicas</div>
-      <p style="font-size:13px;line-height:1.8;margin:0">${rp.orientacoes}</p>
-    </div>` : ''}
-
-  </div>`;
-}
-
-function mostrarAdaptacao(alunoId,el) {
-  document.querySelectorAll('.rtab').forEach(t=>t.classList.remove('active'));
-  el.classList.add('active');state.alunoAdaptacaoAtual=alunoId;
-  const adapt=state.adaptacoes[alunoId];
-  const box=document.getElementById('resultado-text');
-  if(!adapt){box.innerHTML='Aguardando...';return;}
-  if(adapt.tipo==='pictograma') renderPrancha(adapt,box);
-  else box.innerHTML=renderAdaptacaoHtml(adapt);
-  // Volta para aba do aluno ao trocar
-  mostrarAba('aluno');
-  // Atualiza registro se aba do professor estiver ativa
-  const registroEl=document.getElementById('resultado-registro');
-  if(registroEl&&registroEl.style.display!=='none') registroEl.innerHTML=renderRegistroPedagogicoHtml(adapt);
-}
-
-function renderPrancha(adapt,container) {
-  const{conceitos,pictogramas,nomeAtiv,disciplina}=adapt;
-  if(!conceitos.length){container.innerHTML='<div class="empty-state"><div class="empty-icon">⚠️</div><p>Não foi possível gerar a prancha.</p></div>';return;}
-  let html=`<div style="margin-bottom:16px"><div style="font-weight:800;font-size:16px;margin-bottom:4px">🖼️ Prancha de Pictogramas</div><div style="font-size:12px;color:var(--muted)">ARASAAC · ${nomeAtiv||disciplina}</div></div><div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:12px;">`;
-  conceitos.forEach((c,i)=>{
-    const pic=pictogramas[i];const imgUrl=pic?`https://static.arasaac.org/pictograms/${pic._id}/${pic._id}_500.png`:null;
-    html+=`<div style="background:white;border-radius:12px;padding:10px 8px;text-align:center;border:2px solid #e5e7eb;">${imgUrl?`<img src="${imgUrl}" alt="${c.palavra}" style="width:80px;height:80px;object-fit:contain;display:block;margin:0 auto 8px" onerror="this.style.display='none'">`:''}<div style="font-size:12px;font-weight:700;color:#111;text-transform:uppercase">${c.palavra}</div>${c.contexto?`<div style="font-size:10px;color:#6b7280;margin-top:3px">${c.contexto}</div>`:''}</div>`;
-  });
-  container.innerHTML=html+'</div>';
-}
-
-function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
-
-function markdownParaHtml(texto) {
-  const cores=['#1D4ED8','#7C3AED','#059669','#C2410C','#0369A1'];
-  const fundos=['#EFF6FF','#F5F3FF','#ECFDF5','#FFF7ED','#E0F2FE'];
-  let corIdx=0;
-  return texto
-    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
-    .replace(/^---(.+?)---$/gm,(m,tit)=>{
-      const cor=cores[corIdx%cores.length];
-      const fundo=fundos[corIdx%fundos.length];
-      corIdx++;
-      return `<div style="margin:20px 0 8px;padding:10px 16px;background:${fundo};border-left:4px solid ${cor};border-radius:0 8px 8px 0">
-        <span style="font-family:'Syne',sans-serif;font-weight:800;font-size:15px;color:${cor}">${tit.trim()}</span>
-      </div>`;
-    })
-    .replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>')
-    .replace(/\*(.+?)\*/g,'<em>$1</em>')
-    .replace(/^[-•\*]\s+(.+)$/gm,'<div style="display:flex;gap:8px;margin:6px 0;padding-left:8px"><span style="color:#2563EB;font-weight:700;flex-shrink:0">▸</span><span>$1</span></div>')
-    .replace(/^(\d+)\.\s+(.+)$/gm,'<div style="display:flex;gap:8px;margin:8px 0;padding-left:8px"><span style="color:#7C3AED;font-weight:700;flex-shrink:0">$1.</span><span>$2</span></div>')
-    .replace(/^([A-ZÁÉÍÓÚÂÊÎÔÛÃÕÀÇ\s]{5,})$/gm,(m)=>{
-      if(m.trim().length<4) return m;
-      return `<div style="font-weight:700;font-size:14px;color:#334155;margin:14px 0 6px;padding-bottom:4px;border-bottom:1px solid #E2E8F0">${m}</div>`;
-    })
-    .replace(/\n/g,'<br>');
-}
-
-function linhaParaRuns(linha) {
-  const partes=linha.split(/(\*\*.*?\*\*)/g);
-  return partes.map(p=>{
-    if(p.startsWith('**')&&p.endsWith('**')){
-      const txt=esc(p.slice(2,-2));
-      return `<w:r><w:rPr><w:b/><w:sz w:val="24"/><w:szCs w:val="24"/></w:rPr><w:t xml:space="preserve">${txt}</w:t></w:r>`;
-    }
-    return p?`<w:r><w:rPr><w:sz w:val="24"/><w:szCs w:val="24"/></w:rPr><w:t xml:space="preserve">${esc(p)}</w:t></w:r>`:'';
-  }).join('');
-}
-
-function gerarXmlDocx(titulo, texto, imagem=null) {
-  const meta=state.user?.user_metadata||{};
-  const data=new Date().toLocaleDateString('pt-BR');
-  const escola=meta.escola||'';
-  const prof=meta.name||state.user?.email||'';
-  let p=`
-  <w:p><w:pPr><w:jc w:val="center"/><w:spacing w:before="0" w:after="80"/></w:pPr>
-    <w:r><w:rPr><w:b/><w:sz w:val="40"/><w:szCs w:val="40"/><w:color w:val="2563EB"/></w:rPr>
-      <w:t>${esc(titulo)}</w:t></w:r>
-  </w:p>`;
-  if(escola||prof){
-    p+=`<w:p><w:pPr><w:jc w:val="center"/><w:spacing w:before="0" w:after="200"/></w:pPr>
-      <w:r><w:rPr><w:sz w:val="18"/><w:color w:val="94A3B8"/></w:rPr>
-        <w:t>${esc([escola,prof,data].filter(Boolean).join('  ·  '))}</w:t></w:r>
-    </w:p>`;
-  }
-  const coresTitulo=['1D4ED8','7C3AED','059669','C2410C','0369A1'];
-  const coresFundo=['EFF6FF','F5F3FF','ECFDF5','FFF7ED','E0F2FE'];
-  let corIdx=0;
-  // Imagem original — inserida antes do texto adaptado
-  let imagemRel='';
-  let imagemXml='';
-  if(imagem&&imagem.base64){
-    // Extrai só o base64 sem o prefixo data:image/...;base64,
-    imagemXml=`
-  <w:p><w:pPr><w:jc w:val="center"/><w:spacing w:before="120" w:after="200"/></w:pPr>
-    <w:r><w:rPr><w:noProof/></w:rPr>
-      <w:drawing><wp:inline xmlns:wp="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing">
-        <wp:extent cx="5486400" cy="7315200"/>
-        <wp:docPr id="1" name="imagem_original"/>
-        <a:graphic xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main">
-          <a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/picture">
-            <pic:pic xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture">
-              <pic:nvPicPr><pic:cNvPr id="1" name="imagem_original"/><pic:cNvPicPr/></pic:nvPicPr>
-              <pic:blipFill>
-                <a:blip r:embed="rIdImg1" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"/>
-                <a:stretch><a:fillRect/></a:stretch>
-              </pic:blipFill>
-              <pic:spPr><a:xfrm><a:off x="0" y="0"/><a:ext cx="5486400" cy="7315200"/></a:xfrm>
-                <a:prstGeom prst="rect"><a:avLst/></a:prstGeom>
-              </pic:spPr>
-            </pic:pic>
-          </a:graphicData>
-        </a:graphic>
-      </wp:inline></w:drawing>
-    </w:r>
-  </w:p>
-  <w:p><w:pPr><w:spacing w:before="0" w:after="120"/></w:pPr></w:p>`;
-    imagemRel=`<Relationship Id="rIdImg1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/imagem_original.png"/>`;
-  }
-  p+=imagemXml;
-  const linhas=texto
-    .replace(/^\*\*([^*\n]+)\*\*$/gm, '---$1---')
-    .replace(/^\* /gm, '- ')
-    .split('\n');
-  for(let i=0;i<linhas.length;i++){
-    const linha=linhas[i].trim();
-    if(!linha){p+='<w:p><w:pPr><w:spacing w:before="0" w:after="60"/></w:pPr></w:p>';continue;}
-    const secaoMatch=linha.match(/^---(.+)---$/);
-    if(secaoMatch){
-      const tit=secaoMatch[1].trim();
-      const cor=coresTitulo[corIdx%coresTitulo.length];
-      const fundo=coresFundo[corIdx%coresFundo.length];
-      corIdx++;
-      p+=`
-      <w:p><w:pPr><w:spacing w:before="240" w:after="0"/>
-        <w:shd w:val="clear" w:color="auto" w:fill="${fundo}"/>
-        <w:pBdr><w:left w:val="thick" w:sz="24" w:space="4" w:color="${cor}"/></w:pBdr>
-        <w:ind w:left="200"/>
-      </w:pPr>
-        <w:r><w:rPr><w:b/><w:sz w:val="26"/><w:szCs w:val="26"/><w:color w:val="${cor}"/></w:rPr>
-          <w:t>${esc(tit)}</w:t></w:r>
-      </w:p>
-      <w:p><w:pPr><w:spacing w:before="0" w:after="40"/></w:pPr></w:p>`;
-      continue;
-    }
-    const ehSubtitulo=linha===linha.toUpperCase()&&linha.length>4&&linha.replace(/[^a-zA-ZÀ-ÿ]/g,'').length>3&&!linha.includes('.');
-    if(ehSubtitulo){
-      p+=`<w:p><w:pPr><w:spacing w:before="160" w:after="60"/>
-        <w:pBdr><w:bottom w:val="single" w:sz="4" w:space="1" w:color="E2E8F0"/></w:pBdr>
-      </w:pPr>
-        <w:r><w:rPr><w:b/><w:sz w:val="22"/><w:szCs w:val="22"/><w:color w:val="334155"/></w:rPr>
-          <w:t>${esc(linha)}</w:t></w:r>
-      </w:p>`;
-      continue;
-    }
-    const listaMatch=linha.match(/^[-•]\s+(.+)$/);
-    if(listaMatch){
-      p+=`<w:p><w:pPr><w:spacing w:before="60" w:after="60"/><w:ind w:left="400" w:hanging="200"/></w:pPr>
-        <w:r><w:rPr><w:color w:val="2563EB"/><w:sz w:val="24"/></w:rPr><w:t>▸  </w:t></w:r>
-        <w:r><w:rPr><w:sz w:val="24"/><w:szCs w:val="24"/><w:color w:val="1E293B"/></w:rPr>
-          <w:t xml:space="preserve">${esc(listaMatch[1])}</w:t></w:r>
-      </w:p>`;
-      continue;
-    }
-    const numMatch=linha.match(/^(\d+)\.\s+(.+)$/);
-    if(numMatch){
-      p+=`<w:p><w:pPr><w:spacing w:before="80" w:after="60"/><w:ind w:left="400" w:hanging="280"/></w:pPr>
-        <w:r><w:rPr><w:b/><w:color w:val="7C3AED"/><w:sz w:val="24"/></w:rPr><w:t>${esc(numMatch[1])}. </w:t></w:r>
-        ${linhaParaRuns(numMatch[2])}
-      </w:p>`;
-      continue;
-    }
-    p+=`<w:p><w:pPr><w:spacing w:before="60" w:after="80"/></w:pPr>
-      ${linhaParaRuns(linha)}
-    </w:p>`;
-  }
-  const xmlStyles=`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:styles xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
-    <w:docDefaults><w:rPrDefault><w:rPr>
-      <w:rFonts w:ascii="Calibri" w:hAnsi="Calibri" w:cs="Calibri"/>
-      <w:sz w:val="24"/><w:szCs w:val="24"/><w:color w:val="1E293B"/>
-    </w:rPr></w:rPrDefault></w:docDefaults>
-    <w:style w:type="paragraph" w:styleId="Normal"><w:name w:val="Normal"/>
-      <w:pPr><w:spacing w:line="360" w:lineRule="auto"/></w:pPr>
-    </w:style>
-  </w:styles>`;
-  return {
-    xmlDoc: `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" xmlns:wp="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing" xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture"><w:body>${p}<w:sectPr><w:pgSz w:w="12240" w:h="15840"/><w:pgMar w:top="1440" w:right="1440" w:bottom="1440" w:left="1440"/></w:sectPr></w:body></w:document>`,
-    xmlStyles,
-    imagemBase64: imagem?.base64?.split(',')[1]||null,
-    imagemRel,
-  };
-}
-
-async function criarDocx(nomeArquivo, titulo, texto, imagem=null) {
-  const{xmlDoc,xmlStyles,imagemBase64,imagemRel}=gerarXmlDocx(titulo,texto,imagem);
-  const temImagem=!!(imagemBase64&&imagemRel);
-  const xmlCT=`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/>${temImagem?'<Default Extension="png" ContentType="image/png"/><Default Extension="jpg" ContentType="image/jpeg"/>':''}<Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/><Override PartName="/word/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.styles+xml"/></Types>`;
-  const xmlRelsMain=`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/></Relationships>`;
-  const xmlRelsWord=`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/>${imagemRel||''}</Relationships>`;
-  const zip=new JSZip();
-  zip.file('[Content_Types].xml',xmlCT);
-  zip.file('_rels/.rels',xmlRelsMain);
-  zip.file('word/document.xml',xmlDoc);
-  zip.file('word/styles.xml',xmlStyles);
-  zip.file('word/_rels/document.xml.rels',xmlRelsWord);
-  if(temImagem) zip.file('word/media/imagem_original.png',imagemBase64,{base64:true});
-  const blob=await zip.generateAsync({type:'blob',mimeType:'application/vnd.openxmlformats-officedocument.wordprocessingml.document'});
-  const url=URL.createObjectURL(blob);
-  const a=document.createElement('a');a.href=url;a.download=nomeArquivo;a.click();URL.revokeObjectURL(url);
-}
-
-async function baixarDocx() {
-  const txt=state.adaptacoes[state.alunoAdaptacaoAtual];
-  if(!txt) return showToast('⚠️ Nenhuma adaptação selecionada','warn');
-  const aluno=state.alunos.find(a=>a.id===state.alunoAdaptacaoAtual);
-  const nome=aluno?.nome||'aluno';
-  const imagem=state.imagemMaterial||null;
-  if(typeof txt==='object'&&txt.tipo==='json'){
-    const d=txt.data;
-    let textoParts=[`---${d.nomeAtividade||'Material Adaptado'}---`,''];
-    (d.passos||[]).forEach(p=>textoParts.push(`${p.numero}. ${p.texto}`));
-    textoParts.push('');
-    if(d.resumo?.length){textoParts.push('---Resumo Rápido---','');d.resumo.forEach(r=>textoParts.push(`**${r.titulo}:** ${r.conteudo}`));textoParts.push('');}
-    if(d.questoes?.length){
-      textoParts.push('---Atividade---','');
-      d.questoes.forEach((q,i)=>{
-        textoParts.push(`${i+1}. ${q.enunciado}`);
-        if(q.tipo==='multipla')(q.opcoes||[]).forEach(op=>textoParts.push(`   ${op}`));
-        if(q.tipo==='vf') textoParts.push(`   ( ) Verdadeiro  ( ) Falso`);
-        textoParts.push('');
-      });
-      textoParts.push('---Gabarito---','');
-      d.questoes.forEach((q,i)=>textoParts.push(`Questão ${i+1}: ${q.gabarito}`));
-    }
-    const textoFinal=textoParts.join('\n');
-    try{await criarDocx(`Adaptacao_${nome}.docx`,`Adaptação — ${nome}`,textoFinal,imagem);showToast('📥 DOCX baixado!');}
-    catch(e){showToast('❌ Erro ao gerar DOCX','warn');}
-    return;
-  }
-  if(typeof txt!=='string'){
-    showToast('⏳ Gerando DOCX com imagens...','');
-    try{ await criarDocxPrancha(`Prancha_${nome}.docx`, `Prancha — ${nome}`, txt); showToast('📥 DOCX baixado!'); }
-    catch(e){ showToast('❌ Erro ao gerar DOCX','warn'); console.error(e); }
-    return;
-  }
-  try{
-    const{material}=extrairBlocos(txt);
-    await criarDocx(`Adaptacao_${nome}.docx`,`Adaptação — ${nome}`,material,imagem);
-    showToast('📥 DOCX baixado!');
-  }catch(e){showToast('❌ Erro ao gerar DOCX','warn');}
-}
-
-async function imgParaBase64(url) {
-  try {
-    const resp = await fetch(url);
-    if(!resp.ok) return null;
-    const blob = await resp.blob();
-    return new Promise(res => {
-      const reader = new FileReader();
-      reader.onloadend = () => res(reader.result.split(',')[1]);
-      reader.onerror = () => res(null);
-      reader.readAsDataURL(blob);
-    });
-  } catch(e) { return null; }
-}
-
-async function criarDocxPrancha(nomeArquivo, titulo, adapt) {
-  const { conceitos, pictogramas, nomeAtiv, disciplina } = adapt;
-  const imagens = [];
-  for(let i=0;i<conceitos.length;i++){
-    const pic = pictogramas[i];
-    if(pic){
-      const url = `https://static.arasaac.org/pictograms/${pic._id}/${pic._id}_500.png`;
-      const b64 = await imgParaBase64(url);
-      imagens.push(b64);
-    } else {
-      imagens.push(null);
-    }
-  }
-  const zip = new JSZip();
-  const wordRels = [];
-  let imgXml = '';
-  let rIdCounter = 1;
-  conceitos.forEach((c, i) => {
-    const b64 = imagens[i];
-    const rId = `rId${rIdCounter++}`;
-    const imgName = `img${i}.png`;
-    if(b64){
-      zip.file(`word/media/${imgName}`, b64, {base64:true});
-      wordRels.push(`<Relationship Id="${rId}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/${imgName}"/>`);
-      imgXml += `
-        <w:tc><w:tcPr><w:tcW w:w="1800" w:type="dxa"/><w:vAlign w:val="center"/></w:tcPr>
-          <w:p><w:pPr><w:jc w:val="center"/></w:pPr>
-            <w:r><w:rPr><w:noProof/></w:rPr>
-              <w:drawing><wp:inline xmlns:wp="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing">
-                <wp:extent cx="914400" cy="914400"/>
-                <wp:docPr id="${i+1}" name="${imgName}"/>
-                <a:graphic xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main">
-                  <a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/picture">
-                    <pic:pic xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture">
-                      <pic:nvPicPr><pic:cNvPr id="${i+1}" name="${imgName}"/><pic:cNvPicPr/></pic:nvPicPr>
-                      <pic:blipFill>
-                        <a:blip r:embed="${rId}" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"/>
-                        <a:stretch><a:fillRect/></a:stretch>
-                      </pic:blipFill>
-                      <pic:spPr><a:xfrm><a:off x="0" y="0"/><a:ext cx="914400" cy="914400"/></a:xfrm>
-                        <a:prstGeom prst="rect"><a:avLst/></a:prstGeom>
-                      </pic:spPr>
-                    </pic:pic>
-                  </a:graphicData>
-                </a:graphic>
-              </wp:inline></w:drawing>
-            </w:r>
-          </w:p>
-          <w:p><w:pPr><w:jc w:val="center"/></w:pPr>
-            <w:r><w:rPr><w:b/><w:sz w:val="20"/></w:rPr><w:t>${esc(c.palavra.toUpperCase())}</w:t></w:r>
-          </w:p>
-          ${c.contexto?`<w:p><w:pPr><w:jc w:val="center"/></w:pPr><w:r><w:rPr><w:sz w:val="16"/><w:color w:val="64748B"/></w:rPr><w:t>${esc(c.contexto)}</w:t></w:r></w:p>`:''}
-        </w:tc>`;
-    } else {
-      imgXml += `
-        <w:tc><w:tcPr><w:tcW w:w="1800" w:type="dxa"/><w:vAlign w:val="center"/></w:tcPr>
-          <w:p><w:pPr><w:jc w:val="center"/></w:pPr>
-            <w:r><w:rPr><w:sz w:val="40"/></w:rPr><w:t>🖼️</w:t></w:r>
-          </w:p>
-          <w:p><w:pPr><w:jc w:val="center"/></w:pPr>
-            <w:r><w:rPr><w:b/><w:sz w:val="20"/></w:rPr><w:t>${esc(c.palavra.toUpperCase())}</w:t></w:r>
-          </w:p>
-        </w:tc>`;
-    }
-    if((i+1) % 4 === 0 && i < conceitos.length-1){
-      imgXml += '</w:tr><w:tr>';
-    }
-  });
-  const resto = conceitos.length % 4;
-  if(resto > 0){
-    for(let k=resto;k<4;k++){
-      imgXml += '<w:tc><w:tcPr><w:tcW w:w="1800" w:type="dxa"/></w:tcPr><w:p/></w:tc>';
-    }
-  }
-  const xmlDoc = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"
-  xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"
-  xmlns:wp="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing"
-  xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"
-  xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture">
-<w:body>
-  <w:p><w:pPr><w:jc w:val="center"/></w:pPr>
-    <w:r><w:rPr><w:b/><w:sz w:val="36"/><w:color w:val="2563EB"/></w:rPr><w:t>${esc(titulo)}</w:t></w:r>
-  </w:p>
-  <w:p><w:pPr><w:jc w:val="center"/></w:pPr>
-    <w:r><w:rPr><w:sz w:val="20"/><w:color w:val="64748B"/></w:rPr><w:t>Material: ${esc(nomeAtiv||disciplina)} · ARASAAC</w:t></w:r>
-  </w:p>
-  <w:p/>
-  <w:tbl>
-    <w:tblPr><w:tblW w:w="7200" w:type="dxa"/><w:tblBorders>
-      <w:top w:val="single" w:sz="4" w:color="D0DAE6"/>
-      <w:left w:val="single" w:sz="4" w:color="D0DAE6"/>
-      <w:bottom w:val="single" w:sz="4" w:color="D0DAE6"/>
-      <w:right w:val="single" w:sz="4" w:color="D0DAE6"/>
-      <w:insideH w:val="single" w:sz="4" w:color="D0DAE6"/>
-      <w:insideV w:val="single" w:sz="4" w:color="D0DAE6"/>
-    </w:tblBorders></w:tblPr>
-    <w:tblGrid><w:gridCol w:w="1800"/><w:gridCol w:w="1800"/><w:gridCol w:w="1800"/><w:gridCol w:w="1800"/></w:tblGrid>
-    <w:tr>${imgXml}</w:tr>
-  </w:tbl>
-  <w:sectPr><w:pgSz w:w="12240" w:h="15840"/><w:pgMar w:top="720" w:right="720" w:bottom="720" w:left="720"/></w:sectPr>
-</w:body></w:document>`;
-  const xmlStyles = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:styles xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:style w:type="paragraph" w:styleId="Normal"><w:name w:val="Normal"/><w:rPr><w:sz w:val="24"/></w:rPr></w:style></w:styles>`;
-  const xmlCT = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Default Extension="png" ContentType="image/png"/><Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/><Override PartName="/word/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.styles+xml"/></Types>`;
-  const xmlRelsMain = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/></Relationships>`;
-  const xmlRelsWord = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/>${wordRels.join('')}</Relationships>`;
-  zip.file('[Content_Types].xml', xmlCT);
-  zip.file('_rels/.rels', xmlRelsMain);
-  zip.file('word/document.xml', xmlDoc);
-  zip.file('word/styles.xml', xmlStyles);
-  zip.file('word/_rels/document.xml.rels', xmlRelsWord);
-  const blob = await zip.generateAsync({type:'blob', mimeType:'application/vnd.openxmlformats-officedocument.wordprocessingml.document'});
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a'); a.href=url; a.download=nomeArquivo; a.click(); URL.revokeObjectURL(url);
-}
-
-async function baixarTodos() {
-  let baixados=0;
-  const imagem=state.imagemMaterial||null;
-  for(const id of Object.keys(state.adaptacoes)){
-    const aluno=state.alunos.find(x=>x.id===id);
-    const txt=state.adaptacoes[id];
-    if(!txt) continue;
-    const nome=aluno?.nome||id;
-    try{
-      if(typeof txt==='object'&&txt.tipo==='json'){
-        const d=txt.data;
-        let textoParts=[`---${d.nomeAtividade||'Material Adaptado'}---`,''];
-        (d.passos||[]).forEach(p=>textoParts.push(`${p.numero}. ${p.texto}`));
-        textoParts.push('');
-        if(d.resumo?.length){
-          textoParts.push('---Resumo Rápido---','');
-          d.resumo.forEach(r=>textoParts.push(`**${r.titulo}:** ${r.conteudo}`));
-          textoParts.push('');
-        }
-        if(d.questoes?.length){
-          textoParts.push('---Atividade---','');
-          d.questoes.forEach((q,i)=>{
-            textoParts.push(`${i+1}. ${q.enunciado}`);
-            if(q.tipo==='multipla')(q.opcoes||[]).forEach(op=>textoParts.push(`   ${op}`));
-            if(q.tipo==='vf') textoParts.push(`   ( ) Verdadeiro  ( ) Falso`);
-            textoParts.push('');
-          });
-          textoParts.push('---Gabarito---','');
-          d.questoes.forEach((q,i)=>textoParts.push(`Questão ${i+1}: ${q.gabarito}`));
-        }
-        await criarDocx(`Adaptacao_${nome}.docx`,`Adaptação — ${nome}`,textoParts.join('\n'),imagem);
-        baixados++;
-      } else if(typeof txt==='object'&&txt.tipo==='pictograma'){
-        await criarDocxPrancha(`Prancha_${nome}.docx`,`Prancha — ${nome}`,txt);
-        baixados++;
-      } else if(typeof txt==='object'&&txt.tipo==='texto'){
-        const{material}=extrairBlocos(txt.data);
-        await criarDocx(`Adaptacao_${nome}.docx`,`Adaptação — ${nome}`,material,imagem);
-        baixados++;
-      } else if(typeof txt==='string'){
-        const{material}=extrairBlocos(txt);
-        await criarDocx(`Adaptacao_${nome}.docx`,`Adaptação — ${nome}`,material,imagem);
-        baixados++;
-      }
-      await new Promise(r=>setTimeout(r,600));
-    }catch(e){console.error('Erro ao baixar DOCX de '+nome,e);}
-  }
-  showToast(`📦 ${baixados} DOCX baixados!`);
-}
-
-async function baixarPei() {
-  if(!state.peiAtual?.alunoAtivo) return;
-  const dado=state.peiAtual.alunos[state.peiAtual.alunoAtivo];
-  if(!dado) return;
-  try{await criarDocx(`PEI_${dado.aluno.nome.replace(/\s/g,'_')}.docx`,`PEI — ${dado.aluno.nome}`,dado.texto);showToast('📥 PEI baixado!');}
-  catch(e){showToast('❌ Erro ao gerar DOCX','warn');}
-}
-
-async function baixarTodosPei() {
-  if(!state.peiAtual?.alunos) return;
-  const ids=Object.keys(state.peiAtual.alunos);
-  if(!ids.length) return showToast('⚠️ Nenhum PEI gerado','warn');
-  let baixados=0;
-  for(const id of ids){
-    const dado=state.peiAtual.alunos[id];
-    if(!dado) continue;
-    try{await criarDocx(`PEI_${dado.aluno.nome.replace(/\s/g,'_')}.docx`,`PEI — ${dado.aluno.nome}`,dado.texto);baixados++;await new Promise(r=>setTimeout(r,600));}
-    catch(e){console.error(e);}
-  }
-  showToast(`📦 ${baixados} PEIs baixados!`);
-}
-
-async function gerarPei() {
-  const turmaId=document.getElementById('pei-turma').value;
-  const planejamento=document.getElementById('pei-planejamento').value.trim();
-  const periodo=document.getElementById('pei-periodo').value.trim();
-  const professor=document.getElementById('pei-professor').value.trim();
-  const disciplina=document.getElementById('pei-disciplina').value.trim();
-  if(!turmaId) return showToast('⚠️ Selecione uma turma','warn');
-  if(!planejamento) return showToast('⚠️ Cole ou faça upload do planejamento','warn');
-  const checkboxes=document.querySelectorAll('#pei-alunos-checkboxes input[type=checkbox]:checked');
-  if(!checkboxes.length) return showToast('⚠️ Selecione pelo menos um aluno','warn');
-  const alunosSel=Array.from(checkboxes).map(cb=>state.alunos.find(a=>a.id===cb.value)).filter(Boolean);
-  const turma=state.turmas.find(t=>t.id===turmaId);
-  document.getElementById('btn-gerar-pei').disabled=true;
-  document.getElementById('pei-resultado').style.display='none';
-  const progBar=document.getElementById('prog-bar-pei');const progFill=document.getElementById('prog-fill-pei');
-  progBar.classList.add('show');
-  state.peiAtual={alunos:{},turma,periodo,professor};
-  for(let i=0;i<alunosSel.length;i++){
-    const aluno=alunosSel[i];
-    progFill.style.width=`${Math.round(((i+0.5)/alunosSel.length)*100)}%`;
-    try{
-      const r=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({messages:[{role:'user',content:buildPromptPei(aluno,turma,planejamento,periodo,professor,disciplina)}]})});
-      if(!r.ok){
-        const txt=await r.text().catch(()=>'');
-        const msg=txt.includes('rate')||txt.includes('Rate')?'Limite de requisições atingido — aguarde 30 segundos.':'Erro do servidor. Tente novamente.';
-        state.peiAtual.alunos[aluno.id]={aluno,texto:`⚠️ ${msg}`};
-      } else {
-        const d=await r.json();
-        state.peiAtual.alunos[aluno.id]={aluno,texto:d.content?.[0]?.text||'Erro ao gerar.'};
-      }
-    }catch(e){state.peiAtual.alunos[aluno.id]={aluno,texto:'⚠️ Erro de conexão. Tente novamente.'};}
-    progFill.style.width=`${Math.round(((i+1)/alunosSel.length)*100)}%`;
-    if(i<alunosSel.length-1) await new Promise(r=>setTimeout(r,2000));
-  }
-  setTimeout(()=>{progBar.classList.remove('show');progFill.style.width='0%';document.getElementById('btn-gerar-pei').disabled=false;renderPeiResultado();},400);
-}
-
-function buildPromptPei(aluno,turma,planejamento,periodo,professor,disciplina) {
-  const fragMap={baixa:'Texto contínuo',media:'Parágrafos curtos',alta:'Blocos curtos e tópicos',nao_alfabetizado:'Pictogramas/CAA'};
-  const abstMap={alta:'Alta',media:'Média',baixa:'Baixa — linguagem direta',nao_abstrai:'Não abstrai'};
-  const medMap={autonomo:'Autônomo',guiado:'Guiado',passo_a_passo:'Passo a passo'};
-  const conds=[];if(aluno.dislexia) conds.push('Dislexia');if(aluno.tdah) conds.push('TDAH');if(aluno.tea) conds.push('TEA');if(aluno.baixa_visao) conds.push('Baixa visão');if(aluno.altas_habilidades) conds.push('Altas habilidades/Superdotação');
-  const meta=state.user?.user_metadata||{};
-  const refCurr=meta.estado==='RS_RG'?'Documento Orientador Curricular do Território Rio-grandino (SMEd/Rio Grande-RS)':meta.estado==='RS'?'Referencial Curricular Gaúcho':meta.estado==='SP'?'Currículo Paulista':'BNCC';
-  return `Você é especialista em educação inclusiva e legislação brasileira. Gere um PEI completo.
-DADOS: Aluno: ${aluno.nome} | Turma: ${turma.nome} | Etapa: ${turma.etapa.toUpperCase()} | Disciplina: ${disciplina||turma.disciplina} | Professor(a): ${professor||meta.name||'—'} | Período: ${periodo||'—'} | Escola: ${meta.escola||'—'} | Ref. Curr.: ${refCurr}
-PERFIL: Leitura: ${fragMap[aluno.fragmentacao]||aluno.fragmentacao} | Abstração: ${abstMap[aluno.abstracao]||aluno.abstracao} | Mediação: ${medMap[aluno.mediacao]||aluno.mediacao} | Condições: ${conds.length?conds.join(', '):'Não especificadas'} | Observações: ${aluno.obs||'Nenhuma'} | Interesses: ${aluno.interesses||'Não informado'}
-PLANEJAMENTO DA TURMA:
-${planejamento}
-
-Gere o PEI:
-PLANO EDUCACIONAL INDIVIDUALIZADO — PEI
-========================================
-Aluno(a): ${aluno.nome} | Turma: ${turma.nome} | Disciplina: ${disciplina||turma.disciplina}
-Professor(a): ${professor||meta.name||'___'} | Período: ${periodo||'___'} | Data: ___/___/______
-Escola: ${meta.escola||'___________________'} | Referência: ${refCurr}
-----------------------------------------
-IDENTIFICAÇÃO E CARACTERIZAÇÃO DO ALUNO
-----------------------------------------
-[Perfil pedagógico em 3-4 linhas]
-----------------------------------------
-CONTEÚDOS, ADAPTAÇÕES E OBJETIVOS
-----------------------------------------
-[Para cada conteúdo do planejamento:]
-CONTEÚDO: [nome]
-ADAPTAÇÕES: [estratégias específicas para o perfil]
-OBJETIVO: [o que o aluno deve alcançar]
----
-----------------------------------------
-AVALIAÇÃO
-----------------------------------------
-Tipo: [adequado ao perfil]
-Forma: [Nota e/ou Parecer descritivo]
-Critério: [como medir o progresso]
-----------------------------------------
-ASSINATURAS
-----------------------------------------
-Professor(a): _______________________  Data: ___/___/______
-Coordenação: _______________________  Data: ___/___/______
-Família/Responsável: ________________  Data: ___/___/______`;
-}
-
-function renderPeiResultado() {
-  const{alunos}=state.peiAtual;const ids=Object.keys(alunos);if(!ids.length) return;
-  document.getElementById('pei-tabs').innerHTML=ids.map((id,i)=>`<button class="rtab${i===0?' active':''}" onclick="selectPeiTab('${id}')" id="pei-tab-${id}">${alunos[id].aluno.nome}</button>`).join('');
-  selectPeiTab(ids[0]);document.getElementById('pei-resultado').style.display='block';
-}
-
-function selectPeiTab(alunoId) {
-  document.querySelectorAll('#pei-tabs .rtab').forEach(t=>t.classList.remove('active'));
-  const tab=document.getElementById(`pei-tab-${alunoId}`);if(tab) tab.classList.add('active');
-  const dado=state.peiAtual?.alunos?.[alunoId];
-  if(dado) document.getElementById('pei-texto').textContent=dado.texto;
-  state.peiAtual.alunoAtivo=alunoId;
-}
-
-function renderHistorico() {
-  const list=document.getElementById('historico-list');
-  if(!state.historico.length){list.innerHTML='<div class="empty-state"><div class="empty-icon">📁</div><p>Nenhuma adaptação gerada ainda.</p></div>';return;}
-  const porTurma={};
-  state.historico.forEach(h=>{const k=h.turma_nome||'Sem turma';if(!porTurma[k]) porTurma[k]=[];porTurma[k].push(h);});
-  let html='';
-  Object.keys(porTurma).forEach(turmaK=>{
-    html+=`<div class="section-title" style="margin-top:20px;font-size:14px">🏫 ${turmaK}</div>`;
-    porTurma[turmaK].forEach(h=>{
-      const temConteudo=!!(h.conteudo);
-      html+=`<div class="historico-item">
-        <div class="hist-icon">📄</div>
-        <div class="hist-info">
-          <div class="hist-title">${h.titulo}</div>
-          <div class="hist-meta">${h.aluno_nome||'Aluno'} · ${h.created_at?new Date(h.created_at).toLocaleDateString('pt-BR'):''}</div>
-          <div style="margin-top:4px"><span class="tag tag-blue">${h.disciplina}</span></div>
-        </div>
-        ${temConteudo?`<div style="display:flex;flex-direction:column;gap:6px;flex-shrink:0">
-          <button class="btn btn-secondary btn-sm" onclick="reabrirAdaptacao('${h.id}')">📂 Reabrir</button>
-          <button class="btn btn-sm" onclick="baixarHistoricoDocx('${h.id}')" style="background:rgba(5,150,105,0.1);color:var(--accent3);border:1px solid rgba(5,150,105,0.2)">📥 DOCX</button>
-        </div>`:''}
-      </div>`;
-    });
-  });
-  list.innerHTML=html;
-}
-
-function reabrirAdaptacao(historicoId) {
-  const h=state.historico.find(x=>x.id===historicoId);
-  if(!h||!h.conteudo) return showToast('⚠️ Conteúdo não disponível para este registro','warn');
-  // Restaura adaptação no state
-  state.adaptacoes={};
-  state.adaptacoes[h.aluno_id]=h.conteudo;
-  state.alunoAdaptacaoAtual=h.aluno_id;
-  state.imagemMaterial=null;
-  // Navega para tela de adaptação
-  showPanel('adaptar');
-  // Mostra resultado
-  document.getElementById('resultado-area').style.display='block';
-  document.getElementById('resultado-tabs').innerHTML=`<div class="rtab active" onclick="mostrarAdaptacao('${h.aluno_id}',this)">${h.aluno_nome}</div>`;
-  const box=document.getElementById('resultado-text');
-  const adapt=h.conteudo;
-  if(adapt&&adapt.tipo==='pictograma') renderPrancha(adapt,box);
-  else if(adapt) box.innerHTML=renderAdaptacaoHtml(adapt);
-  mostrarAba('aluno');
-  showToast(`📂 Adaptação de ${h.aluno_nome} reaberta!`);
-}
-
-async function baixarHistoricoDocx(historicoId) {
-  const h=state.historico.find(x=>x.id===historicoId);
-  if(!h||!h.conteudo) return showToast('⚠️ Conteúdo não disponível','warn');
-  const adapt=h.conteudo;
-  const nome=h.aluno_nome||'aluno';
-  if(adapt.tipo==='json'){
-    const d=adapt.data;
-    let textoParts=[`---${d.nomeAtividade||'Material Adaptado'}---`,''];
-    (d.passos||[]).forEach(p=>textoParts.push(`${p.numero}. ${p.texto}`));
-    textoParts.push('');
-    if(d.resumo?.length){textoParts.push('---Resumo Rápido---','');d.resumo.forEach(r=>textoParts.push(`**${r.titulo}:** ${r.conteudo}`));textoParts.push('');}
-    if(d.questoes?.length){
-      textoParts.push('---Atividade---','');
-      d.questoes.forEach((q,i)=>{
-        textoParts.push(`${i+1}. ${q.enunciado}`);
-        if(q.tipo==='multipla')(q.opcoes||[]).forEach(op=>textoParts.push(`   ${op}`));
-        if(q.tipo==='vf') textoParts.push(`   ( ) Verdadeiro  ( ) Falso`);
-        textoParts.push('');
-      });
-      textoParts.push('---Gabarito---','');
-      d.questoes.forEach((q,i)=>textoParts.push(`Questão ${i+1}: ${q.gabarito}`));
-    }
-    try{await criarDocx(`Adaptacao_${nome}.docx`,`Adaptação — ${nome}`,textoParts.join('\n'));showToast('📥 DOCX baixado!');}
-    catch(e){showToast('❌ Erro ao gerar DOCX','warn');}
-  }
-}
-
-async function baixarRegistroProfessor() {
-  const adapt=state.adaptacoes[state.alunoAdaptacaoAtual];
-  if(!adapt||adapt.tipo!=='json'||!adapt.data) return showToast('⚠️ Nenhum registro disponível','warn');
-  const d=adapt.data;
-  const rp=d.registroPedagogico||{};
-  const aluno=state.alunos.find(a=>a.id===state.alunoAdaptacaoAtual);
-  const nome=aluno?.nome||'aluno';
-  const conds=[];
-  if(aluno?.tea) conds.push('TEA');if(aluno?.tdah) conds.push('TDAH');
-  if(aluno?.dislexia) conds.push('Dislexia');if(aluno?.baixa_visao) conds.push('Baixa visão');
-  if(aluno?.altas_habilidades) conds.push('Altas habilidades');
-  let textoParts=[
-    `---Registro Pedagógico — ${nome}---`,
-    '',
-    `Disciplina: ${d.disciplina||'—'}`,
-    `Referencial: ${rp.refCurr||'BNCC'}`,
-    `Diagnóstico: ${conds.length?conds.join(', '):'Não especificado'}`,
-    '',
-    '---Objetivos de Aprendizagem---',
-    '',
-  ];
-  (rp.objetivos||[]).forEach((o,i)=>textoParts.push(`${i+1}. ${o}`));
-  textoParts.push('','---Habilidades BNCC---','');
-  (rp.habilidadesBNCC||rp.habilidades||[]).forEach(h=>textoParts.push(`${h.codigo} — ${h.descricao}`));
-  if((rp.habilidadesEstadual||[]).length){
-    textoParts.push('',`---Habilidades ${rp.refCurr||'Referencial Estadual'}---`,'');
-    rp.habilidadesEstadual.forEach(h=>textoParts.push(`${h.codigo} — ${h.descricao}`));
-  }
-  if(rp.orientacoes) textoParts.push('','---Orientações Metodológicas---','',rp.orientacoes);
-  try{
-    await criarDocx(`Registro_${nome}.docx`,`Registro Pedagógico — ${nome}`,textoParts.join('\n'));
-    showToast('📋 Registro do professor baixado!');
-  }catch(e){showToast('❌ Erro ao gerar DOCX','warn');}
-}
-
-async function baixarPdf() {
-  const adapt=state.adaptacoes[state.alunoAdaptacaoAtual];
-  if(!adapt||adapt.tipo==='pictograma') return showToast('⚠️ Selecione uma adaptação de texto','warn');
-  const aluno=state.alunos.find(a=>a.id===state.alunoAdaptacaoAtual);
-  const nome=aluno?.nome||'aluno';
-  const meta=state.user?.user_metadata||{};
-
-  showToast('⏳ Gerando PDF...','');
-
-  // Cria container oculto com largura A4
-  const container=document.createElement('div');
-  container.style.cssText='position:fixed;left:-9999px;top:0;width:740px;background:white;font-family:Arial,sans-serif;font-size:13px;line-height:1.7;color:#1e293b;';
-  container.innerHTML=`<style>
-    :root{--accent:#2563eb;--accent2:#7c3aed;--accent3:#059669;--border:#d0dae6;--surface:#fff;--surface2:#e8eef5;--bg:#f0f4f8;--text:#1e293b;--muted:#64748b;--warn:#ea580c;--card:#fff;}
-    *{box-sizing:border-box;}
-  </style>`;
-  document.body.appendChild(container);
-
-  const {jsPDF}=window.jspdf;
-  const pdf=new jsPDF({orientation:'portrait',unit:'mm',format:'a4'});
-  const pageW=pdf.internal.pageSize.getWidth(); // 210mm
-  const pageH=pdf.internal.pageSize.getHeight(); // 297mm
-  const margin=12;
-  const usableH=pageH-(margin*2); // altura útil por página em mm
-  const usableW=pageW-(margin*2);
-
-  let curY=margin;
-
-  async function renderSecao(html, padding='16px') {
-    const div=document.createElement('div');
-    div.style.cssText=`width:740px;padding:${padding};background:white;`;
-    div.innerHTML=html;
-    container.appendChild(div);
-    const canvas=await html2canvas(div,{scale:1.5,useCORS:true,backgroundColor:'#ffffff',logging:false});
-    container.removeChild(div);
-    const imgData=canvas.toDataURL('image/jpeg',0.92);
-    const imgH=(canvas.height*usableW)/canvas.width; // altura em mm
-    // Se não cabe na página atual, pula para próxima
-    if(curY+imgH > pageH-margin && curY > margin+10) {
-      pdf.addPage();
-      curY=margin;
-    }
-    pdf.addImage(imgData,'JPEG',margin,curY,usableW,imgH);
-    curY+=imgH+4;
-  }
-
-  try {
-    if(adapt.tipo!=='json'||!adapt.data){
-      showToast('❌ Formato não suportado para PDF','warn');
-      document.body.removeChild(container);
-      return;
-    }
-    const d=adapt.data;
-
-    // Cabeçalho
-    await renderSecao(`
-      <div style="text-align:center;padding-bottom:14px;border-bottom:2px solid #2563eb">
-        <div style="font-size:11px;color:#64748b;margin-bottom:4px">${[meta.escola,meta.name,new Date().toLocaleDateString('pt-BR')].filter(Boolean).join('  ·  ')}</div>
-        <h1 style="font-family:Arial,sans-serif;font-size:20px;font-weight:800;color:#2563eb;margin:0">Adaptação — ${nome}</h1>
-        <span style="display:inline-block;margin-top:8px;padding:3px 12px;background:rgba(37,99,235,0.1);color:#2563eb;border-radius:20px;font-size:11px;font-weight:700">${esc2(d.disciplina||'')}</span>
-      </div>`, '0');
-
-    // Cada passo individualmente — nunca corta no meio
-    if((d.passos||[]).length){
-      await renderSecao(`<div style="font-weight:800;font-size:14px;margin-bottom:8px;color:#1e293b">📖 Aprenda Passo a Passo</div>`,'8px 0');
-      for(const p of d.passos){
-        await renderSecao(`
-          <div style="display:flex;align-items:flex-start;gap:10px;padding:10px 14px;background:#F8FAFC;border-radius:8px;border-left:4px solid #2563eb">
-            <span style="display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;min-width:24px;background:#2563eb;color:white;border-radius:50%;font-weight:700;font-size:11px">${p.numero}</span>
-            <p style="margin:0;font-size:13px;line-height:1.6">${esc2(p.texto)}</p>
-          </div>`,'4px 0');
-      }
-    }
-
-    // Resumo — cada card individualmente
-    if((d.resumo||[]).length){
-      await renderSecao(`<div style="font-weight:800;font-size:14px;margin:8px 0 4px;color:#1e293b">⚡ Resumo Rápido</div>`,'8px 0');
-      for(const r of d.resumo){
-        await renderSecao(`
-          <div style="background:#2563eb;border-radius:8px;padding:12px 14px;color:white;margin-bottom:4px">
-            <div style="font-weight:700;font-size:12px;margin-bottom:3px">${esc2(r.titulo)}</div>
-            <div style="font-size:12px;opacity:0.92">${esc2(r.conteudo)}</div>
-          </div>`,'4px 0');
-      }
-    }
-
-    // Questões — cada uma individualmente
-    if((d.questoes||[]).length){
-      await renderSecao(`<div style="font-weight:800;font-size:14px;margin:8px 0 4px;color:#1e293b">✏️ Atividade</div>`,'8px 0');
-      d.questoes.forEach(async(q,qi)=>{});
-      for(let qi=0;qi<d.questoes.length;qi++){
-        const q=d.questoes[qi];
-        let qHtml=`<div style="background:white;border:2px solid #d0dae6;border-radius:10px;padding:14px">
-          <p style="font-weight:700;font-size:13px;margin:0 0 10px">QUESTÃO ${qi+1}. ${esc2(q.enunciado)}</p>`;
-        if(q.tipo==='multipla'){
-          (q.opcoes||[]).forEach(op=>{
-            qHtml+=`<div style="display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:7px;border:1px solid #d0dae6;margin-bottom:6px;font-size:13px">
-              <span style="width:16px;height:16px;border-radius:50%;border:2px solid #d0dae6;flex-shrink:0;display:inline-block"></span>
-              ${esc2(op)}</div>`;
-          });
-        }
-        if(q.tipo==='vf'){
-          qHtml+=`<div style="display:flex;align-items:center;gap:12px;font-size:13px">
-            <span style="flex:1">${esc2(q.enunciado)}</span>
-            <div style="width:44px;height:44px;border:2px dashed #93c5fd;border-radius:8px;display:flex;align-items:center;justify-content:center;color:#93c5fd;font-size:16px">( )</div>
-          </div>`;
-        }
-        qHtml+='</div>';
-        await renderSecao(qHtml,'4px 0');
-      }
-    }
-
-    // Gabarito
-    if((d.questoes||[]).length){
-      const gabHtml=`<div style="background:#f8fafc;border:1px solid #d0dae6;border-radius:8px;padding:12px 14px">
-        <div style="font-weight:700;font-size:12px;margin-bottom:8px;color:#1e293b">📝 GABARITO</div>
-        ${d.questoes.map((q,qi)=>`<p style="font-size:12px;margin:0 0 4px"><strong style="color:#2563eb">Q${qi+1}:</strong> ${esc2(q.gabarito)}</p>`).join('')}
-      </div>`;
-      await renderSecao(gabHtml,'4px 0');
-    }
-
-    pdf.save(`Adaptacao_${nome.replace(/\s/g,'_')}.pdf`);
-    showToast('📄 PDF baixado!');
-  } catch(e) {
-    console.error(e);
-    showToast('❌ Erro ao gerar PDF','warn');
-  } finally {
-    if(document.body.contains(container)) document.body.removeChild(container);
-  }
-}
-
-
-function setUploadState(s){['idle','loading','success','error'].forEach(x=>document.getElementById('upload-'+x).style.display=s===x?'block':'none');}
-function handleDrop(e){e.preventDefault();document.getElementById('upload-zone').classList.remove('dragover');const file=e.dataTransfer.files[0];if(file) handleFileSelect(file);}
-
-async function lerArquivo(file) {
-  const ext=file.name.split('.').pop().toLowerCase();
-  if(!['pdf','docx','doc','txt','png','jpg','jpeg','webp'].includes(ext))
-    throw new Error(`Formato .${ext} não suportado.`);
-
-  // IMAGEM DIRETA (foto do celular, PNG, JPG, WEBP)
-  if(['png','jpg','jpeg','webp'].includes(ext)){
-    return new Promise((res,rej)=>{
-      const r=new FileReader();
-      r.onload=e=>res({tipo:'imagem', base64:e.target.result, mimeType:file.type, nome:file.name});
-      r.onerror=()=>rej(new Error('Falha ao ler imagem'));
-      r.readAsDataURL(file);
-    });
-  }
-
-  // TXT
-  if(ext==='txt'){
-    const texto=await new Promise((res,rej)=>{
-      const r=new FileReader();
-      r.onload=e=>res(e.target.result);
-      r.onerror=()=>rej(new Error('Falha'));
-      r.readAsText(file,'UTF-8');
-    });
-    return {tipo:'texto', conteudo:texto.trim()};
-  }
-
-  // DOCX / DOC
-  if(ext==='docx'||ext==='doc'){
-    const ab=await file.arrayBuffer();
-    const result=await mammoth.extractRawText({arrayBuffer:ab});
-    return {tipo:'texto', conteudo:(result.value||'').trim()};
-  }
-
-  // PDF — tenta extrair texto primeiro
-  if(ext==='pdf'){
-    const ab=await file.arrayBuffer();
-    const pdf=await pdfjsLib.getDocument({data:ab}).promise;
-    let texto='';
-    for(let i=1;i<=pdf.numPages;i++){
-      const p=await pdf.getPage(i);
-      const c=await p.getTextContent();
-      texto+=c.items.map(x=>x.str).join(' ')+'\n\n';
-    }
-    // Se extraiu texto suficiente, usa texto
-    if(texto.trim().length>=80){
-      return {tipo:'texto', conteudo:texto.trim()};
-    }
-    // PDF com pouco texto = provavelmente atividade com imagem
-    // Renderiza primeira página como imagem e manda para visão da IA
-    showToast('🖼️ PDF com imagem detectado — usando visão da IA...','');
-    const page=await pdf.getPage(1);
-    const viewport=page.getViewport({scale:2});
-    const canvas=document.createElement('canvas');
-    canvas.width=viewport.width;
-    canvas.height=viewport.height;
-    await page.render({canvasContext:canvas.getContext('2d'),viewport}).promise;
-    return {tipo:'imagem', base64:canvas.toDataURL('image/png'), mimeType:'image/png', nome:file.name};
-  }
-
-  throw new Error('Formato não suportado.');
-}
-
-async function handleFileSelect(file) {
-  if(!file) return;
-  if(file.size>10*1024*1024){setUploadState('error');document.getElementById('upload-errmsg').textContent='Arquivo muito grande. Máximo: 10MB.';return;}
-  setUploadState('loading');
-  try{
-    const resultado=await lerArquivo(file);
-    const nomeInput=document.getElementById('material-nome');
-    if(!nomeInput.value) nomeInput.value=file.name.replace(/\.[^/.]+$/,'');
-
-    if(resultado.tipo==='imagem'){
-      // Guarda imagem no state para usar na geração
-      state.imagemMaterial=resultado;
-      // Limpa textarea — o texto virá da IA quando gerar
-      document.getElementById('material-texto').value='';
-      document.getElementById('upload-filename').textContent='🖼️ '+file.name;
-      document.getElementById('upload-charcount').textContent='✅ Imagem carregada — a IA vai ler o conteúdo';
-      setUploadState('success');
-    } else {
-      // Texto normal
-      state.imagemMaterial=null;
-      if(!resultado.conteudo||resultado.conteudo.length<10){
-        setUploadState('error');
-        document.getElementById('upload-errmsg').textContent='Não foi possível extrair texto. Cole manualmente.';
-        return;
-      }
-      document.getElementById('material-texto').value=resultado.conteudo;
-      document.getElementById('upload-filename').textContent='📄 '+file.name;
-      document.getElementById('upload-charcount').textContent=`✅ ${resultado.conteudo.length.toLocaleString('pt-BR')} caracteres extraídos`;
-      setUploadState('success');
-    }
-  }catch(err){setUploadState('error');document.getElementById('upload-errmsg').textContent='Erro: '+err.message;}
-}
-
-function setPeiUploadState(s){['idle','loading','success','error'].forEach(x=>document.getElementById('pei-upload-'+x).style.display=s===x?'block':'none');}
-function handlePeiDrop(e){e.preventDefault();document.getElementById('pei-upload-zone').classList.remove('dragover');const file=e.dataTransfer.files[0];if(file) handlePeiFileSelect(file);}
-
-async function handlePeiFileSelect(file) {
-  if(!file) return;
-  if(file.size>10*1024*1024){setPeiUploadState('error');document.getElementById('pei-upload-errmsg').textContent='Arquivo muito grande.';return;}
-  setPeiUploadState('loading');
-  try{
-    const texto=await lerArquivo(file);
-    if(!texto||texto.length<10){setPeiUploadState('error');document.getElementById('pei-upload-errmsg').textContent='Não foi possível extrair texto.';return;}
-    document.getElementById('pei-planejamento').value=texto;
-    document.getElementById('pei-upload-filename').textContent='📄 '+file.name;
-    setPeiUploadState('success');
-  }catch(err){setPeiUploadState('error');document.getElementById('pei-upload-errmsg').textContent='Erro: '+err.message;}
-}
-
-function showPanel(id) {
-  closeSidebar();
-  document.querySelectorAll('.content-panel').forEach(p=>p.classList.remove('active'));
-  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
-  document.getElementById('panel-'+id).classList.add('active');
-  const nav=document.getElementById('nav-'+id);if(nav) nav.classList.add('active');
-  if(id==='alunos') renderPainelAlunos();
-  if(id==='dashboard') renderDashboard();
-  if(id==='perfil') carregarDadosPerfil();
-}
-function openModal(id){document.getElementById(id).classList.add('open');}
-function closeModal(id){document.getElementById(id).classList.remove('open');}
-function toggleSidebar(){document.getElementById('main-sidebar').classList.toggle('open');document.getElementById('sidebar-overlay').classList.toggle('open');}
-function closeSidebar(){document.getElementById('main-sidebar').classList.remove('open');document.getElementById('sidebar-overlay').classList.remove('open');}
-function setBottomNav(id){document.querySelectorAll('.bnav-item').forEach(b=>b.classList.remove('active'));const el=document.getElementById('bnav-'+id);if(el) el.classList.add('active');}
-
-function showToast(msg,type) {
-  const t=document.createElement('div');
-  t.style.cssText=`position:fixed;bottom:24px;right:24px;padding:14px 20px;border-radius:12px;font-size:14px;font-weight:500;z-index:9999;animation:fadeUp 0.3s ease;background:${type==='warn'?'#fb923c22':'#34d39922'};border:1px solid ${type==='warn'?'#fb923c':'#34d399'};color:${type==='warn'?'#fb923c':'#34d399'};font-family:'DM Sans',sans-serif;backdrop-filter:blur(10px);`;
-  t.textContent=msg;document.body.appendChild(t);setTimeout(()=>t.remove(),3000);
-}
-
-function novaAdaptacao() {
-  // Limpa tudo da adaptação atual
-  state.adaptacoes={};
-  state.alunoAdaptacaoAtual=null;
-  state.imagemMaterial=null;
-  // Limpa campos de texto
-  document.getElementById('material-texto').value='';
-  document.getElementById('material-disciplina').value='';
-  document.getElementById('material-nome').value='';
-  // Reseta upload zone
-  setUploadState('idle');
-  // Limpa seleção de turma e alunos
-  document.getElementById('adaptar-turma').value='';
-  document.getElementById('aluno-select-list').innerHTML='<div class="empty-state"><div class="empty-icon">👆</div><p>Selecione uma turma acima</p></div>';
-  // Esconde resultado
-  document.getElementById('resultado-area').style.display='none';
-  document.getElementById('resultado-tabs').innerHTML='';
-  document.getElementById('resultado-text').innerHTML='';
-  // Fecha prévia se aberta
-  document.getElementById('previa-docx').style.display='none';
-  document.getElementById('btn-previa').textContent='👁 Prévia do DOCX';
-  // Scroll para o topo
-  document.querySelector('.main-content').scrollTop=0;
-  showToast('✅ Pronto para nova adaptação!');
-}
-
-function togglePrevia() {
-  const div=document.getElementById('previa-docx');
-  const btn=document.getElementById('btn-previa');
-  if(div.style.display==='none'){
-    const adapt=state.adaptacoes[state.alunoAdaptacaoAtual];
-    if(!adapt||adapt.tipo==='pictograma') return showToast('⚠️ Selecione uma adaptação de texto','warn');
-    document.getElementById('previa-conteudo').innerHTML=renderAdaptacaoHtml(adapt);
-    div.style.display='block';
-    btn.textContent='✕ Fechar prévia';
-    div.scrollIntoView({behavior:'smooth',block:'nearest'});
-  } else {
-    div.style.display='none';
-    btn.textContent='👁 Prévia do DOCX';
-  }
-}
-
-function confirmarApagarAluno(id,nome) {
-  if(!confirm(`Apagar o aluno "${nome}"?\n\nEssa ação não pode ser desfeita.`)) return;
-  apagarAluno(id);
-}
-
-async function apagarAluno(id) {
-  const{error}=await sb.from('alunos').delete().eq('id',id);
-  if(error) return showToast('❌ Erro ao apagar aluno','warn');
-  state.alunos=state.alunos.filter(a=>a.id!==id);
-  renderAlunosList(state.turmaSelecionada);
-  renderPainelAlunos();
-  updateStats();
-  showToast('✅ Aluno apagado.');
-}
-
-function confirmarApagarTurma(id,nome) {
-  const alunos=state.alunos.filter(a=>a.turma_id===id);
-  const aviso=alunos.length>0?`\n\n⚠️ Isso também apagará ${alunos.length} aluno(s).`:'';
-  if(!confirm(`Apagar a turma "${nome}"?${aviso}\n\nEssa ação não pode ser desfeita.`)) return;
-  apagarTurma(id);
-}
-
-async function apagarTurma(id) {
-  const{error}=await sb.from('turmas').delete().eq('id',id);
-  if(error) return showToast('❌ Erro ao apagar turma','warn');
-  state.turmas=state.turmas.filter(t=>t.id!==id);
-  state.alunos=state.alunos.filter(a=>a.turma_id!==id);
-  renderAll();
-  showToast('✅ Turma apagada.');
-}
-
-window.addEventListener('click',e=>{if(e.target.classList.contains('modal-overlay')) e.target.classList.remove('open');});
-init();
-</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
+<!-- Módulos da aplicação — ordem importa -->
+<script src="/js/app.js"></script>
+<script src="/js/ui.js"></script>
+<script src="/js/auth.js"></script>
+<script src="/js/turmas.js"></script>
+<script src="/js/alunos.js"></script>
+<script src="/js/adaptacao.js"></script>
+<script src="/js/downloads.js"></script>
+<script src="/js/historico.js"></script>
 </body>
 </html>
