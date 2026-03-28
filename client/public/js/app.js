@@ -3,7 +3,7 @@
 // ═══════════════════════════════════════════
 
 const SUPABASE_URL = 'https://ttyxcayltmgdtshohxzk.supabase.co';
-const SUPABASE_KEY = 'sb_publishable_uPQpcbgyBu9X0xJmfd9bdA_yOr53tnI';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR0eXhjYXlsdG1nZHRzaG9oeHprIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MDk3NTI5NzAsImV4cCI6MjAyNTMyODk3MH0.NnFKRWWGqGxFJJgFPNMzMWsLp2V_tLHBATuDm7_WKHE';
 
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
@@ -13,16 +13,27 @@ const App = {
   perfil: null,
   turmas: [],
   alunos: [],
-  turmaAtual: null,    // id da turma aberta
-  alunoAtual: null,    // id do aluno sendo adaptado
-  adaptacaoAtual: null, // resultado da adaptação
+  turmaAtual: null,
+  alunoAtual: null,
+  adaptacaoAtual: null,
 
-  // Inicializa a aplicação
   async init() {
+    // Se a URL tem hash com access_token (retorno do OAuth Google),
+    // o Supabase processa automaticamente — só aguarda a sessão
+    const hash = window.location.hash;
+    const temToken = hash.includes('access_token') || hash.includes('error_description');
+
+    if (temToken) {
+      // Aguarda o Supabase processar o token do hash
+      await new Promise(res => setTimeout(res, 500));
+    }
+
     const { data: { session } } = await sb.auth.getSession();
 
     if (session?.user) {
       App.usuario = session.user;
+      // Limpa o hash da URL sem recarregar
+      if (hash) window.history.replaceState(null, '', window.location.pathname);
       await App.carregarPerfil();
     } else {
       UI.mostrarTela('auth');
@@ -32,6 +43,7 @@ const App = {
     sb.auth.onAuthStateChange(async (event, session) => {
       if (event === 'SIGNED_IN' && session?.user) {
         App.usuario = session.user;
+        window.history.replaceState(null, '', window.location.pathname);
         await App.carregarPerfil();
       } else if (event === 'SIGNED_OUT') {
         App.usuario = null;
@@ -43,7 +55,6 @@ const App = {
     });
   },
 
-  // Carrega perfil do professor
   async carregarPerfil() {
     const { data, error } = await sb
       .from('perfis')
@@ -52,9 +63,6 @@ const App = {
       .single();
 
     if (error || !data) {
-      // Primeiro acesso — preenche com dados do Google se disponível
-      const meta = App.usuario.user_metadata || {};
-      document.getElementById('cad-nome')?.setAttribute('value', meta.full_name || meta.name || '');
       UI.mostrarTela('perfil');
       return;
     }
@@ -66,7 +74,6 @@ const App = {
     UI.navegar('turmas');
   },
 
-  // Carrega turmas e alunos do professor
   async carregarDados() {
     const [turmasRes, alunosRes] = await Promise.all([
       sb.from('turmas').select('*').eq('user_id', App.usuario.id).order('created_at', { ascending: false }),
@@ -78,5 +85,4 @@ const App = {
   }
 };
 
-// Inicializa quando o DOM estiver pronto
 document.addEventListener('DOMContentLoaded', () => App.init());
