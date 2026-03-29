@@ -18,28 +18,47 @@ const App = {
   adaptacaoAtual: null,
 
   async init() {
-    // Se a URL tem hash com access_token (retorno do OAuth Google),
-    // o Supabase processa automaticamente — só aguarda a sessão
     const hash = window.location.hash;
-    const temToken = hash.includes('access_token') || hash.includes('error_description');
+    const search = window.location.search;
+    const temToken = hash.includes('access_token') || search.includes('code=');
 
     if (temToken) {
-      // Aguarda o Supabase processar o token do hash
-      await new Promise(res => setTimeout(res, 500));
+      // Mostra loading enquanto processa o token
+      UI.mostrarTela('loading');
+      // Aguarda o Supabase processar — pode levar até 2s
+      await new Promise(res => setTimeout(res, 1500));
+      window.history.replaceState(null, '', window.location.pathname);
     }
 
     const { data: { session } } = await sb.auth.getSession();
 
     if (session?.user) {
       App.usuario = session.user;
-      // Limpa o hash da URL sem recarregar
-      if (hash) window.history.replaceState(null, '', window.location.pathname);
       await App.carregarPerfil();
-    } else {
-      UI.mostrarTela('auth');
+      return;
     }
 
-    // Escuta mudanças de autenticação
+    // Se tinha token mas sessão não criou, tenta via onAuthStateChange
+    if (temToken) {
+      await new Promise((resolve) => {
+        const { data: { subscription } } = sb.auth.onAuthStateChange(async (event, session) => {
+          if (event === 'SIGNED_IN' && session?.user) {
+            subscription.unsubscribe();
+            App.usuario = session.user;
+            window.history.replaceState(null, '', window.location.pathname);
+            await App.carregarPerfil();
+            resolve();
+          }
+        });
+        // Timeout de segurança
+        setTimeout(() => { subscription.unsubscribe(); resolve(); }, 5000);
+      });
+      return;
+    }
+
+    UI.mostrarTela('auth');
+
+    // Escuta mudanças de autenticação normais
     sb.auth.onAuthStateChange(async (event, session) => {
       if (event === 'SIGNED_IN' && session?.user) {
         App.usuario = session.user;
