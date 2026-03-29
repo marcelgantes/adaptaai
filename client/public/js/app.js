@@ -18,47 +18,7 @@ const App = {
   adaptacaoAtual: null,
 
   async init() {
-    const hash = window.location.hash;
-    const search = window.location.search;
-    const temToken = hash.includes('access_token') || search.includes('code=');
-
-    if (temToken) {
-      // Mostra loading enquanto processa o token
-      UI.mostrarTela('loading');
-      // Aguarda o Supabase processar — pode levar até 2s
-      await new Promise(res => setTimeout(res, 1500));
-      window.history.replaceState(null, '', window.location.pathname);
-    }
-
-    const { data: { session } } = await sb.auth.getSession();
-
-    if (session?.user) {
-      App.usuario = session.user;
-      await App.carregarPerfil();
-      return;
-    }
-
-    // Se tinha token mas sessão não criou, tenta via onAuthStateChange
-    if (temToken) {
-      await new Promise((resolve) => {
-        const { data: { subscription } } = sb.auth.onAuthStateChange(async (event, session) => {
-          if (event === 'SIGNED_IN' && session?.user) {
-            subscription.unsubscribe();
-            App.usuario = session.user;
-            window.history.replaceState(null, '', window.location.pathname);
-            await App.carregarPerfil();
-            resolve();
-          }
-        });
-        // Timeout de segurança
-        setTimeout(() => { subscription.unsubscribe(); resolve(); }, 5000);
-      });
-      return;
-    }
-
-    UI.mostrarTela('auth');
-
-    // Escuta mudanças de autenticação normais
+    // Escuta mudanças de autenticação ANTES de tudo
     sb.auth.onAuthStateChange(async (event, session) => {
       if (event === 'SIGNED_IN' && session?.user) {
         App.usuario = session.user;
@@ -72,6 +32,15 @@ const App = {
         UI.mostrarTela('auth');
       }
     });
+
+    // Verifica sessão existente
+    const { data: { session } } = await sb.auth.getSession();
+    if (session?.user) {
+      App.usuario = session.user;
+      await App.carregarPerfil();
+    } else {
+      UI.mostrarTela('auth');
+    }
   },
 
   async carregarPerfil() {
