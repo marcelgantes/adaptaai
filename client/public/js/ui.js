@@ -4,11 +4,12 @@
 
 const UI = {
 
-  // Mostra uma tela principal (auth, perfil, app)
+  // Mostra uma tela principal (auth, perfil, app, loading)
   mostrarTela(tela) {
     document.getElementById('tela-auth').style.display = tela === 'auth' ? '' : 'none';
     document.getElementById('tela-perfil').style.display = tela === 'perfil' ? '' : 'none';
     document.getElementById('tela-app').style.display = tela === 'app' ? '' : 'none';
+    document.getElementById('tela-loading').style.display = tela === 'loading' ? '' : 'none';
   },
 
   // Navega entre páginas dentro do app
