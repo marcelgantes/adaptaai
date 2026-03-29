@@ -1,17 +1,7 @@
-// ═══════════════════════════════════════════
-// APP.JS — State global e inicialização
-// ═══════════════════════════════════════════
-
 const SUPABASE_URL = 'https://ttyxcayltmgdtshohxzk.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR0eXhjYXlsdG1nZHRzaG9oeHprIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MDk3NTI5NzAsImV4cCI6MjAyNTMyODk3MH0.NnFKRWWGqGxFJJgFPNMzMWsLp2V_tLHBATuDm7_WKHE';
 
-const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {
-  auth: {
-    detectSessionInUrl: true,
-    persistSession: true,
-    autoRefreshToken: true,
-  }
-});
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 const App = {
   usuario: null,
@@ -23,42 +13,15 @@ const App = {
   adaptacaoAtual: null,
 
   async init() {
-    const hash = window.location.hash;
-    const temToken = hash.includes('access_token');
-
-    if (temToken) {
-      // Tem token no hash — espera o Supabase processar via listener
-      UI.mostrarTela('loading');
-      await new Promise((resolve) => {
-        const timeout = setTimeout(() => resolve(), 5000);
-        sb.auth.onAuthStateChange(async (event, session) => {
-          if (event === 'SIGNED_IN' && session?.user) {
-            clearTimeout(timeout);
-            App.usuario = session.user;
-            window.history.replaceState(null, '', window.location.pathname);
-            await App.carregarPerfil();
-            resolve();
-          }
-        });
-      });
-      return;
-    }
-
-    // Sem token — verifica sessão existente normalmente
-    const { data: { session } } = await sb.auth.getSession();
-
-    if (session?.user) {
-      App.usuario = session.user;
-      await App.carregarPerfil();
-    } else {
-      UI.mostrarTela('auth');
-    }
-
-    // Escuta mudanças futuras
+    // Supabase detecta o token no hash automaticamente
+    // Basta escutar o onAuthStateChange que dispara sempre
     sb.auth.onAuthStateChange(async (event, session) => {
       if (event === 'SIGNED_IN' && session?.user) {
         App.usuario = session.user;
-        window.history.replaceState(null, '', window.location.pathname);
+        // Limpa o hash da URL
+        if (window.location.hash.includes('access_token')) {
+          window.history.replaceState(null, '', window.location.pathname);
+        }
         await App.carregarPerfil();
       } else if (event === 'SIGNED_OUT') {
         App.usuario = null;
@@ -68,6 +31,19 @@ const App = {
         UI.mostrarTela('auth');
       }
     });
+
+    // Verifica sessão existente
+    const { data: { session } } = await sb.auth.getSession();
+    if (session?.user) {
+      App.usuario = session.user;
+      await App.carregarPerfil();
+    } else if (!window.location.hash.includes('access_token')) {
+      // Só mostra login se não tem token chegando
+      UI.mostrarTela('auth');
+    } else {
+      // Tem token no hash — mostra loading e aguarda o onAuthStateChange
+      UI.mostrarTela('loading');
+    }
   },
 
   async carregarPerfil() {
@@ -94,7 +70,6 @@ const App = {
       sb.from('turmas').select('*').eq('user_id', App.usuario.id).order('created_at', { ascending: false }),
       sb.from('alunos').select('*').eq('user_id', App.usuario.id).order('created_at', { ascending: true })
     ]);
-
     App.turmas = turmasRes.data || [];
     App.alunos = alunosRes.data || [];
   }
