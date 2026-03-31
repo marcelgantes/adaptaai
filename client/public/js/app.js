@@ -13,15 +13,46 @@ const App = {
   adaptacaoAtual: null,
 
   async init() {
-    // Supabase detecta o token no hash automaticamente
-    // Basta escutar o onAuthStateChange que dispara sempre
-    sb.auth.onAuthStateChange(async (event, session) => {
-      if (event === 'SIGNED_IN' && session?.user) {
-        App.usuario = session.user;
-        // Limpa o hash da URL
-        if (window.location.hash.includes('access_token')) {
-          window.history.replaceState(null, '', window.location.pathname);
+    // Tenta extrair token do hash manualmente
+    const hash = window.location.hash;
+    if (hash.includes('access_token')) {
+      const params = new URLSearchParams(hash.substring(1));
+      const accessToken = params.get('access_token');
+      const refreshToken = params.get('refresh_token');
+
+      if (accessToken && refreshToken) {
+        const { data, error } = await sb.auth.setSession({
+          access_token: accessToken,
+          refresh_token: refreshToken
+        });
+
+        window.history.replaceState(null, '', window.location.pathname);
+
+        if (data?.session?.user) {
+          App.usuario = data.session.user;
+          await App.carregarPerfil();
+          App._escutarAuth();
+          return;
         }
+      }
+    }
+
+    // Sem token no hash — verifica sessão existente
+    const { data: { session } } = await sb.auth.getSession();
+    if (session?.user) {
+      App.usuario = session.user;
+      await App.carregarPerfil();
+    } else {
+      UI.mostrarTela('auth');
+    }
+
+    App._escutarAuth();
+  },
+
+  _escutarAuth() {
+    sb.auth.onAuthStateChange(async (event, session) => {
+      if (event === 'SIGNED_IN' && session?.user && !App.usuario) {
+        App.usuario = session.user;
         await App.carregarPerfil();
       } else if (event === 'SIGNED_OUT') {
         App.usuario = null;
@@ -31,19 +62,6 @@ const App = {
         UI.mostrarTela('auth');
       }
     });
-
-    // Verifica sessão existente
-    const { data: { session } } = await sb.auth.getSession();
-    if (session?.user) {
-      App.usuario = session.user;
-      await App.carregarPerfil();
-    } else if (!window.location.hash.includes('access_token')) {
-      // Só mostra login se não tem token chegando
-      UI.mostrarTela('auth');
-    } else {
-      // Tem token no hash — mostra loading e aguarda o onAuthStateChange
-      UI.mostrarTela('loading');
-    }
   },
 
   async carregarPerfil() {
