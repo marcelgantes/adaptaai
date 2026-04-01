@@ -626,14 +626,31 @@ window.addEventListener('scroll', () => {
 (async function() {
   const hash = window.location.hash;
   if (!hash.includes('access_token')) return;
+
+  // Inicializa Supabase para processar o token
   const sb = supabase.createClient(
     'https://ttyxcayltmgdtshohxzk.supabase.co',
-    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR0eXhjYXlsdG1nZHRzaG9oeHprIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MDk3NTI5NzAsImV4cCI6MjAyNTMyODk3MH0.NnFKRWWGqGxFJJgFPNMzMWsLp2V_tLHBATuDm7_WKHE'
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR0eXhjYXlsdG1nZHRzaG9oeHprIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM1MjU2ODUsImV4cCI6MjA4OTEwMTY4NX0.h1kmF6TqKPph69x3mxsZRVtOfGqXZYbhB9Zr8Kj-rgs'
   );
-  await new Promise(r => setTimeout(r, 800));
+
+  // Aguarda o Supabase processar o token do hash
+  await new Promise(r => setTimeout(r, 1000));
+
   const { data: { session } } = await sb.auth.getSession();
   if (session?.user) {
+    // Sessão criada — vai para o app
     window.location.replace('/app');
+  } else {
+    // Tenta via listener
+    sb.auth.onAuthStateChange((event, session) => {
+      if (event === 'SIGNED_IN' && session?.user) {
+        window.location.replace('/app');
+      }
+    });
+    // Timeout de segurança
+    setTimeout(() => {
+      window.location.replace('/app');
+    }, 3000);
   }
 })();
 </script>
