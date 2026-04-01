@@ -13,6 +13,9 @@ const App = {
   adaptacaoAtual: null,
 
   async init() {
+    // Começa com loading para evitar flash da tela de login
+    UI.mostrarTela('loading');
+
     // Processa token do hash ANTES do DOMContentLoaded
     const hash = window.location.hash;
     if (hash.includes('access_token')) {
