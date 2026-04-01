@@ -13,7 +13,7 @@ const App = {
   adaptacaoAtual: null,
 
   async init() {
-    // Tenta extrair token do hash manualmente
+    // Processa token do hash ANTES do DOMContentLoaded
     const hash = window.location.hash;
     if (hash.includes('access_token')) {
       const params = new URLSearchParams(hash.substring(1));
@@ -21,40 +21,48 @@ const App = {
       const refreshToken = params.get('refresh_token');
 
       if (accessToken && refreshToken) {
-        const { data, error } = await sb.auth.setSession({
-          access_token: accessToken,
-          refresh_token: refreshToken
-        });
+        try {
+          const { data, error } = await sb.auth.setSession({
+            access_token: accessToken,
+            refresh_token: refreshToken
+          });
 
-        window.history.replaceState(null, '', window.location.pathname);
+          // Limpa o hash imediatamente
+          window.history.replaceState(null, '', window.location.pathname);
 
-        if (data?.session?.user) {
-          App.usuario = data.session.user;
-          await App.carregarPerfil();
-          App._escutarAuth();
-          return;
+          if (!error && data?.session?.user) {
+            App.usuario = data.session.user;
+            App._escutarAuth();
+            await App.carregarPerfil();
+            return;
+          }
+          console.error('Erro setSession:', error);
+        } catch(e) {
+          console.error('Exceção setSession:', e);
         }
       }
+      // Se chegou aqui, token falhou — mostra login
+      window.history.replaceState(null, '', window.location.pathname);
+      UI.mostrarTela('auth');
+      App._escutarAuth();
+      return;
     }
 
-    // Sem token no hash — verifica sessão existente
+    // Sem token — verifica sessão existente
     const { data: { session } } = await sb.auth.getSession();
     if (session?.user) {
       App.usuario = session.user;
+      App._escutarAuth();
       await App.carregarPerfil();
     } else {
       UI.mostrarTela('auth');
+      App._escutarAuth();
     }
-
-    App._escutarAuth();
   },
 
   _escutarAuth() {
     sb.auth.onAuthStateChange(async (event, session) => {
-      if (event === 'SIGNED_IN' && session?.user && !App.usuario) {
-        App.usuario = session.user;
-        await App.carregarPerfil();
-      } else if (event === 'SIGNED_OUT') {
+      if (event === 'SIGNED_OUT') {
         App.usuario = null;
         App.perfil = null;
         App.turmas = [];
@@ -93,4 +101,13 @@ const App = {
   }
 };
 
-document.addEventListener('DOMContentLoaded', () => App.init());
+// Inicia IMEDIATAMENTE — não espera DOMContentLoaded
+// O Supabase precisa processar o token antes da página renderizar
+(async () => {
+  // Aguarda o DOM estar pronto
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => App.init());
+  } else {
+    await App.init();
+  }
+})();
