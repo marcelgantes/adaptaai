@@ -10,6 +10,12 @@ const UI = {
     document.getElementById('tela-perfil').style.display = tela === 'perfil' ? '' : 'none';
     document.getElementById('tela-app').style.display = tela === 'app' ? '' : 'none';
     document.getElementById('tela-loading').style.display = tela === 'loading' ? '' : 'none';
+    document.getElementById('tela-confirmacao').style.display = tela === 'confirmacao' ? '' : 'none';
+  },
+
+  mostrarTelaConfirmacao(email) {
+    document.getElementById('confirmacao-email').textContent = email;
+    UI.mostrarTela('confirmacao');
   },
 
   // Navega entre páginas dentro do app
