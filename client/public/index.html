@@ -10,6 +10,21 @@
 </head>
 <body>
 
+<!-- Tela confirmação de email -->
+<div id="tela-confirmacao" class="tela" style="display:none">
+  <div style="min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;background:linear-gradient(135deg,#EFF6FF 0%,#F5F3FF 100%)">
+    <div style="background:white;border-radius:20px;padding:40px 36px;width:100%;max-width:420px;box-shadow:0 20px 60px rgba(0,0,0,0.08);text-align:center">
+      <div style="font-size:52px;margin-bottom:16px">📧</div>
+      <h2 style="font-size:22px;font-weight:800;margin-bottom:8px">Confirme seu e-mail</h2>
+      <p style="font-size:15px;color:#6B7280;margin-bottom:8px">Enviamos um link de confirmação para:</p>
+      <p id="confirmacao-email" style="font-size:16px;font-weight:700;color:#2563EB;margin-bottom:24px"></p>
+      <p style="font-size:14px;color:#6B7280;margin-bottom:28px">Clique no link do e-mail para ativar sua conta. Verifique também a pasta de spam.</p>
+      <button class="btn-primario" onclick="UI.trocarAba('login');UI.mostrarTela('auth')" style="margin-bottom:12px">Já confirmei — Entrar</button>
+      <button class="btn-link" onclick="Auth.reenviarConfirmacao()">Reenviar e-mail</button>
+    </div>
+  </div>
+</div>
+
 <!-- Tela loading (OAuth redirect) -->
 <div id="tela-loading" class="tela" style="display:none">
   <div style="min-height:100vh;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:16px;background:linear-gradient(135deg,#EFF6FF 0%,#F5F3FF 100%)">
@@ -73,6 +88,10 @@
       <div class="campo">
         <label>Senha</label>
         <input type="password" id="cad-senha" placeholder="mínimo 6 caracteres" autocomplete="new-password">
+      </div>
+      <div class="campo">
+        <label>Confirmar senha</label>
+        <input type="password" id="cad-senha-conf" placeholder="repita a senha" autocomplete="new-password">
       </div>
       <div id="cadastro-erro" class="msg-erro" style="display:none"></div>
       <button class="btn-primario" onclick="Auth.cadastrarEmail()">Criar conta</button>
